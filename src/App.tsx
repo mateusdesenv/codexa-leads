@@ -17,7 +17,24 @@ import { auth } from './firebase'
 import Login from './Login'
 import ImportExport from './ImportExport'
 import codexaLogo from 'codexa-ui/logos/logos-fundo-transparente/primary-logo.png'
+import {
+  Alert,
+  Avatar,
+  Badge,
+  Button,
+  Dialog,
+  EmptyState,
+  Input,
+  SearchInput,
+  Select,
+  Spinner,
+  Tag,
+} from 'codexa-ui'
+
 import type { ColumnId, KanbanState, Lead, LeadWithMeta, Temperature } from './types'
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const AnchorButton = Button as any
 import { loadKanbanStates, saveKanbanStates } from './storage'
 import './App.css'
 
@@ -141,6 +158,18 @@ function getWebsiteLabel(kind: LeadWithMeta['websiteKind']) {
   return 'Sem site'
 }
 
+function getTemperatureTone(t: Temperature): 'danger' | 'warning' | 'info' {
+  if (t === 'quente') return 'danger'
+  if (t === 'medio') return 'warning'
+  return 'info'
+}
+
+function getWebsiteTone(kind: LeadWithMeta['websiteKind']): 'success' | 'info' | 'neutral' {
+  if (kind === 'proprio') return 'success'
+  if (kind === 'social') return 'info'
+  return 'neutral'
+}
+
 function isOverdue(dueDate?: string): boolean {
   if (!dueDate) return false
   return new Date(dueDate).getTime() < new Date().setHours(0, 0, 0, 0)
@@ -149,15 +178,6 @@ function isOverdue(dueDate?: string): boolean {
 function formatDate(dateStr?: string): string {
   if (!dateStr) return ''
   return new Date(dateStr).toLocaleDateString('pt-BR')
-}
-
-function getUserInitials(user: User): string {
-  const name = user.displayName ?? user.email ?? 'U'
-  return name
-    .split(/[\s@]+/)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? '')
-    .join('')
 }
 
 function isValidUrl(url: string): boolean {
@@ -173,31 +193,37 @@ function Actions({ lead }: { lead: Lead }) {
   return (
     <div className="lead-actions" onClick={(e) => e.stopPropagation()}>
       {lead.phone && (
-        <a
-          className="action-btn action-btn--primary"
+        <AnchorButton
+          as="a"
           href={`tel:${lead.phoneUnformatted ?? lead.phone}`}
+          variant="primary"
+          size="small"
         >
           Ligar
-        </a>
+        </AnchorButton>
       )}
       {lead.website && isValidUrl(lead.website) && (
-        <a
-          className="action-btn action-btn--secondary"
+        <AnchorButton
+          as="a"
           href={lead.website}
           target="_blank"
           rel="noopener noreferrer"
+          variant="secondary"
+          size="small"
         >
           Site
-        </a>
+        </AnchorButton>
       )}
-      <a
-        className="action-btn action-btn--secondary"
+      <AnchorButton
+        as="a"
         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lead.title ?? '')}&query_place_id=${lead.placeId}`}
         target="_blank"
         rel="noopener noreferrer"
+        variant="secondary"
+        size="small"
       >
         Maps
-      </a>
+      </AnchorButton>
     </div>
   )
 }
@@ -237,15 +263,14 @@ function LeadCard({
             {lead.title}
           </h3>
           {lead.categoryName && (
-            <span className="kanban-card__category">{lead.categoryName}</span>
+            <Tag tone="neutral">
+              {lead.categoryName}
+            </Tag>
           )}
         </div>
-        <span
-          className={`temperature-badge temperature-badge--${lead.temperature}`}
-          title={`Score ${lead.score}`}
-        >
+        <Badge tone={getTemperatureTone(lead.temperature)} size="small">
           {getTemperatureEmoji(lead.temperature)} {lead.score}
-        </span>
+        </Badge>
       </div>
 
       <div className="kanban-card__body">
@@ -255,19 +280,22 @@ function LeadCard({
               ⭐ {lead.totalScore.toFixed(1)} ({lead.reviewsCount ?? 0})
             </span>
           )}
-          <span className={`kanban-card__website kanban-card__website--${lead.websiteKind}`}>
+          <Badge tone={getWebsiteTone(lead.websiteKind)} size="small">
             {getWebsiteLabel(lead.websiteKind)}
-          </span>
+          </Badge>
         </div>
 
         {lead.phone && (
-          <a
+          <AnchorButton
+            as="a"
             href={`tel:${lead.phoneUnformatted ?? lead.phone}`}
+            variant="ghost"
+            size="small"
             className="kanban-card__phone"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e: React.MouseEvent) => e.stopPropagation()}
           >
             {lead.phone}
-          </a>
+          </AnchorButton>
         )}
 
         {lead.kanbanState.nextAction && (
@@ -346,115 +374,103 @@ function LeadModal({
     onClose()
   }
 
+  const statusOptions = COLUMNS.map((c) => ({
+    value: c.id,
+    label: `${c.emoji} ${c.label}`,
+  }))
+
+  const lostReasonOptions = [
+    { value: '', label: 'Selecione' },
+    ...LOST_REASONS.map((r) => ({ value: r, label: r })),
+  ]
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <header className="modal__header">
-          <h2>{lead.title}</h2>
-          <button type="button" className="modal__close" onClick={onClose} aria-label="Fechar">
-            ×
-          </button>
-        </header>
-
-        <div className="modal__meta">
-          <span className={`temperature-badge temperature-badge--${lead.temperature}`}>
-            {getTemperatureEmoji(lead.temperature)} {getTemperatureLabel(lead.temperature)} — Score {lead.score}
-          </span>
-          {lead.categoryName && <span className="modal__category">{lead.categoryName}</span>}
-        </div>
-
-        <form className="modal__form" onSubmit={handleSubmit}>
-          <div className="prospect-field">
-            <label htmlFor="status">Etapa do funil</label>
-            <select
-              id="status"
-              value={state.column}
-              onChange={(e) => setState({ ...state, column: e.target.value as ColumnId })}
-            >
-              {COLUMNS.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.emoji} {c.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="prospect-field">
-            <label htmlFor="nextAction">Próxima ação</label>
-            <input
-              id="nextAction"
-              type="text"
-              placeholder="Ex: Enviar mensagem de apresentação"
-              value={state.nextAction ?? ''}
-              onChange={(e) => setState({ ...state, nextAction: e.target.value })}
-            />
-          </div>
-
-          <div className="prospect-field">
-            <label htmlFor="dueDate">Data de follow-up</label>
-            <input
-              id="dueDate"
-              type="date"
-              value={state.dueDate ?? ''}
-              onChange={(e) => setState({ ...state, dueDate: e.target.value })}
-            />
-          </div>
-
-          {state.column === 'proposta' && (
-            <>
-              <div className="prospect-field">
-                <label htmlFor="proposalValue">Valor da proposta</label>
-                <input
-                  id="proposalValue"
-                  type="text"
-                  placeholder="R$ 0,00"
-                  value={state.proposalValue ?? ''}
-                  onChange={(e) => setState({ ...state, proposalValue: e.target.value })}
-                />
-              </div>
-              <div className="prospect-field">
-                <label htmlFor="proposalReturnDate">Data prevista de retorno</label>
-                <input
-                  id="proposalReturnDate"
-                  type="date"
-                  value={state.proposalReturnDate ?? ''}
-                  onChange={(e) =>
-                    setState({ ...state, proposalReturnDate: e.target.value })
-                  }
-                />
-              </div>
-            </>
-          )}
-
-          {state.column === 'perdido' && (
-            <div className="prospect-field">
-              <label htmlFor="lostReason">Motivo</label>
-              <select
-                id="lostReason"
-                value={state.lostReason ?? ''}
-                onChange={(e) => setState({ ...state, lostReason: e.target.value })}
-              >
-                <option value="">Selecione</option>
-                {LOST_REASONS.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          <div className="modal__actions">
-            <button type="button" className="action-btn action-btn--secondary" onClick={onClose}>
-              Cancelar
-            </button>
-            <button type="submit" className="action-btn action-btn--primary">
-              Salvar
-            </button>
-          </div>
-        </form>
+    <Dialog open onClose={onClose} title={lead.title}>
+      <div className="modal__meta">
+        <Badge tone={getTemperatureTone(lead.temperature)} size="small">
+          {getTemperatureEmoji(lead.temperature)} {getTemperatureLabel(lead.temperature)} — Score {lead.score}
+        </Badge>
+        {lead.categoryName && (
+          <Tag tone="neutral">
+            {lead.categoryName}
+          </Tag>
+        )}
       </div>
-    </div>
+
+      <form className="modal__form" onSubmit={handleSubmit}>
+        <Select
+          label="Etapa do funil"
+          id="status"
+          value={state.column}
+          onChange={(value: string) => setState({ ...state, column: value as ColumnId })}
+          options={statusOptions}
+        />
+
+        <Input
+          label="Próxima ação"
+          id="nextAction"
+          type="text"
+          placeholder="Ex: Enviar mensagem de apresentação"
+          value={state.nextAction ?? ''}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setState({ ...state, nextAction: e.target.value })
+          }
+        />
+
+        <Input
+          label="Data de follow-up"
+          id="dueDate"
+          type="date"
+          value={state.dueDate ?? ''}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setState({ ...state, dueDate: e.target.value })
+          }
+        />
+
+        {state.column === 'proposta' && (
+          <>
+            <Input
+              label="Valor da proposta"
+              id="proposalValue"
+              type="text"
+              placeholder="R$ 0,00"
+              value={state.proposalValue ?? ''}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setState({ ...state, proposalValue: e.target.value })
+              }
+            />
+            <Input
+              label="Data prevista de retorno"
+              id="proposalReturnDate"
+              type="date"
+              value={state.proposalReturnDate ?? ''}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setState({ ...state, proposalReturnDate: e.target.value })
+              }
+            />
+          </>
+        )}
+
+        {state.column === 'perdido' && (
+          <Select
+            label="Motivo"
+            id="lostReason"
+            value={state.lostReason ?? ''}
+            onChange={(value: string) => setState({ ...state, lostReason: value })}
+            options={lostReasonOptions}
+          />
+        )}
+
+        <div className="modal__actions">
+          <Button type="button" variant="secondary" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button type="submit" variant="primary">
+            Salvar
+          </Button>
+        </div>
+      </form>
+    </Dialog>
   )
 }
 
@@ -635,20 +651,22 @@ function App() {
         </div>
 
         <nav className="prospect-nav" aria-label="Navegação principal">
-          <button
+          <Button
             type="button"
-            className={`prospect-nav__item ${currentView === 'home' ? 'prospect-nav__item--active' : ''}`}
+            variant={currentView === 'home' ? 'primary' : 'ghost'}
+            fullWidth
             onClick={() => setCurrentView('home')}
           >
             Home
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
-            className={`prospect-nav__item ${currentView === 'import' ? 'prospect-nav__item--active' : ''}`}
+            variant={currentView === 'import' ? 'primary' : 'ghost'}
+            fullWidth
             onClick={() => setCurrentView('import')}
           >
             Importar / Exportar
-          </button>
+          </Button>
         </nav>
       </aside>
 
@@ -660,21 +678,15 @@ function App() {
           </div>
 
           <div className="prospect-header__user">
-            <div className="user-avatar" title={user.displayName ?? user.email ?? 'Usuário'}>
-              {user.photoURL ? (
-                <img src={user.photoURL} alt="" />
-              ) : (
-                <span>{getUserInitials(user)}</span>
-              )}
-            </div>
+            <Avatar
+              name={user.displayName ?? user.email ?? 'Usuário'}
+              src={user.photoURL || undefined}
+              size="medium"
+            />
             <span className="user-name">{user.displayName ?? user.email ?? 'Usuário'}</span>
-            <button
-              type="button"
-              className="action-btn action-btn--secondary"
-              onClick={() => signOut(auth)}
-            >
+            <Button type="button" variant="secondary" size="small" onClick={() => signOut(auth)}>
               Sair
-            </button>
+            </Button>
           </div>
         </header>
 
@@ -682,37 +694,52 @@ function App() {
           {currentView === 'home' ? (
             <>
               <div className="prospect-toolbar">
-            <div className="prospect-field" style={{ flex: '2 1 300px' }}>
-              <label htmlFor="search">Buscar</label>
-              <input
+            <div className="prospect-toolbar__field prospect-toolbar__field--search">
+              <SearchInput
+                label="Buscar"
                 id="search"
-                type="text"
                 placeholder="Nome, endereço, telefone..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
+                onClear={() => setSearch('')}
               />
             </div>
-            <div className="prospect-field" style={{ flex: '1 1 220px' }}>
-              <label htmlFor="category">Categoria</label>
-              <select
+            <div className="prospect-toolbar__field prospect-toolbar__field--category">
+              <Select
+                label="Categoria"
                 id="category"
                 value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-              >
-                <option value="">Todas</option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
+                onChange={(value: string) => setCategoryFilter(value)}
+                options={[
+                  { value: '', label: 'Todas' },
+                  ...categories.map((cat) => ({ value: cat, label: cat })),
+                ]}
+              />
             </div>
           </div>
 
           {loading ? (
-            <div className="prospect-loading">Carregando leads...</div>
+            <div className="prospect-loading">
+              <Spinner size="medium" label="Carregando leads..." />
+            </div>
           ) : error ? (
-            <div className="prospect-empty">{error}</div>
+            <div className="prospect-empty">
+              <Alert tone="danger" title="Erro ao carregar">
+                {error}
+              </Alert>
+            </div>
+          ) : filteredLeads.length === 0 ? (
+            <div className="prospect-empty">
+              <EmptyState
+                title="Nenhum lead encontrado"
+                description="Tente ajustar os filtros ou importar novos leads."
+                action={
+                  <Button variant="primary" onClick={() => setCurrentView('import')}>
+                    Importar leads
+                  </Button>
+                }
+              />
+            </div>
           ) : (
             <DndContext
               sensors={sensors}

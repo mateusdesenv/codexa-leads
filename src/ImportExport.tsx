@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { Button, Card, FormField, Alert } from 'codexa-ui'
 import type { Lead, LeadWithMeta } from './types'
 
 interface ImportExportProps {
@@ -59,14 +60,13 @@ export default function ImportExport({ leads, onImport, onExport }: ImportExport
       </header>
 
       <div className="import-export__grid">
-        <section className="import-card">
+        <Card padding="medium">
           <h3>Importar leads</h3>
           <p>
             Selecione um arquivo JSON com os leads. Cada lead precisa ter pelo
             menos <code>title</code> e <code>placeId</code>.
           </p>
-          <div className="prospect-field">
-            <label htmlFor="import-file">Arquivo JSON</label>
+          <FormField label="Arquivo JSON" id="import-file">
             <input
               id="import-file"
               ref={inputRef}
@@ -74,25 +74,29 @@ export default function ImportExport({ leads, onImport, onExport }: ImportExport
               accept=".json,application/json"
               onChange={handleFileChange}
             />
-          </div>
-          {message && <div className="import-export__message import-export__message--success" role="status">{message}</div>}
-          {error && <div className="import-export__message import-export__message--error" role="alert">{error}</div>}
-        </section>
+          </FormField>
+          {message && (
+            <Alert tone="success" title="Importação concluída">
+              {message}
+            </Alert>
+          )}
+          {error && (
+            <Alert tone="danger" title="Erro na importação">
+              {error}
+            </Alert>
+          )}
+        </Card>
 
-        <section className="export-card">
+        <Card padding="medium">
           <h3>Exportar leads</h3>
           <p>
             Baixe todos os <strong>{leads.length}</strong> leads atuais em
             formato JSON.
           </p>
-          <button
-            type="button"
-            className="action-btn action-btn--primary"
-            onClick={onExport}
-          >
+          <Button type="button" variant="primary" onClick={onExport}>
             Exportar JSON
-          </button>
-        </section>
+          </Button>
+        </Card>
       </div>
     </div>
   )

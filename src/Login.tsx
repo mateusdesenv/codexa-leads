@@ -4,6 +4,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
 } from 'firebase/auth'
+import { Button, Card, Input, Alert } from 'codexa-ui'
 import { auth, googleProvider } from './firebase'
 
 export default function Login() {
@@ -44,74 +45,77 @@ export default function Login() {
 
   return (
     <div className="login-page">
-      <div className="login-card">
+      <Card padding="large" className="login-card" style={{ width: '100%', maxWidth: '420px' }}>
         <header className="login-card__header">
           <h1>Prospecção Codexa</h1>
           <p>Faça login para acessar o painel de leads.</p>
         </header>
 
-        {error && <div className="login-card__error" role="alert">{error}</div>}
+        {error && (
+          <Alert tone="danger" title="Erro de autenticação">
+            {error}
+          </Alert>
+        )}
 
         <form className="login-card__form" onSubmit={handleSubmit}>
-          <div className="prospect-field">
-            <label htmlFor="email">E-mail</label>
-            <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={loading}
-            />
-          </div>
-
-          <div className="prospect-field">
-            <label htmlFor="password">Senha</label>
-            <input
-              id="password"
-              type="password"
-              autoComplete={isSignUp ? 'new-password' : 'current-password'}
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={loading}
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="action-btn action-btn--primary action-btn--full"
+          <Input
+            label="E-mail"
+            id="email"
+            type="email"
+            autoComplete="email"
+            placeholder="seu@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             disabled={loading}
+            required
+          />
+
+          <Input
+            label="Senha"
+            id="password"
+            type="password"
+            autoComplete={isSignUp ? 'new-password' : 'current-password'}
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={loading}
+            required
+          />
+
+          <Button
+            type="submit"
+            variant="primary"
+            fullWidth
+            loading={loading}
           >
-            {loading ? 'Carregando…' : isSignUp ? 'Criar conta' : 'Entrar'}
-          </button>
+            {isSignUp ? 'Criar conta' : 'Entrar'}
+          </Button>
         </form>
 
-        <button
+        <Button
           type="button"
-          className="login-card__toggle"
+          variant="ghost"
+          fullWidth
           onClick={() => setIsSignUp((v) => !v)}
           disabled={loading}
         >
           {isSignUp ? 'Já tem conta? Entrar' : 'Criar nova conta'}
-        </button>
+        </Button>
 
         <div className="login-card__divider">
           <span>ou</span>
         </div>
 
-        <button
+        <Button
           type="button"
-          className="action-btn action-btn--secondary action-btn--full"
+          variant="secondary"
+          fullWidth
           onClick={handleGoogle}
           disabled={loading}
         >
           Entrar com Google
-        </button>
-      </div>
+        </Button>
+      </Card>
     </div>
   )
 }
