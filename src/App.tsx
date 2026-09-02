@@ -16,6 +16,7 @@ import { onAuthStateChanged, signOut, type User } from 'firebase/auth'
 import { auth } from './firebase'
 import Login from './Login'
 import ImportExport from './ImportExport'
+import codexaLogo from 'codexa-ui/logos/logos-fundo-transparente/primary-logo.png'
 import type { ColumnId, KanbanState, Lead, LeadWithMeta, Temperature } from './types'
 import { loadKanbanStates, saveKanbanStates } from './storage'
 import './App.css'
@@ -630,11 +631,7 @@ function App() {
     <div className="prospect-app">
       <aside className="prospect-sidebar">
         <div className="prospect-sidebar__brand">
-          <img src="/favicon.svg" alt="" className="prospect-sidebar__logo" width="40" height="40" />
-          <div className="prospect-sidebar__brand-text">
-            <h1>Codexa</h1>
-            <p>Prospecção</p>
-          </div>
+          <img src={codexaLogo} alt="Codexa" className="prospect-sidebar__logo" />
         </div>
 
         <nav className="prospect-nav" aria-label="Navegação principal">

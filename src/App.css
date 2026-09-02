@@ -19,35 +19,15 @@
 .prospect-sidebar__brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: flex-start;
   padding: 0 8px;
 }
 
 .prospect-sidebar__logo {
-  width: 40px;
-  height: 40px;
-  flex: 0 0 40px;
-}
-
-.prospect-sidebar__brand-text {
-  display: grid;
-  gap: 2px;
-}
-
-.prospect-sidebar__brand-text h1 {
-  margin: 0;
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--ds-graphite);
-}
-
-.prospect-sidebar__brand-text p {
-  margin: 0;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--ds-gray);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  max-width: 180px;
+  max-height: 56px;
+  width: auto;
+  height: auto;
 }
 
 .prospect-main {
@@ -628,12 +608,9 @@
     padding: 0;
   }
 
-  .prospect-sidebar__brand h1 {
-    font-size: 1.2rem;
-  }
-
-  .prospect-sidebar__brand p {
-    display: none;
+  .prospect-sidebar__logo {
+    max-height: 40px;
+    max-width: 120px;
   }
 
   .prospect-nav {
