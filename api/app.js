@@ -7,6 +7,8 @@ import { fileURLToPath } from 'url'
 import { connectToDatabase } from './lib/db.js'
 import { Lead } from './lib/lead.js'
 
+console.log('[api] app module loaded')
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
@@ -99,6 +101,7 @@ app.post('/api/leads/seed', async (_req, res) => {
 })
 
 app.get('/api/health', (_req, res) => {
+  console.log('[api] health hit')
   res.json({ ok: true })
 })
 
