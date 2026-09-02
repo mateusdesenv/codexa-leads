@@ -1,16 +1,17 @@
 .prospect-app {
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 32px 24px 72px;
+  padding: 24px 24px 48px;
+  min-width: 320px;
 }
 
 .prospect-header {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .prospect-header h1 {
   margin: 0 0 8px;
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 650;
   letter-spacing: -0.02em;
   color: var(--ds-graphite);
@@ -19,7 +20,7 @@
 .prospect-header p {
   margin: 0;
   color: var(--ds-gray);
-  font-size: 0.94rem;
+  font-size: 0.9rem;
 }
 
 .prospect-toolbar {
@@ -28,7 +29,7 @@
   gap: 16px;
   align-items: flex-end;
   margin-bottom: 24px;
-  padding: 20px;
+  padding: 16px 20px;
   background: var(--ds-white);
   border: 1px solid var(--ds-line);
   border-radius: 16px;
@@ -38,7 +39,6 @@
 .prospect-field {
   display: grid;
   gap: 6px;
-  flex: 1 1 220px;
   min-width: 0;
 }
 
@@ -71,222 +71,316 @@
   box-shadow: 0 0 0 3px rgba(37, 191, 68, 0.16);
 }
 
-.prospect-sort {
-  display: flex;
-  gap: 8px;
-}
-
-.prospect-sort select {
-  flex: 1;
-  min-height: 44px;
-  padding: 0 13px;
-  color: var(--ds-graphite);
-  background: var(--ds-white);
-  border: 1px solid #cfd4db;
-  border-radius: 10px;
-  font-size: 0.875rem;
-  outline: none;
-  transition: border-color 160ms ease, box-shadow 160ms ease;
-}
-
-.prospect-sort select:focus {
-  border-color: var(--ds-green-dark);
-  box-shadow: 0 0 0 3px rgba(37, 191, 68, 0.16);
-}
-
-.sort-direction {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  color: var(--ds-graphite);
-  background: var(--ds-white);
-  border: 1px solid var(--ds-line);
-  border-radius: 10px;
-  font-size: 0.94rem;
-  font-weight: 650;
-  cursor: pointer;
-  transition: border-color 160ms ease, background-color 160ms ease;
-}
-
-.sort-direction:hover {
-  border-color: var(--ds-green);
-  background: var(--ds-green-ice);
-}
-
-.sort-direction:focus-visible {
-  outline: 3px solid rgba(37, 191, 68, 0.28);
-  outline-offset: 2px;
-}
-
-.prospect-stats {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 24px;
-}
-
-.stat-card {
-  display: grid;
-  gap: 4px;
-  min-width: 140px;
-  padding: 16px 20px;
-  background: var(--ds-white);
-  border: 1px solid var(--ds-line);
-  border-radius: 12px;
-  box-shadow: var(--ds-shadow-subtle);
-}
-
-.stat-card strong {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--ds-graphite);
-}
-
-.stat-card span {
-  font-size: 0.78rem;
+.prospect-loading,
+.prospect-empty {
+  padding: 48px 24px;
+  text-align: center;
   color: var(--ds-gray);
 }
 
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+.kanban-board {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  min-height: calc(100vh - 260px);
+  align-items: flex-start;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ds-line) transparent;
 }
 
-.prospect-card {
+.kanban-board::-webkit-scrollbar {
+  height: 8px;
+}
+
+.kanban-board::-webkit-scrollbar-thumb {
+  background: var(--ds-line);
+  border-radius: 4px;
+}
+
+.kanban-column {
+  flex: 0 0 300px;
   display: flex;
   flex-direction: column;
-  padding: 22px;
+  max-height: calc(100vh - 260px);
   background: var(--ds-white);
   border: 1px solid var(--ds-line);
   border-radius: 16px;
   box-shadow: var(--ds-shadow-subtle);
-  transition: box-shadow 160ms ease, transform 160ms ease;
+  transition: box-shadow 160ms ease, border-color 160ms ease;
 }
 
-.prospect-card:hover {
+.kanban-column--over {
+  border-color: var(--ds-green);
+  box-shadow: 0 0 0 3px rgba(37, 191, 68, 0.16);
+}
+
+.kanban-column__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--ds-line);
+  border-top: 4px solid var(--ds-green);
+  border-radius: 16px 16px 0 0;
+  background: #f4f6f7;
+}
+
+.kanban-column__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.kanban-column__emoji {
+  font-size: 1.1rem;
+  flex: 0 0 auto;
+}
+
+.kanban-column__title h2 {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 650;
+  color: var(--ds-graphite);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kanban-column__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 24px;
+  padding: 0 8px;
+  background: var(--ds-white);
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border: 1px solid var(--ds-line);
+}
+
+.kanban-column__cards {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: grid;
+  gap: 12px;
+  min-height: 60px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ds-line) transparent;
+}
+
+.kanban-column__cards::-webkit-scrollbar {
+  width: 6px;
+}
+
+.kanban-column__cards::-webkit-scrollbar-thumb {
+  background: var(--ds-line);
+  border-radius: 3px;
+}
+
+.kanban-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  background: var(--ds-white);
+  border: 1px solid var(--ds-line);
+  border-radius: 12px;
+  box-shadow: var(--ds-shadow-subtle);
+  cursor: grab;
+  transition: box-shadow 160ms ease, transform 160ms ease, border-color 160ms ease;
+}
+
+.kanban-card:hover {
   box-shadow: 0 6px 18px rgba(17, 19, 26, 0.08);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
-.prospect-card__header {
+.kanban-card:active {
+  cursor: grabbing;
+}
+
+.kanban-card--quente {
+  border-left: 3px solid #ef4444;
+}
+
+.kanban-card--medio {
+  border-left: 3px solid #f59e0b;
+}
+
+.kanban-card--frio {
+  border-left: 3px solid #3b82f6;
+}
+
+.kanban-card__header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 18px;
+  gap: 10px;
 }
 
-.prospect-card__title {
-  margin: 0 0 8px;
-  font-size: 1.05rem;
+.kanban-card__title-wrap {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  flex: 1;
+}
+
+.kanban-card__title {
+  margin: 0;
+  font-size: 0.86rem;
   font-weight: 650;
   line-height: 1.25;
   color: var(--ds-graphite);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.prospect-card__category {
+.kanban-card__category {
   display: inline-block;
-  padding: 4px 8px;
+  width: max-content;
+  padding: 3px 7px;
   background: var(--ds-green-ice);
-  border-radius: 6px;
-  font-size: 0.72rem;
+  border-radius: 5px;
+  font-size: 0.68rem;
   font-weight: 650;
   color: var(--ds-charcoal);
 }
 
-.prospect-card__body {
-  display: grid;
-  gap: 12px;
-  flex: 1;
-  margin-bottom: 20px;
-}
-
-.prospect-card__row {
-  display: grid;
+.temperature-badge {
+  display: inline-flex;
+  align-items: center;
   gap: 3px;
-  margin: 0;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex: 0 0 auto;
 }
 
-.prospect-card__row span {
-  font-size: 0.72rem;
+.temperature-badge--quente {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.temperature-badge--medio {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.temperature-badge--frio {
+  color: #1e40af;
+  background: #dbeafe;
+}
+
+.kanban-card__body {
+  display: grid;
+  gap: 8px;
+}
+
+.kanban-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.kanban-card__rating {
+  font-size: 0.78rem;
+  color: var(--ds-charcoal);
   font-weight: 650;
+}
+
+.kanban-card__website {
+  display: inline-flex;
+  padding: 3px 7px;
+  border-radius: 5px;
+  font-size: 0.68rem;
+  font-weight: 650;
+}
+
+.kanban-card__website--proprio {
+  color: #13782b;
+  background: #eaf9ee;
+}
+
+.kanban-card__website--social {
+  color: #8a5c00;
+  background: #fff4d6;
+}
+
+.kanban-card__website--sem {
+  color: #245b91;
+  background: #eaf3fc;
+}
+
+.kanban-card__phone {
+  font-size: 0.8rem;
+  color: var(--ds-green-dark);
+  text-decoration: none;
+  font-weight: 650;
+}
+
+.kanban-card__phone:hover {
+  text-decoration: underline;
+}
+
+.kanban-card__next-action {
+  display: grid;
+  gap: 2px;
+  padding: 8px;
+  background: #f4f6f7;
+  border-radius: 8px;
+  font-size: 0.72rem;
+}
+
+.kanban-card__next-action span {
   color: var(--ds-gray);
+  font-weight: 650;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
-.prospect-card__row strong {
-  font-size: 0.875rem;
-  font-weight: 500;
+.kanban-card__next-action strong {
   color: var(--ds-graphite);
-  line-height: 1.45;
-  word-break: break-word;
+  font-weight: 600;
+  line-height: 1.3;
 }
 
-.prospect-card__link {
-  color: var(--ds-green-dark);
-  text-decoration: none;
-}
-
-.prospect-card__link:hover {
-  text-decoration: underline;
-}
-
-.prospect-card__metrics {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 6px;
-}
-
-.prospect-card__metrics > div {
-  display: grid;
-  gap: 2px;
-  min-width: 80px;
-  padding: 10px 12px;
-  background: #f4f6f7;
-  border-radius: 10px;
-}
-
-.prospect-card__metrics span {
-  font-size: 0.7rem;
+.kanban-card__next-action time {
   color: var(--ds-gray);
 }
 
-.prospect-card__metrics strong {
-  font-size: 0.9rem;
-  color: var(--ds-graphite);
+.kanban-card__next-action--overdue {
+  background: #fdebee;
 }
 
-.card-score {
-  font-weight: 700;
-  color: var(--ds-green-dark);
+.kanban-card__next-action--overdue span,
+.kanban-card__next-action--overdue time {
+  color: #a61f2b;
 }
 
-.prospect-card__city {
-  color: var(--ds-charcoal);
-  font-weight: 650;
-}
-
-.prospect-card__footer {
+.kanban-card__footer .lead-actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
-  margin-top: auto;
 }
 
 .action-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 36px;
-  padding: 0 16px;
-  font-size: 0.82rem;
+  min-height: 30px;
+  padding: 0 12px;
+  font-size: 0.75rem;
   font-weight: 650;
-  border-radius: 10px;
+  border-radius: 8px;
   border: 1px solid transparent;
   cursor: pointer;
   transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
@@ -326,204 +420,107 @@
   background: var(--ds-green-ice);
 }
 
-.closed-tag {
-  display: inline-block;
-  padding: 5px 10px;
-  background: #fdebee;
-  color: #a61f2b;
-  border-radius: 6px;
-  font-size: 0.72rem;
-  font-weight: 650;
+.kanban-card--dragging {
+  width: 280px;
+  box-shadow: 0 14px 30px rgba(17, 19, 26, 0.14);
+  cursor: grabbing;
 }
 
-.open-tag {
-  display: inline-block;
-  padding: 5px 10px;
-  background: #eaf9ee;
-  color: #13782b;
-  border-radius: 6px;
-  font-size: 0.72rem;
-  font-weight: 650;
-}
-
-.view-toggle {
-  display: inline-flex;
-  gap: 4px;
-  padding: 4px;
-  background: var(--ds-green-ice);
-  border: 1px solid #e1eee4;
-  border-radius: 10px;
-}
-
-.view-toggle__btn {
-  min-height: 38px;
-  padding: 0 18px;
-  color: var(--ds-gray);
-  background: transparent;
-  border: 0;
-  border-radius: 7px;
-  font: inherit;
-  font-size: 0.82rem;
-  font-weight: 650;
-  cursor: pointer;
-  transition: color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
-}
-
-.view-toggle__btn:hover,
-.view-toggle__btn.is-active {
-  color: var(--ds-graphite);
-  background: var(--ds-white);
-}
-
-.view-toggle__btn.is-active {
-  box-shadow: 0 2px 7px rgba(17, 19, 26, 0.08);
-}
-
-.view-toggle__btn:focus-visible {
-  outline: 3px solid rgba(37, 191, 68, 0.28);
-  outline-offset: 2px;
-}
-
-.lead-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.list-view {
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
   display: grid;
-  gap: 12px;
+  place-items: center;
+  padding: 24px;
+  background: rgba(17, 19, 26, 0.45);
+  backdrop-filter: blur(2px);
 }
 
-.prospect-list-item {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 18px 22px;
+.modal {
+  width: 100%;
+  max-width: 460px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 24px;
   background: var(--ds-white);
-  border: 1px solid var(--ds-line);
   border-radius: 16px;
-  box-shadow: var(--ds-shadow-subtle);
-  transition: box-shadow 160ms ease, transform 160ms ease;
+  box-shadow: 0 14px 40px rgba(17, 19, 26, 0.18);
 }
 
-.prospect-list-item:hover {
-  box-shadow: 0 6px 18px rgba(17, 19, 26, 0.08);
-  transform: translateY(-1px);
-}
-
-.prospect-list-item__main {
+.modal__header {
   display: flex;
-  align-items: center;
-  flex: 1;
-  gap: 24px;
-  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
-.prospect-list-item__info {
-  display: grid;
-  gap: 6px;
-  flex: 1 1 220px;
-  min-width: 0;
-}
-
-.prospect-list-item__title {
+.modal__header h2 {
   margin: 0;
-  font-size: 0.98rem;
+  font-size: 1.2rem;
   font-weight: 650;
   line-height: 1.3;
   color: var(--ds-graphite);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.prospect-list-item__category {
-  display: inline-block;
-  padding: 3px 8px;
-  background: var(--ds-green-ice);
-  border-radius: 6px;
-  font-size: 0.72rem;
-  font-weight: 650;
-  color: var(--ds-charcoal);
-  width: max-content;
-}
-
-.prospect-list-item__details {
-  display: grid;
-  gap: 4px;
-  flex: 1 1 260px;
-  min-width: 0;
-  font-size: 0.82rem;
-}
-
-.prospect-list-item__address,
-.prospect-list-item__phone,
-.prospect-list-item__website {
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: var(--ds-charcoal);
-}
-
-.prospect-list-item__phone,
-.prospect-list-item__website {
-  color: var(--ds-green-dark);
-  text-decoration: none;
-}
-
-.prospect-list-item__phone:hover,
-.prospect-list-item__website:hover {
-  text-decoration: underline;
-}
-
-.prospect-list-item__metrics {
-  display: flex;
+.modal__close {
+  display: inline-flex;
   align-items: center;
-  gap: 14px;
-  flex: 0 0 auto;
-  min-width: 0;
-  font-size: 0.82rem;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
   color: var(--ds-gray);
+  background: transparent;
+  border: 1px solid var(--ds-line);
+  border-radius: 8px;
+  font-size: 1.25rem;
+  cursor: pointer;
 }
 
-.prospect-list-item__city {
+.modal__close:hover {
+  color: var(--ds-graphite);
+  background: var(--ds-green-ice);
+}
+
+.modal__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal__category {
   display: inline-block;
   padding: 4px 10px;
   background: var(--ds-green-ice);
   border-radius: 6px;
+  font-size: 0.78rem;
   font-weight: 650;
   color: var(--ds-charcoal);
 }
 
-.prospect-list-item__score {
-  font-weight: 700;
-  color: var(--ds-green-dark);
+.modal__form {
+  display: grid;
+  gap: 16px;
 }
 
-.prospect-list-item__aside {
+.modal__form .prospect-field input,
+.modal__form .prospect-field select {
+  width: 100%;
+}
+
+.modal__actions {
   display: flex;
-  align-items: center;
-  gap: 14px;
-  flex: 0 0 auto;
-}
-
-.prospect-empty {
-  padding: 48px 24px;
-  text-align: center;
-  color: var(--ds-gray);
-}
-
-.prospect-loading {
-  padding: 48px 24px;
-  text-align: center;
-  color: var(--ds-gray);
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
 }
 
 @media (max-width: 760px) {
   .prospect-app {
-    padding: 24px 16px 48px;
+    padding: 16px;
   }
 
   .prospect-toolbar {
@@ -535,34 +532,16 @@
     flex: 1 1 auto;
   }
 
-  .cards-grid {
-    grid-template-columns: 1fr;
+  .kanban-board {
+    min-height: calc(100vh - 240px);
   }
 
-  .prospect-card__header {
-    flex-direction: column;
+  .kanban-column {
+    flex: 0 0 260px;
+    max-height: calc(100vh - 240px);
   }
 
-  .prospect-list-item,
-  .prospect-list-item__main,
-  .prospect-list-item__aside {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .prospect-list-item__aside {
-    width: 100%;
-  }
-
-  .prospect-list-item__aside .lead-actions {
-    width: 100%;
-  }
-
-  .prospect-list-item__aside .lead-actions .action-btn {
-    flex: 1;
-  }
-
-  .prospect-list-item__details {
-    width: 100%;
+  .modal {
+    padding: 20px;
   }
 }

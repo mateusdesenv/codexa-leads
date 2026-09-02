@@ -1,4 +1,17 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  TouchSensor,
+  useDroppable,
+  useDraggable,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragStartEvent,
+} from '@dnd-kit/core'
+import { CSS } from '@dnd-kit/utilities'
 import './App.css'
 
 interface Lead {
@@ -22,8 +35,79 @@ interface Lead {
   placeId: string
 }
 
-type SortKey = 'title' | 'categoryName' | 'city' | 'totalScore' | 'reviewsCount'
-type ViewMode = 'grid' | 'list'
+type ColumnId =
+  | 'open'
+  | 'contato'
+  | 'conversa'
+  | 'followup'
+  | 'proposta'
+  | 'negociacao'
+  | 'fechado'
+  | 'perdido'
+
+type Temperature = 'quente' | 'medio' | 'frio'
+
+interface KanbanState {
+  column: ColumnId
+  nextAction?: string
+  dueDate?: string
+  lostReason?: string
+  proposalValue?: string
+  proposalReturnDate?: string
+}
+
+interface LeadWithMeta extends Lead {
+  kanbanState: KanbanState
+  score: number
+  temperature: Temperature
+  websiteKind: 'proprio' | 'social' | 'sem'
+}
+
+const STORAGE_KEY = 'codexa-leads-kanban'
+
+const COLUMNS: { id: ColumnId; label: string; emoji: string; color: string }[] = [
+  { id: 'open', label: 'Open', emoji: '🟢', color: '#25BF44' },
+  { id: 'contato', label: 'Contato feito', emoji: '📞', color: '#3B82F6' },
+  { id: 'conversa', label: 'Em conversa', emoji: '💬', color: '#8B5CF6' },
+  { id: 'followup', label: 'Follow-up', emoji: '📅', color: '#F59E0B' },
+  { id: 'proposta', label: 'Proposta enviada', emoji: '📄', color: '#0EA5E9' },
+  { id: 'negociacao', label: 'Negociação', emoji: '🔥', color: '#EF4444' },
+  { id: 'fechado', label: 'Cliente fechado', emoji: '✅', color: '#13992F' },
+  { id: 'perdido', label: 'Perdido', emoji: '❌', color: '#6D7480' },
+]
+
+const LOST_REASONS = [
+  'Sem interesse',
+  'Sem orçamento',
+  'Já possui fornecedor',
+  'Não respondeu',
+  'Empresa encerrada',
+  'Outro',
+]
+
+const SOCIAL_HOSTS = [
+  'instagram.com',
+  'facebook.com',
+  'fb.com',
+  'linktr.ee',
+  'linktree',
+  'maps.app.goo.gl',
+  'g.page',
+  'google.com',
+  'wa.me',
+  'whatsapp',
+  'wixsite.com',
+  'wordpress.com',
+  'blogger.com',
+  'youtube.com',
+  'tiktok.com',
+  'twitter.com',
+  'x.com',
+  'threads.net',
+  'kw.ai',
+  'canva.site',
+  'beacons.ai',
+]
 
 const fetchLeads = async (): Promise<Lead[]> => {
   const res = await fetch('/data/leads.json')
@@ -31,20 +115,115 @@ const fetchLeads = async (): Promise<Lead[]> => {
   return res.json()
 }
 
-function statusTag(lead: Lead) {
-  if (lead.permanentlyClosed) return <span className="closed-tag">Fechado</span>
-  if (lead.temporarilyClosed) return <span className="closed-tag">Fechado temp.</span>
-  return <span className="open-tag">Ativo</span>
+function loadKanbanStates(): Record<string, KanbanState> {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    return raw ? (JSON.parse(raw) as Record<string, KanbanState>) : {}
+  } catch {
+    return {}
+  }
 }
 
-function scoreBadge(score: number | null) {
-  if (score == null) return '-'
-  return <span className="card-score">{score.toFixed(1)}</span>
+function saveKanbanStates(states: Record<string, KanbanState>) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(states))
+  } catch {
+    // noop
+  }
+}
+
+function getHost(website: string): string | null {
+  try {
+    return new URL(website).hostname.toLowerCase()
+  } catch {
+    return null
+  }
+}
+
+function isSocialOrAggregator(website: string): boolean {
+  const host = getHost(website)
+  if (!host) return false
+  return SOCIAL_HOSTS.some((h) => host === h || host.endsWith('.' + h) || host.includes(h))
+}
+
+function classifyWebsite(website: string | null): LeadWithMeta['websiteKind'] {
+  if (!website) return 'sem'
+  if (isSocialOrAggregator(website)) return 'social'
+  return 'proprio'
+}
+
+function scoreLead(lead: Lead): number {
+  let score = 0
+
+  const website = classifyWebsite(lead.website)
+  if (website === 'sem') score += 25
+  else if (website === 'social') score += 35
+  else score += 15
+
+  const reviews = lead.reviewsCount ?? 0
+  if (reviews >= 100) score += 15
+  else if (reviews >= 50) score += 10
+  else if (reviews >= 10) score += 5
+
+  const rating = lead.totalScore
+  if (rating !== null && rating !== undefined) {
+    if (rating < 3.5 && reviews >= 20) score += 20
+    else if (rating >= 4.5 && reviews >= 50) score += 10
+    else if (rating >= 4.0) score += 5
+  }
+
+  if (lead.phone) score += 10
+  if (lead.website) score += 5
+
+  return Math.min(100, Math.max(0, score))
+}
+
+function getTemperature(score: number): Temperature {
+  if (score >= 70) return 'quente'
+  if (score >= 40) return 'medio'
+  return 'frio'
+}
+
+function getTemperatureLabel(t: Temperature) {
+  if (t === 'quente') return 'Quente'
+  if (t === 'medio') return 'Médio'
+  return 'Frio'
+}
+
+function getTemperatureEmoji(t: Temperature) {
+  if (t === 'quente') return '🔥'
+  if (t === 'medio') return '🟡'
+  return '❄️'
+}
+
+function getWebsiteLabel(kind: LeadWithMeta['websiteKind']) {
+  if (kind === 'proprio') return 'Site próprio'
+  if (kind === 'social') return 'Rede social'
+  return 'Sem site'
+}
+
+function isOverdue(dueDate?: string): boolean {
+  if (!dueDate) return false
+  return new Date(dueDate).getTime() < new Date().setHours(0, 0, 0, 0)
+}
+
+function formatDate(dateStr?: string): string {
+  if (!dateStr) return ''
+  return new Date(dateStr).toLocaleDateString('pt-BR')
+}
+
+function isValidUrl(url: string): boolean {
+  try {
+    new URL(url)
+    return true
+  } catch {
+    return false
+  }
 }
 
 function Actions({ lead }: { lead: Lead }) {
   return (
-    <div className="lead-actions">
+    <div className="lead-actions" onClick={(e) => e.stopPropagation()}>
       {lead.phone && (
         <a
           className="action-btn action-btn--primary"
@@ -53,7 +232,7 @@ function Actions({ lead }: { lead: Lead }) {
           Ligar
         </a>
       )}
-      {lead.website && (
+      {lead.website && isValidUrl(lead.website) && (
         <a
           className="action-btn action-btn--secondary"
           href={lead.website}
@@ -75,150 +254,279 @@ function Actions({ lead }: { lead: Lead }) {
   )
 }
 
-function GridCard({ lead }: { lead: Lead }) {
+function LeadCard({
+  lead,
+  onClick,
+}: {
+  lead: LeadWithMeta
+  onClick: (lead: LeadWithMeta) => void
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    isDragging,
+  } = useDraggable({ id: lead.placeId, data: { lead } })
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    opacity: isDragging ? 0.4 : 1,
+  }
+
   return (
-    <article className="prospect-card">
-      <div className="prospect-card__header">
-        <div>
-          <h2 className="prospect-card__title">{lead.title}</h2>
+    <article
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      className={`kanban-card kanban-card--${lead.temperature}`}
+      style={style}
+      onClick={() => !isDragging && onClick(lead)}
+    >
+      <div className="kanban-card__header">
+        <div className="kanban-card__title-wrap">
+          <h3 className="kanban-card__title" title={lead.title}>
+            {lead.title}
+          </h3>
           {lead.categoryName && (
-            <span className="prospect-card__category">{lead.categoryName}</span>
+            <span className="kanban-card__category">{lead.categoryName}</span>
           )}
         </div>
-        {statusTag(lead)}
+        <span
+          className={`temperature-badge temperature-badge--${lead.temperature}`}
+          title={`Score ${lead.score}`}
+        >
+          {getTemperatureEmoji(lead.temperature)} {lead.score}
+        </span>
       </div>
 
-      <div className="prospect-card__body">
-        {lead.address && (
-          <p className="prospect-card__row">
-            <span>Endereço</span>
-            <strong>{lead.address}</strong>
-          </p>
-        )}
+      <div className="kanban-card__body">
+        <div className="kanban-card__meta">
+          {lead.totalScore !== null && lead.totalScore !== undefined && (
+            <span className="kanban-card__rating">
+              ⭐ {lead.totalScore.toFixed(1)} ({lead.reviewsCount ?? 0})
+            </span>
+          )}
+          <span className={`kanban-card__website kanban-card__website--${lead.websiteKind}`}>
+            {getWebsiteLabel(lead.websiteKind)}
+          </span>
+        </div>
+
         {lead.phone && (
-          <p className="prospect-card__row">
-            <span>Telefone</span>
-            <a
-              href={`tel:${lead.phoneUnformatted ?? lead.phone}`}
-              className="prospect-card__link"
-            >
-              {lead.phone}
-            </a>
-          </p>
+          <a
+            href={`tel:${lead.phoneUnformatted ?? lead.phone}`}
+            className="kanban-card__phone"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {lead.phone}
+          </a>
         )}
-        {lead.website && (
-          <p className="prospect-card__row">
-            <span>Site</span>
-            <a
-              href={lead.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="prospect-card__link"
-            >
-              {lead.website.replace(/^https?:\/\//, '')}
-            </a>
-          </p>
+
+        {lead.kanbanState.nextAction && (
+          <div
+            className={`kanban-card__next-action ${isOverdue(lead.kanbanState.dueDate) ? 'kanban-card__next-action--overdue' : ''}`}
+          >
+            <span>Próxima ação</span>
+            <strong>{lead.kanbanState.nextAction}</strong>
+            {lead.kanbanState.dueDate && (
+              <time dateTime={lead.kanbanState.dueDate}>
+                {isOverdue(lead.kanbanState.dueDate) ? 'Atrasado: ' : 'Até: '}
+                {formatDate(lead.kanbanState.dueDate)}
+              </time>
+            )}
+          </div>
         )}
-        <div className="prospect-card__metrics">
-          <div>
-            <span>Nota</span>
-            <strong>{scoreBadge(lead.totalScore)}</strong>
-          </div>
-          <div>
-            <span>Reviews</span>
-            <strong>{lead.reviewsCount ?? '-'}</strong>
-          </div>
-          {lead.city && (
-            <div>
-              <span>Cidade</span>
-              <strong className="prospect-card__city">{lead.city}</strong>
-            </div>
-          )}
-        </div>
       </div>
 
-      <div className="prospect-card__footer">
+      <div className="kanban-card__footer">
         <Actions lead={lead} />
       </div>
     </article>
   )
 }
 
-function ListItem({ lead }: { lead: Lead }) {
+function KanbanColumn({
+  column,
+  leads,
+  onCardClick,
+}: {
+  column: (typeof COLUMNS)[number]
+  leads: LeadWithMeta[]
+  onCardClick: (lead: LeadWithMeta) => void
+}) {
+  const { setNodeRef, isOver } = useDroppable({ id: column.id, data: { column } })
+
   return (
-    <article className="prospect-list-item">
-      <div className="prospect-list-item__main">
-        <div className="prospect-list-item__info">
-          <h3 className="prospect-list-item__title">{lead.title}</h3>
-          {lead.categoryName && (
-            <span className="prospect-list-item__category">{lead.categoryName}</span>
-          )}
+    <div
+      ref={setNodeRef}
+      className={`kanban-column ${isOver ? 'kanban-column--over' : ''}`}
+    >
+      <header className="kanban-column__header" style={{ borderColor: column.color }}>
+        <div className="kanban-column__title">
+          <span className="kanban-column__emoji" style={{ color: column.color }}>
+            {column.emoji}
+          </span>
+          <h2>{column.label}</h2>
         </div>
-
-        <div className="prospect-list-item__details">
-          {lead.address && (
-            <span className="prospect-list-item__address" title={lead.address}>
-              {lead.address}
-            </span>
-          )}
-          {lead.phone && (
-            <a
-              href={`tel:${lead.phoneUnformatted ?? lead.phone}`}
-              className="prospect-list-item__phone"
-            >
-              {lead.phone}
-            </a>
-          )}
-          {lead.website && (
-            <a
-              href={lead.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="prospect-list-item__website"
-            >
-              {lead.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-            </a>
-          )}
-        </div>
-
-        <div className="prospect-list-item__metrics">
-          {lead.city && (
-            <span className="prospect-list-item__city">{lead.city}</span>
-          )}
-          <span className="prospect-list-item__score">{scoreBadge(lead.totalScore)}</span>
-          <span>{lead.reviewsCount ?? '-'} reviews</span>
-        </div>
+        <span className="kanban-column__count" style={{ color: column.color }}>
+          {leads.length}
+        </span>
+      </header>
+      <div className="kanban-column__cards">
+        {leads.map((lead) => (
+          <LeadCard key={lead.placeId} lead={lead} onClick={onCardClick} />
+        ))}
       </div>
+    </div>
+  )
+}
 
-      <div className="prospect-list-item__aside">
-        {statusTag(lead)}
-        <Actions lead={lead} />
+function LeadModal({
+  lead,
+  onClose,
+  onSave,
+}: {
+  lead: LeadWithMeta
+  onClose: () => void
+  onSave: (placeId: string, state: KanbanState) => void
+}) {
+  const [state, setState] = useState<KanbanState>({ ...lead.kanbanState })
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    onSave(lead.placeId, state)
+    onClose()
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <header className="modal__header">
+          <h2>{lead.title}</h2>
+          <button type="button" className="modal__close" onClick={onClose} aria-label="Fechar">
+            ×
+          </button>
+        </header>
+
+        <div className="modal__meta">
+          <span className={`temperature-badge temperature-badge--${lead.temperature}`}>
+            {getTemperatureEmoji(lead.temperature)} {getTemperatureLabel(lead.temperature)} — Score {lead.score}
+          </span>
+          {lead.categoryName && <span className="modal__category">{lead.categoryName}</span>}
+        </div>
+
+        <form className="modal__form" onSubmit={handleSubmit}>
+          <div className="prospect-field">
+            <label htmlFor="status">Etapa do funil</label>
+            <select
+              id="status"
+              value={state.column}
+              onChange={(e) => setState({ ...state, column: e.target.value as ColumnId })}
+            >
+              {COLUMNS.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.emoji} {c.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="prospect-field">
+            <label htmlFor="nextAction">Próxima ação</label>
+            <input
+              id="nextAction"
+              type="text"
+              placeholder="Ex: Enviar mensagem de apresentação"
+              value={state.nextAction ?? ''}
+              onChange={(e) => setState({ ...state, nextAction: e.target.value })}
+            />
+          </div>
+
+          <div className="prospect-field">
+            <label htmlFor="dueDate">Data de follow-up</label>
+            <input
+              id="dueDate"
+              type="date"
+              value={state.dueDate ?? ''}
+              onChange={(e) => setState({ ...state, dueDate: e.target.value })}
+            />
+          </div>
+
+          {state.column === 'proposta' && (
+            <>
+              <div className="prospect-field">
+                <label htmlFor="proposalValue">Valor da proposta</label>
+                <input
+                  id="proposalValue"
+                  type="text"
+                  placeholder="R$ 0,00"
+                  value={state.proposalValue ?? ''}
+                  onChange={(e) => setState({ ...state, proposalValue: e.target.value })}
+                />
+              </div>
+              <div className="prospect-field">
+                <label htmlFor="proposalReturnDate">Data prevista de retorno</label>
+                <input
+                  id="proposalReturnDate"
+                  type="date"
+                  value={state.proposalReturnDate ?? ''}
+                  onChange={(e) =>
+                    setState({ ...state, proposalReturnDate: e.target.value })
+                  }
+                />
+              </div>
+            </>
+          )}
+
+          {state.column === 'perdido' && (
+            <div className="prospect-field">
+              <label htmlFor="lostReason">Motivo</label>
+              <select
+                id="lostReason"
+                value={state.lostReason ?? ''}
+                onChange={(e) => setState({ ...state, lostReason: e.target.value })}
+              >
+                <option value="">Selecione</option>
+                {LOST_REASONS.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          <div className="modal__actions">
+            <button type="button" className="action-btn action-btn--secondary" onClick={onClose}>
+              Cancelar
+            </button>
+            <button type="submit" className="action-btn action-btn--primary">
+              Salvar
+            </button>
+          </div>
+        </form>
       </div>
-    </article>
+    </div>
   )
 }
 
 function App() {
-  const [leads, setLeads] = useState<Lead[]>([])
+  const [rawLeads, setRawLeads] = useState<Lead[]>([])
+  const [leadStates, setKanbanStates] = useState<Record<string, KanbanState>>(() =>
+    loadKanbanStates(),
+  )
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
-  const [cityFilter, setCityFilter] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('')
-  const [view, setView] = useState<ViewMode>(() => {
-    const params = new URLSearchParams(window.location.search)
-    const viewParam = params.get('view')
-    return viewParam === 'list' ? 'list' : 'grid'
-  })
-  const [sort, setSort] = useState<{ key: SortKey; dir: 'asc' | 'desc' }>({
-    key: 'title',
-    dir: 'asc',
-  })
+  const [selectedLead, setSelectedLead] = useState<LeadWithMeta | null>(null)
+  const [activeDrag, setActiveDrag] = useState<LeadWithMeta | null>(null)
+  const didDrag = useRef(false)
 
   useEffect(() => {
     fetchLeads()
       .then((data) => {
-        setLeads(data)
+        setRawLeads(data)
         setLoading(false)
       })
       .catch((err) => {
@@ -227,113 +535,115 @@ function App() {
       })
   }, [])
 
-  const cities = useMemo(
-    () =>
-      Array.from(
-        new Set(leads.map((l) => l.city).filter((c): c is string => !!c)),
-      ).sort(),
-    [leads],
-  )
+  useEffect(() => {
+    saveKanbanStates(leadStates)
+  }, [leadStates])
 
   const categories = useMemo(
     () =>
       Array.from(
-        new Set(
-          leads.map((l) => l.categoryName).filter((c): c is string => !!c),
-        ),
+        new Set(rawLeads.map((l) => l.categoryName).filter((c): c is string => !!c)),
       ).sort(),
-    [leads],
+    [rawLeads],
   )
 
-  const filtered = useMemo(() => {
-    return leads.filter((lead) => {
+  const leadsWithMeta = useMemo<LeadWithMeta[]>(() => {
+    return rawLeads.map((lead) => {
+      const state = leadStates[lead.placeId] ?? { column: 'open' }
+      return {
+        ...lead,
+        kanbanState: state,
+        score: scoreLead(lead),
+        temperature: getTemperature(scoreLead(lead)),
+        websiteKind: classifyWebsite(lead.website),
+      }
+    })
+  }, [rawLeads, leadStates])
+
+  const filteredLeads = useMemo(() => {
+    return leadsWithMeta.filter((lead) => {
       const matchesSearch = [lead.title, lead.address, lead.phone, lead.categoryName]
         .filter(Boolean)
         .some((v) => v!.toLowerCase().includes(search.toLowerCase()))
-      const matchesCity = cityFilter ? lead.city === cityFilter : true
       const matchesCategory = categoryFilter ? lead.categoryName === categoryFilter : true
-      return matchesSearch && matchesCity && matchesCategory
+      return matchesSearch && matchesCategory
     })
-  }, [leads, search, cityFilter, categoryFilter])
+  }, [leadsWithMeta, search, categoryFilter])
 
-  const sorted = useMemo(() => {
-    const sortedList = [...filtered]
-    sortedList.sort((a, b) => {
-      const aVal = a[sort.key]
-      const bVal = b[sort.key]
-      if (aVal == null && bVal == null) return 0
-      if (aVal == null) return 1
-      if (bVal == null) return -1
-      if (typeof aVal === 'string' && typeof bVal === 'string') {
-        return sort.dir === 'asc'
-          ? aVal.localeCompare(bVal, 'pt-BR')
-          : bVal.localeCompare(aVal, 'pt-BR')
-      }
-      if (typeof aVal === 'number' && typeof bVal === 'number') {
-        return sort.dir === 'asc' ? aVal - bVal : bVal - aVal
-      }
-      return 0
+  const leadsByColumn = useMemo(() => {
+    const map: Record<ColumnId, LeadWithMeta[]> = COLUMNS.reduce(
+      (acc, c) => ({ ...acc, [c.id]: [] }),
+      {} as Record<ColumnId, LeadWithMeta[]>,
+    )
+    filteredLeads.forEach((lead) => {
+      map[lead.kanbanState.column] = map[lead.kanbanState.column] ?? []
+      map[lead.kanbanState.column].push(lead)
     })
-    return sortedList
-  }, [filtered, sort])
+    COLUMNS.forEach((c) => {
+      map[c.id].sort((a, b) => b.score - a.score)
+    })
+    return map
+  }, [filteredLeads])
 
-  const sortOptions: { key: SortKey; label: string }[] = [
-    { key: 'title', label: 'Nome' },
-    { key: 'categoryName', label: 'Categoria' },
-    { key: 'city', label: 'Cidade' },
-    { key: 'totalScore', label: 'Nota' },
-    { key: 'reviewsCount', label: 'Reviews' },
-  ]
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 250, tolerance: 5 },
+    }),
+  )
+
+  const handleDragStart = (event: DragStartEvent) => {
+    didDrag.current = true
+    const placeId = event.active.id as string
+    const lead = leadsWithMeta.find((l) => l.placeId === placeId)
+    if (lead) setActiveDrag(lead)
+  }
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    setActiveDrag(null)
+    setTimeout(() => {
+      didDrag.current = false
+    }, 100)
+
+    const { active, over } = event
+    if (!over) return
+    const newColumn = over.id as ColumnId
+    const placeId = active.id as string
+    if (!COLUMNS.some((c) => c.id === newColumn)) return
+    setKanbanStates((prev) => ({
+      ...prev,
+      [placeId]: { ...(prev[placeId] ?? { column: 'open' }), column: newColumn },
+    }))
+  }
+
+  const handleSaveLead = (placeId: string, state: KanbanState) => {
+    setKanbanStates((prev) => ({ ...prev, [placeId]: state }))
+  }
+
+  const handleCardClick = (lead: LeadWithMeta) => {
+    if (didDrag.current) return
+    setSelectedLead(lead)
+  }
 
   return (
     <div className="prospect-app">
       <header className="prospect-header">
         <h1>Prospecção Codexa</h1>
-        <p>Leads capturados do Google Places para prospecção comercial.</p>
+        <p>Kanban de prospecção comercial. Arraste os cards entre as etapas.</p>
       </header>
 
-      <section className="prospect-stats">
-        <div className="stat-card">
-          <strong>{leads.length}</strong>
-          <span>Total de leads</span>
-        </div>
-        <div className="stat-card">
-          <strong>{filtered.length}</strong>
-          <span>Filtrados</span>
-        </div>
-        <div className="stat-card">
-          <strong>{cities.length}</strong>
-          <span>Cidades</span>
-        </div>
-      </section>
-
       <div className="prospect-toolbar">
-        <div className="prospect-field">
+        <div className="prospect-field" style={{ flex: '2 1 300px' }}>
           <label htmlFor="search">Buscar</label>
           <input
             id="search"
             type="text"
-            placeholder="Nome, endereço, telefone, categoria..."
+            placeholder="Nome, endereço, telefone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="prospect-field">
-          <label htmlFor="city">Cidade</label>
-          <select
-            id="city"
-            value={cityFilter}
-            onChange={(e) => setCityFilter(e.target.value)}
-          >
-            <option value="">Todas</option>
-            {cities.map((city) => (
-              <option key={city} value={city}>
-                {city}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="prospect-field">
+        <div className="prospect-field" style={{ flex: '1 1 220px' }}>
           <label htmlFor="category">Categoria</label>
           <select
             id="category"
@@ -348,55 +658,6 @@ function App() {
             ))}
           </select>
         </div>
-        <div className="prospect-field">
-          <label htmlFor="sort">Ordenar</label>
-          <div className="prospect-sort">
-            <select
-              id="sort"
-              value={sort.key}
-              onChange={(e) =>
-                setSort((prev) => ({ ...prev, key: e.target.value as SortKey }))
-              }
-            >
-              {sortOptions.map((opt) => (
-                <option key={opt.key} value={opt.key}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-            <button
-              type="button"
-              className="sort-direction"
-              onClick={() =>
-                setSort((prev) => ({ ...prev, dir: prev.dir === 'asc' ? 'desc' : 'asc' }))
-              }
-              aria-label={sort.dir === 'asc' ? 'Ordenar decrescente' : 'Ordenar crescente'}
-            >
-              {sort.dir === 'asc' ? '↑' : '↓'}
-            </button>
-          </div>
-        </div>
-        <div className="prospect-field" style={{ flex: '0 0 auto' }}>
-          <label>Visualização</label>
-          <div className="view-toggle" role="group" aria-label="Visualização">
-            <button
-              type="button"
-              className={`view-toggle__btn ${view === 'grid' ? 'is-active' : ''}`}
-              onClick={() => setView('grid')}
-              aria-pressed={view === 'grid'}
-            >
-              Grid
-            </button>
-            <button
-              type="button"
-              className={`view-toggle__btn ${view === 'list' ? 'is-active' : ''}`}
-              onClick={() => setView('list')}
-              aria-pressed={view === 'list'}
-            >
-              Lista
-            </button>
-          </div>
-        </div>
       </div>
 
       {loading ? (
@@ -404,27 +665,56 @@ function App() {
       ) : error ? (
         <div className="prospect-empty">{error}</div>
       ) : (
-        <>
-          {view === 'grid' ? (
-            <div className="cards-grid">
-              {sorted.map((lead) => (
-                <GridCard key={lead.placeId} lead={lead} />
-              ))}
-              {sorted.length === 0 && (
-                <div className="prospect-empty">Nenhum lead encontrado.</div>
-              )}
-            </div>
-          ) : (
-            <div className="list-view">
-              {sorted.map((lead) => (
-                <ListItem key={lead.placeId} lead={lead} />
-              ))}
-              {sorted.length === 0 && (
-                <div className="prospect-empty">Nenhum lead encontrado.</div>
-              )}
-            </div>
-          )}
-        </>
+        <DndContext
+          sensors={sensors}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="kanban-board">
+            {COLUMNS.map((column) => (
+              <KanbanColumn
+                key={column.id}
+                column={column}
+                leads={leadsByColumn[column.id]}
+                onCardClick={handleCardClick}
+              />
+            ))}
+          </div>
+          <DragOverlay dropAnimation={null}>
+            {activeDrag ? (
+              <div className="kanban-card kanban-card--dragging">
+                <div className="kanban-card__header">
+                  <div className="kanban-card__title-wrap">
+                    <h3 className="kanban-card__title">{activeDrag.title}</h3>
+                  </div>
+                  <span className={`temperature-badge temperature-badge--${activeDrag.temperature}`}>
+                    {getTemperatureEmoji(activeDrag.temperature)} {activeDrag.score}
+                  </span>
+                </div>
+                <div className="kanban-card__body">
+                  <div className="kanban-card__meta">
+                    {activeDrag.totalScore !== null && activeDrag.totalScore !== undefined && (
+                      <span className="kanban-card__rating">
+                        ⭐ {activeDrag.totalScore.toFixed(1)} ({activeDrag.reviewsCount ?? 0})
+                      </span>
+                    )}
+                    <span className={`kanban-card__website kanban-card__website--${activeDrag.websiteKind}`}>
+                      {getWebsiteLabel(activeDrag.websiteKind)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      )}
+
+      {selectedLead && (
+        <LeadModal
+          lead={selectedLead}
+          onClose={() => setSelectedLead(null)}
+          onSave={handleSaveLead}
+        />
       )}
     </div>
   )
