@@ -630,8 +630,11 @@ function App() {
     <div className="prospect-app">
       <aside className="prospect-sidebar">
         <div className="prospect-sidebar__brand">
-          <h1>Codexa</h1>
-          <p>Prospecção</p>
+          <img src="/favicon.svg" alt="" className="prospect-sidebar__logo" width="40" height="40" />
+          <div className="prospect-sidebar__brand-text">
+            <h1>Codexa</h1>
+            <p>Prospecção</p>
+          </div>
         </div>
 
         <nav className="prospect-nav" aria-label="Navegação principal">
