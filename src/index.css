@@ -3,8 +3,8 @@
 
 :root {
   font-family: 'Inter', Arial, sans-serif;
-  color: #11131a;
-  background: #fafcfb;
+  color: var(--ds-graphite);
+  background: var(--ds-off-white);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

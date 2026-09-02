@@ -675,6 +675,20 @@
   color: var(--ds-charcoal);
 }
 
+.theme-toggle {
+  font-size: 0.8rem;
+}
+
+.theme-toggle .ds-choice__content strong {
+  color: var(--ds-charcoal);
+}
+
+@media (max-width: 480px) {
+  .theme-toggle {
+    display: none;
+  }
+}
+
 .user-avatar {
   width: 38px;
   height: 38px;

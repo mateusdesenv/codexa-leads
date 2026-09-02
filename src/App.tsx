@@ -30,6 +30,7 @@ import {
   SearchInput,
   Select,
   Spinner,
+  Switch,
   Tag,
 } from 'codexa-ui'
 import type { IconName } from 'codexa-ui'
@@ -501,7 +502,17 @@ function App() {
   const [activeDrag, setActiveDrag] = useState<LeadWithMeta | null>(null)
   const [user, setUser] = useState<User | null | undefined>(undefined)
   const [currentView, setCurrentView] = useState<'home' | 'import' | 'help'>('home')
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const saved = localStorage.getItem('codexa-theme')
+    if (saved === 'dark' || saved === 'light') return saved
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  })
   const didDrag = useRef(false)
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('codexa-theme', theme)
+  }, [theme])
 
   useEffect(() => {
     return onAuthStateChanged(auth, (u) => setUser(u))
@@ -715,6 +726,15 @@ function App() {
           </div>
 
           <div className="prospect-header__user">
+            <Switch
+              id="theme-toggle"
+              label="Escuro"
+              className="theme-toggle"
+              checked={theme === 'dark'}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setTheme(e.target.checked ? 'dark' : 'light')
+              }
+            />
             <Avatar
               name={user.displayName ?? user.email ?? 'Usuário'}
               src={user.photoURL || undefined}

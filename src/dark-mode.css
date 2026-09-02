@@ -1,0 +1,277 @@
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  --ds-green: #2ecc4e;
+  --ds-green-dark: #4ade80;
+  --ds-green-mist: #14331f;
+  --ds-green-ice: #0f1f15;
+
+  --ds-graphite: #f2f4f6;
+  --ds-charcoal: #b8bec7;
+  --ds-gray: #8c929d;
+
+  --ds-line: #2a2d35;
+  --ds-white: #1a1d24;
+  --ds-off-white: #11131a;
+
+  --ds-shadow-subtle: 0 2px 7px rgba(0, 0, 0, 0.28);
+}
+
+html[data-theme="dark"] body {
+  color: var(--ds-graphite);
+  background: var(--ds-off-white);
+}
+
+html[data-theme="dark"] .kanban-card:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+}
+
+html[data-theme="dark"] .kanban-card--dragging {
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme="dark"] .kanban-card__next-action {
+  background: #1f232a;
+}
+
+html[data-theme="dark"] .kanban-card__next-action--overdue {
+  background: #3d1f23;
+}
+
+html[data-theme="dark"] .kanban-card__next-action--overdue span,
+html[data-theme="dark"] .kanban-card__next-action--overdue time,
+html[data-theme="dark"] .kanban-card__next-action--overdue strong {
+  color: #f87171;
+}
+
+/* Lib badge overrides for better dark contrast */
+html[data-theme="dark"] .ds-badge--success {
+  color: #4ade80;
+  background: #14331f;
+}
+
+html[data-theme="dark"] .ds-badge--neutral {
+  color: #e5e7eb;
+  background: #313743;
+}
+
+html[data-theme="dark"] .ds-badge--warning {
+  color: #fbbf24;
+  background: #3a2e0f;
+}
+
+html[data-theme="dark"] .ds-badge--danger {
+  color: #f87171;
+  background: #3d1f23;
+}
+
+html[data-theme="dark"] .ds-badge--info {
+  color: #60a5fa;
+  background: #172554;
+}
+
+/* Lib tag overrides */
+html[data-theme="dark"] .ds-tag {
+  color: #e5e7eb;
+  background: #313743;
+}
+
+html[data-theme="dark"] .ds-tag--success {
+  color: #4ade80;
+  background: #14331f;
+}
+
+html[data-theme="dark"] .ds-tag--warning {
+  color: #fbbf24;
+  background: #3a2e0f;
+}
+
+html[data-theme="dark"] .ds-tag--danger {
+  color: #f87171;
+  background: #3d1f23;
+}
+
+html[data-theme="dark"] .ds-tag--info {
+  color: #60a5fa;
+  background: #172554;
+}
+
+/* Lib alert overrides */
+html[data-theme="dark"] .ds-alert--info {
+  color: #60a5fa;
+  background: #172554;
+  border-color: #1e3a8a;
+}
+
+html[data-theme="dark"] .ds-alert--success {
+  color: #4ade80;
+  background: #14331f;
+  border-color: #166534;
+}
+
+html[data-theme="dark"] .ds-alert--warning {
+  color: #fbbf24;
+  background: #3a2e0f;
+  border-color: #854d0e;
+}
+
+html[data-theme="dark"] .ds-alert--danger {
+  color: #f87171;
+  background: #3d1f23;
+  border-color: #991b1b;
+}
+
+html[data-theme="dark"] .ds-alert--neutral {
+  color: #e5e7eb;
+  background: #1a1d24;
+  border-color: var(--ds-line);
+}
+
+/* Legacy classes still used in drag overlay / custom cards */
+html[data-theme="dark"] .temperature-badge--quente,
+html[data-theme="dark"] .kanban-card__website--proprio {
+  color: #4ade80;
+  background: #14331f;
+}
+
+html[data-theme="dark"] .temperature-badge--medio,
+html[data-theme="dark"] .kanban-card__website--social {
+  color: #fbbf24;
+  background: #3a2e0f;
+}
+
+html[data-theme="dark"] .temperature-badge--frio,
+html[data-theme="dark"] .kanban-card__website--sem {
+  color: #60a5fa;
+  background: #172554;
+}
+
+/* Scrollbars */
+html[data-theme="dark"] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: var(--ds-off-white);
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: var(--ds-line);
+  border-radius: 4px;
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--ds-gray);
+}
+
+/* Form inputs */
+html[data-theme="dark"] .ds-input-wrap {
+  color: var(--ds-charcoal);
+  background: var(--ds-white);
+  border-color: var(--ds-line);
+}
+
+html[data-theme="dark"] .ds-input-wrap:focus-within {
+  border-color: var(--ds-green);
+  box-shadow: 0 0 0 3px rgba(46, 204, 78, 0.25);
+}
+
+html[data-theme="dark"] .ds-input {
+  color: var(--ds-graphite);
+}
+
+html[data-theme="dark"] .ds-input::placeholder {
+  color: var(--ds-gray);
+}
+
+html[data-theme="dark"] .ds-textarea {
+  background: var(--ds-white);
+  color: var(--ds-graphite);
+  border-color: var(--ds-line);
+}
+
+html[data-theme="dark"] .ds-textarea:focus {
+  border-color: var(--ds-green);
+  box-shadow: 0 0 0 3px rgba(46, 204, 78, 0.25);
+}
+
+html[data-theme="dark"] .ds-field__label {
+  color: var(--ds-charcoal);
+}
+
+html[data-theme="dark"] .ds-field__message {
+  color: var(--ds-gray);
+}
+
+/* Select */
+html[data-theme="dark"] .ds-select,
+html[data-theme="dark"] .ds-select-menu {
+  background: var(--ds-white);
+  border-color: var(--ds-line);
+}
+
+html[data-theme="dark"] .ds-select > svg {
+  color: var(--ds-gray);
+}
+
+html[data-theme="dark"] .ds-select-option {
+  color: var(--ds-charcoal);
+}
+
+html[data-theme="dark"] .ds-select-option:hover,
+html[data-theme="dark"] .ds-select-option.is-selected {
+  color: var(--ds-graphite);
+  background: var(--ds-green-ice);
+}
+
+/* Buttons */
+html[data-theme="dark"] .ds-button--primary {
+  color: var(--ds-graphite);
+  background: var(--ds-green);
+  border-color: var(--ds-green);
+}
+
+html[data-theme="dark"] .ds-button--primary:hover:not(:disabled) {
+  color: var(--ds-graphite);
+  background: var(--ds-green-dark);
+  border-color: var(--ds-green-dark);
+}
+
+html[data-theme="dark"] .ds-button--secondary {
+  color: var(--ds-graphite);
+  background: var(--ds-white);
+  border-color: var(--ds-line);
+}
+
+html[data-theme="dark"] .ds-button--secondary:hover:not(:disabled) {
+  background: var(--ds-green-ice);
+  border-color: var(--ds-green);
+}
+
+html[data-theme="dark"] .ds-button--ghost {
+  color: var(--ds-charcoal);
+}
+
+html[data-theme="dark"] .ds-button--ghost:hover:not(:disabled) {
+  color: var(--ds-green);
+  background: var(--ds-green-ice);
+}
+
+/* Empty state */
+html[data-theme="dark"] .ds-empty {
+  border-color: var(--ds-line);
+}
+
+/* Switch */
+html[data-theme="dark"] .ds-switch__track {
+  background: var(--ds-line);
+}
+
+html[data-theme="dark"] .ds-switch__track > span {
+  background: var(--ds-graphite);
+}
+
+html[data-theme="dark"] .ds-switch > input:checked + .ds-switch__track {
+  background: var(--ds-green);
+}
