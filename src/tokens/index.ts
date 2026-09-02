@@ -1,0 +1,7 @@
+export const colors = { green: '#25bf44', greenDark: '#13992f', greenMist: '#eaf9ee', greenIce: '#f4fcf6', graphite: '#11131a', charcoal: '#313743', gray: '#6d7480', line: '#e8ebef', white: '#ffffff', offWhite: '#fafcfb' } as const
+export const spacing = { xs: '4px', sm: '8px', md: '16px', lg: '24px', xl: '32px', section: '72px' } as const
+export const radius = { sm: '8px', md: '10px', lg: '16px', pill: '999px' } as const
+export const shadows = { subtle: '0 2px 7px rgba(17,19,26,.04)', green: '0 6px 18px rgba(19,153,47,.16)', modal: '0 24px 80px rgba(17,19,26,.18)' } as const
+export const motion = { fast: '160ms ease', normal: '240ms ease' } as const
+export const typography = { family: "'Inter', Arial, sans-serif", body: '0.875rem', label: '0.8rem' } as const
+export const tokenCss = `:root { --ds-green: ${colors.green}; --ds-green-dark: ${colors.greenDark}; --ds-green-mist: ${colors.greenMist}; --ds-green-ice: ${colors.greenIce}; --ds-graphite: ${colors.graphite}; --ds-charcoal: ${colors.charcoal}; --ds-gray: ${colors.gray}; --ds-line: ${colors.line}; --ds-white: ${colors.white}; --ds-off-white: ${colors.offWhite}; --ds-space-xs: ${spacing.xs}; --ds-space-sm: ${spacing.sm}; --ds-space-md: ${spacing.md}; --ds-space-lg: ${spacing.lg}; --ds-space-xl: ${spacing.xl}; --ds-radius-sm: ${radius.sm}; --ds-radius-md: ${radius.md}; --ds-radius-lg: ${radius.lg}; --ds-shadow-subtle: ${shadows.subtle}; --ds-shadow-green: ${shadows.green}; --ds-motion-fast: ${motion.fast}; }`

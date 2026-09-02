@@ -1,0 +1,6690 @@
+[{
+  "title": "Clinica Josyellen Biehl - Podologia e Estética Avançada em Emagrecimento",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Clínica especializada",
+  "address": "R. Antônio Verino dos Santos, 291 - Santo Antônio, Criciúma - SC, 88809-400, Brasil",
+  "neighborhood": "Santo Antônio",
+  "street": "R. Antônio Verino dos Santos, 291",
+  "city": "Criciúma",
+  "postalCode": "88809-400",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "http://www.drajosyellenbiehl.com.br/",
+  "phone": "+55 48 99676-1446",
+  "phoneUnformatted": "+5548996761446",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6855154,
+    "lng": -49.3922329
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJ_8U9RNuDIZURxknrb3YaiHI",
+  "categories": [
+    "Clínica especializada",
+    "Esteticista",
+    "Centro de saúde e beleza",
+    "Spa de saúde",
+    "Podólogo",
+    "Spa",
+    "Serviço de emagrecimento"
+  ],
+  "fid": "0x952183db443dc5ff:0x72881a766feb49c6",
+  "cid": "8252875413142587846",
+  "reviewsCount": 264,
+  "imagesCount": 38,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:35.521Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 12:00, 13:00 to 19:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 12:00, 13:00 to 19:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 12:00, 13:00 to 19:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:00 to 12:00, 13:00 to 19:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 12:00, 13:00 to 19:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Da empresa": [
+      {
+        "Se identifica como uma empresa de empreendedoras": true
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Assento com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Banheiro com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro": true
+      },
+      {
+        "Restaurante": false
+      }
+    ],
+    "Planejamento": [
+      {
+        "É recomendado marcar hora": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Clinica%20Josyellen%20Biehl%20-%20Podologia%20e%20Est%C3%A9tica%20Avan%C3%A7ada%20em%20Emagrecimento&query_place_id=ChIJ_8U9RNuDIZURxknrb3YaiHI",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.774461643798716,-49.46388721441443,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 6,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmM_5DGNpBn3wSROQs6n_0uGRHhCNn6nNrwZzQv0fgzy2oMU8oDKbvnAi56Mo-w7MvtY1k4a6yIv1-vHsLr_xbTX59pIyCVPzSNFmbMfZSvh9HsJ1kGz4JjkjyLjPrSlf4wr3hZcQ=w408-h408-k-no",
+  "kgmid": "/g/11jff6_j2x",
+  "businessProfileId": "6354287255267384519"
+},
+{
+  "title": "Bella Si - Clínica de estética Avançada Criciuma",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Centro de saúde e beleza",
+  "address": "Av. Centenário, 3160 - Sl 10 - Centro, Criciúma - SC, 88802-000, Brasil",
+  "neighborhood": "Centro",
+  "street": "Av. Centenário, 3160 - Sl 10",
+  "city": "Criciúma",
+  "postalCode": "88802-000",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://bellasicriciuma.com.br/",
+  "phone": "+55 48 99120-5157",
+  "phoneUnformatted": "+5548991205157",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6798414,
+    "lng": -49.3714891
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 4.8,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJfRYiN4-DIZURjuh9jiSmObw",
+  "categories": [
+    "Centro de saúde e beleza",
+    "Spa de saúde",
+    "Clínica especializada",
+    "Serviço de emagrecimento",
+    "Centro de bem-estar"
+  ],
+  "fid": "0x9521838f3722167d:0xbc39a6248e7de88e",
+  "cid": "13563054428742609038",
+  "reviewsCount": 125,
+  "imagesCount": 64,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:35.521Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 19:30"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 19:30"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 18:30"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:00 to 19:30"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 19:30"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Da empresa": [
+      {
+        "Se identifica como uma empresa de empreendedoras": true
+      }
+    ],
+    "Opções de serviço": [
+      {
+        "Retirada na loja": true
+      },
+      {
+        "Compras na loja": true
+      },
+      {
+        "Serviços no local": true
+      },
+      {
+        "Entrega": false
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Aro de indução magnética": false
+      },
+      {
+        "Assento com acessibilidade para pessoas em cadeira de rodas": false
+      },
+      {
+        "Banheiro com acessibilidade para pessoas em cadeira de rodas": false
+      }
+    ],
+    "Comodidades": [
+      {
+        "Wi-Fi": true
+      },
+      {
+        "Wi-Fi gratuito": true
+      },
+      {
+        "Restaurante": false
+      }
+    ],
+    "Público": [
+      {
+        "Empresa que acolhe a comunidade LGBTQ+": true
+      },
+      {
+        "Espaço seguro para pessoas transgênero": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Cheques": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ],
+    "Estacionamento": [
+      {
+        "Estacionamento descoberto gratuito": true
+      },
+      {
+        "Estacionamento descoberto pago": true
+      },
+      {
+        "Estacionamento gratuito na rua": true
+      },
+      {
+        "Estacionamento no local": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Bella%20Si%20-%20Cl%C3%ADnica%20de%20est%C3%A9tica%20Avan%C3%A7ada%20Criciuma&query_place_id=ChIJfRYiN4-DIZURjuh9jiSmObw",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.774461643798716,-49.46388721441443,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 7,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWldYY3aZsMFPyahb9cj2UjEvMmUb0NuZIHY0BwKycx-RhT1vI1M-WY6eRdGQ_qlHSRRLc-3PBl3mgrg2azwRimNSxdQ9AXdY0xUf1L_fuG0u8tF21EHpWyuA3AX1YcOhmZG2RUXhQ=w426-h240-k-no",
+  "kgmid": "/g/11ppjfthk6",
+  "businessProfileId": "3645546164735141684"
+},
+{
+  "title": "Royal Face Clínica de Estética - Criciúma",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Centro de saúde e beleza",
+  "address": "R. Mal. Floriano Peixoto, 75 - Centro, Criciúma - SC, 88801-040, Brasil",
+  "neighborhood": "Centro",
+  "street": "R. Mal. Floriano Peixoto, 75",
+  "city": "Criciúma",
+  "postalCode": "88801-040",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://royalface.com.br/unidade/criciuma-sc/",
+  "phone": "+55 48 98427-3223",
+  "phoneUnformatted": "+5548984273223",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6792215,
+    "lng": -49.3701454
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJJfi-3eGDIZURsZXrTpMaH4g",
+  "categories": [
+    "Centro de saúde e beleza",
+    "Esteticista",
+    "Spa facial",
+    "Clínica especializada"
+  ],
+  "fid": "0x952183e1ddbef825:0x881f1a934eeb95b1",
+  "cid": "9808587733422806449",
+  "reviewsCount": 968,
+  "imagesCount": 93,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:35.522Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 18:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 18:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "09:00 to 13:00"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "Fechado"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 19:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Acessibilidade": [
+      {
+        "Banheiro com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Wi-Fi": true
+      },
+      {
+        "Wi-Fi gratuito": true
+      }
+    ],
+    "Planejamento": [
+      {
+        "Necessário fazer agendamento": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Royal%20Face%20Cl%C3%ADnica%20de%20Est%C3%A9tica%20-%20Crici%C3%BAma&query_place_id=ChIJJfi-3eGDIZURsZXrTpMaH4g",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.774461643798716,-49.46388721441443,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 8,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmN2oMEnngPn4rsiaR8WkV07aciK5kZBKGGns6RKRiMZ76d9T-D_5Tdg9ZiiscH1bSE3Gh1ypdsLaOpyin5GzrYIK-KS4vaD0KJoyu7wO7uttaMdPGnZVmuMcw_E_Itku6Tvm0UTg=w408-h544-k-no",
+  "kgmid": "/g/11m8w_rzby",
+  "businessProfileId": "9686336795145999099"
+},
+{
+  "title": "Dra. Graziela Knabben | Harmonização Facial | Botox | Preenchimento Labial | Bioestimuladores | Clínica Estética em Criciúma",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Clínica especializada",
+  "address": "R. Augusto dos Anjos, 10 - Sl 01 - Pio Corrêa, Criciúma - SC, 88811-560, Brasil",
+  "neighborhood": "Pio Corrêa",
+  "street": "R. Augusto dos Anjos, 10 - Sl 01",
+  "city": "Criciúma",
+  "postalCode": "88811-560",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "http://www.clinicakaira.com.br/",
+  "phone": "+55 48 99932-2667",
+  "phoneUnformatted": "+5548999322667",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6765995,
+    "lng": -49.3602734
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJgXefO8p5IZUR0MtUXXN-PPw",
+  "categories": [
+    "Clínica especializada"
+  ],
+  "fid": "0x952179ca3b9f7781:0xfc3c7e735d54cbd0",
+  "cid": "18175541230112656336",
+  "reviewsCount": 78,
+  "imagesCount": 20,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:35.522Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "13:30 to 19:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 19:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Acessibilidade": [
+      {
+        "Banheiro com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro": true
+      }
+    ],
+    "Planejamento": [
+      {
+        "Necessário fazer agendamento": true
+      },
+      {
+        "É recomendado marcar hora": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Dra.%20Graziela%20Knabben%20%7C%20Harmoniza%C3%A7%C3%A3o%20Facial%20%7C%20Botox%20%7C%20Preenchimento%20Labial%20%7C%20Bioestimuladores%20%7C%20Cl%C3%ADnica%20Est%C3%A9tica%20em%20Crici%C3%BAma&query_place_id=ChIJgXefO8p5IZUR0MtUXXN-PPw",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.774461643798716,-49.46388721441443,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 9,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmuHRsbUlHT1IgnMHbotdnD_oMML1G4ewD2SINSdP2ydUnWI81iywGcP0kWTRivPbw6asIk3ljWtJFfFlrb-FSXo9hYvsVqskSQbZJ56Y5t1EeWvtID7bZa3imhaqalrLjMg03uixE9ubo3=w408-h612-k-no",
+  "kgmid": "/g/11j90dcnqj",
+  "businessProfileId": "17070961329630031504"
+},
+{
+  "title": "Clínica Injetare Saúde e Estética",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Clínica especializada",
+  "address": "R. Joaquim Nabuco, 1305 - Sala 1 - São Luiz, Criciúma - SC, 88803-001, Brasil",
+  "neighborhood": "São Luiz",
+  "street": "R. Joaquim Nabuco, 1305 - Sala 1",
+  "city": "Criciúma",
+  "postalCode": "88803-001",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://www.contate.me/clinicainjetare-gmn",
+  "phone": "+55 48 99925-6813",
+  "phoneUnformatted": "+5548999256813",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6905829,
+    "lng": -49.3717299
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJecOSqdGDIZURmzxKqMjKG-s",
+  "categories": [
+    "Clínica especializada"
+  ],
+  "fid": "0x952183d1a992c379:0xeb1bcac8a84a3c9b",
+  "cid": "16941357386449960091",
+  "reviewsCount": 97,
+  "imagesCount": 64,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:35.522Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "08:00 to 12:00, 13:30 to 19:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "08:00 to 12:00, 13:30 to 19:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "08:00 to 12:00, 13:30 to 17:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "08:00 to 12:00, 13:30 to 19:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "08:00 to 12:00, 13:30 to 19:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Opções de serviço": [
+      {
+        "Serviços no local": true
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Assento com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Banheiro com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Aro de indução magnética": false
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro": true
+      },
+      {
+        "Banheiro de gênero neutro": true
+      }
+    ],
+    "Público": [
+      {
+        "Empresa que acolhe a comunidade LGBTQ+": true
+      },
+      {
+        "Espaço seguro para pessoas transgênero": true
+      }
+    ],
+    "Planejamento": [
+      {
+        "Necessário fazer agendamento": true
+      },
+      {
+        "É recomendado marcar hora": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ],
+    "Estacionamento": [
+      {
+        "Estacionamento descoberto gratuito": true
+      },
+      {
+        "Estacionamento gratuito na rua": true
+      },
+      {
+        "Estacionamento no local": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Cl%C3%ADnica%20Injetare%20Sa%C3%BAde%20e%20Est%C3%A9tica&query_place_id=ChIJecOSqdGDIZURmzxKqMjKG-s",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.774461643798716,-49.46388721441443,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 10,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkIVicXVkyIO0B6_xywFKqnms2bZ_WTTPNM1Ln-hbq6IqBerhO9vnROcHvYmYYcQqAniNNGO38d_kM3E3FIzQKNyOd35mJYQvABqvklgKthPf7PYXjmvCeaKn2X6qlAyb-Ty1SPlA=w408-h407-k-no",
+  "kgmid": "/g/11my38b8mb",
+  "businessProfileId": "6343343440632042704"
+},
+{
+  "title": "Clinica estética CRIOLASER",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Esteticista",
+  "address": "R. Joaquim Nabuco, 650 - Sl 2 - terrea, Criciúma - SC, 88802-200, Brasil",
+  "neighborhood": "terrea",
+  "street": "R. Joaquim Nabuco, 650 - Sl 2",
+  "city": "Criciúma",
+  "postalCode": "88802-200",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://www.instagram.com/criolaseresteticacriciuma?igsh=aWNwdHJ5bWU1cThz&utm_source=qr",
+  "phone": "+55 48 99171-0017",
+  "phoneUnformatted": "+5548991710017",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6853016,
+    "lng": -49.3720921
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 4.9,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJ31fUNlqDIZURP_kuVQhOXNU",
+  "categories": [
+    "Esteticista",
+    "Depilação",
+    "Centro de saúde e beleza",
+    "Spa de saúde",
+    "Serviço de depilação a laser",
+    "Massoterapeuta",
+    "Clínica especializada"
+  ],
+  "fid": "0x9521835a36d457df:0xd55c4e08552ef93f",
+  "cid": "15374249025631877439",
+  "reviewsCount": 40,
+  "imagesCount": 69,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:35.523Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 18:30"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 18:30"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 18:30"
+    },
+    {
+      "day": "sábado",
+      "hours": "08:30 to 12:30"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:00 to 18:30"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 18:30"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Da empresa": [
+      {
+        "Se identifica como uma empresa de empreendedoras": true
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro de gênero neutro": true
+      },
+      {
+        "Restaurante": false
+      }
+    ],
+    "Público": [
+      {
+        "Empresa que acolhe a comunidade LGBTQ+": true
+      },
+      {
+        "Espaço seguro para pessoas transgênero": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Clinica%20est%C3%A9tica%20CRIOLASER&query_place_id=ChIJ31fUNlqDIZURP_kuVQhOXNU",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.774461643798716,-49.46388721441443,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 11,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlU_isVpsvFPwjlCpLhWu1JLDDjrVP0X9UDbuRM5-zLvDj8fkPv8D5a5vD-dKHnt-OoDFSWN9Q7036dI0MEX9SVw-G3ak-lH8nMgq1UicAfavPbcE7bPZ4Sh4PWaLfrz2gNQJGbyBgXbpzw=w408-h544-k-no",
+  "kgmid": "/g/11y5mhfddp",
+  "businessProfileId": "12452633883334772208"
+},
+{
+  "title": "Mais Beauté Estética",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Clínica especializada",
+  "address": "R. Vilmar Garbeloto, 135 - Santa Catarina, Criciúma - SC, 88810-242, Brasil",
+  "neighborhood": "Santa Catarina",
+  "street": "R. Vilmar Garbeloto, 135",
+  "city": "Criciúma",
+  "postalCode": "88810-242",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "phone": "+55 48 99657-1766",
+  "phoneUnformatted": "+5548996571766",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6726436,
+    "lng": -49.3802994
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 4.9,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJs5gdooWCIZURWcHRNKXBQ9Q",
+  "categories": [
+    "Clínica especializada"
+  ],
+  "fid": "0x95218285a21d98b3:0xd443c1a534d1c159",
+  "cid": "15295281674780262745",
+  "reviewsCount": 155,
+  "imagesCount": 2,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:35.523Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "08:00 to 19:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "08:00 to 19:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "08:00 to 17:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "08:00 to 19:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "08:00 to 19:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Acessibilidade": [
+      {
+        "Banheiro com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro": true
+      }
+    ],
+    "Planejamento": [
+      {
+        "É recomendado marcar hora": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Mais%20Beaut%C3%A9%20Est%C3%A9tica&query_place_id=ChIJs5gdooWCIZURWcHRNKXBQ9Q",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.774461643798716,-49.46388721441443,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 12,
+  "isAdvertisement": false,
+  "imageUrl": "https://streetviewpixels-pa.googleapis.com/v1/thumbnail?panoid=GWoWCubE1hERvwQLQ93Gvg&cb_client=search.gws-prod.gps&w=408&h=240&yaw=244.82733&pitch=0&thumbfov=100",
+  "kgmid": "/g/11dx8fp667",
+  "businessProfileId": "17160993657788992619"
+},
+{
+  "title": "Clínica Estética Virtuosa - Criciúma",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Centro de saúde e beleza",
+  "address": "R. Pedro Beneton, 120 - Centro, Criciúma - SC, 88802-070, Brasil",
+  "neighborhood": "Centro",
+  "street": "R. Pedro Beneton, 120",
+  "city": "Criciúma",
+  "postalCode": "88802-070",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://www.esteticavirtuosa.com.br/criciuma",
+  "phone": "+55 48 99163-5918",
+  "phoneUnformatted": "+5548991635918",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6819557,
+    "lng": -49.3788612
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 4.1,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJS6ZL0p6DIZURu9wa5R41eqo",
+  "categories": [
+    "Centro de saúde e beleza"
+  ],
+  "fid": "0x9521839ed24ba64b:0xaa7a351ee51adcbb",
+  "cid": "12284189340415483067",
+  "reviewsCount": 100,
+  "imagesCount": 10,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:35.523Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "08:00 to 21:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "08:00 to 21:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "08:00 to 21:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "09:00 to 13:00"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "08:00 to 21:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "08:00 to 21:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Opções de serviço": [
+      {
+        "Entrega": false
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Cl%C3%ADnica%20Est%C3%A9tica%20Virtuosa%20-%20Crici%C3%BAma&query_place_id=ChIJS6ZL0p6DIZURu9wa5R41eqo",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.774461643798716,-49.46388721441443,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 13,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmVsvdHIRaaGTdvPqJ2mtCe2FVIPb9V2uZHgLeRv9c3neSmYl05PdWUwYdxd5yIMshsfiRQJ962V8CsHunsq5kwODZm2De0lbua8Vr8T_h7WO6sgNRQj2deHqSfYgyyflWIQFgb=w408-h544-k-no",
+  "kgmid": "/g/11jlnzv8h3",
+  "businessProfileId": "2816332325926913134"
+},
+{
+  "title": "Estética Avançada Sônia Garcia",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Esteticista",
+  "address": "Av. Centenário, 2607 - Centro, Criciúma - SC, 88801-000, Brasil",
+  "neighborhood": "Centro",
+  "street": "Av. Centenário, 2607",
+  "city": "Criciúma",
+  "postalCode": "88801-000",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://soniagarcia.com.br/",
+  "phone": "+55 48 99107-7638",
+  "phoneUnformatted": "+5548991077638",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6805525,
+    "lng": -49.3775794
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 4.9,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJh7cdcw-DIZURhPWzNkMl3pI",
+  "categories": [
+    "Esteticista",
+    "Spa facial",
+    "Centro de saúde e beleza"
+  ],
+  "fid": "0x9521830f731db787:0x92de254336b3f584",
+  "cid": "10582937144978044292",
+  "reviewsCount": 122,
+  "imagesCount": 150,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:35.523Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 22:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 22:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 22:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "09:00 to 16:00"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:00 to 22:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 22:00"
+    }
+  ],
+  "additionalOpeningHours": {
+    "Horário de atendimento on-line": [
+      {
+        "day": "quarta-feira",
+        "hours": "09:00–22:00"
+      },
+      {
+        "day": "quinta-feira",
+        "hours": "09:00–22:00"
+      },
+      {
+        "day": "sexta-feira",
+        "hours": "09:00–22:00"
+      },
+      {
+        "day": "sábado",
+        "hours": "09:00–16:00"
+      },
+      {
+        "day": "domingo",
+        "hours": "Fechado"
+      },
+      {
+        "day": "segunda-feira",
+        "hours": "09:00–22:00"
+      },
+      {
+        "day": "terça-feira",
+        "hours": "09:00–22:00"
+      }
+    ]
+  },
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Da empresa": [
+      {
+        "Se identifica como uma empresa de empreendedoras": true
+      }
+    ],
+    "Opções de serviço": [
+      {
+        "Serviços no local": true
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Assento com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Aro de indução magnética": false
+      },
+      {
+        "Banheiro com acessibilidade para pessoas em cadeira de rodas": false
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": false
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro de gênero neutro": true
+      }
+    ],
+    "Público": [
+      {
+        "Empresa que acolhe a comunidade LGBTQ+": true
+      },
+      {
+        "Espaço seguro para pessoas transgênero": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Est%C3%A9tica%20Avan%C3%A7ada%20S%C3%B4nia%20Garcia&query_place_id=ChIJh7cdcw-DIZURhPWzNkMl3pI",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.774461643798716,-49.46388721441443,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 14,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlq-wkmJJ8t-O2zcjbYEEjiokpPXCjuwxRH1a7iC6YaE0m4sBsVHWEfTOkqq6P_76MxSbUM0NbOyqLFlY5D1pOSQG2Kl6L5Fqjk2ZZfSiKiCrHdE3T0C3On8o1XAEZ-Lf4WtT1ozSVqBqnh=w408-h544-k-no",
+  "kgmid": "/g/11swgmn697",
+  "businessProfileId": "8865827171022805786"
+},
+{
+  "title": "Clivia - Clínica de Estética em Criciúma",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Centro de saúde e beleza",
+  "address": "R. Galdino Trento, 45 - Ceará, Criciúma - SC, 88815-072, Brasil",
+  "neighborhood": "Ceará",
+  "street": "R. Galdino Trento, 45",
+  "city": "Criciúma",
+  "postalCode": "88815-072",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://www.clinicaclivia.com/",
+  "phone": "+55 48 98870-6102",
+  "phoneUnformatted": "+5548988706102",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6834167,
+    "lng": -49.3526125
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJZfVSk0N5IZURH3uJgVYxQgM",
+  "categories": [
+    "Centro de saúde e beleza",
+    "Consultório médico",
+    "Clínica especializada"
+  ],
+  "fid": "0x952179439352f565:0x342315681897b1f",
+  "cid": "234804378186906399",
+  "reviewsCount": 90,
+  "imagesCount": 31,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:35.523Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 18:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 19:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Da empresa": [
+      {
+        "Se identifica como uma empresa de empreendedoras": true
+      }
+    ],
+    "Opções de serviço": [
+      {
+        "Entrega": false
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro de gênero neutro": true
+      },
+      {
+        "Wi-Fi": true
+      },
+      {
+        "Wi-Fi gratuito": true
+      }
+    ],
+    "Público": [
+      {
+        "Empresa que acolhe a comunidade LGBTQ+": true
+      },
+      {
+        "Espaço seguro para pessoas transgênero": true
+      }
+    ],
+    "Planejamento": [
+      {
+        "Necessário fazer agendamento": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      }
+    ],
+    "Estacionamento": [
+      {
+        "Estacionamento no local": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Clivia%20-%20Cl%C3%ADnica%20de%20Est%C3%A9tica%20em%20Crici%C3%BAma&query_place_id=ChIJZfVSk0N5IZURH3uJgVYxQgM",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.774461643798716,-49.46388721441443,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 15,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmxIDCDOM_9zDl1jf73DWL3lC9RTkUgcMS0aLKUnl5mFFrGfVb3d59Z6emxRJGO1dgIjnXzOZJwUUz1uf5ncDHfj6067XzXgwgxADif7Hv0iCjE1mdVyTV2MkiUrUubc9zTV2KSYiYKdHQ=w408-h306-k-no",
+  "kgmid": "/g/11s3qtxm94",
+  "businessProfileId": "15731928346659964640"
+},
+{
+  "title": "Clinica de Estética UnaBelle Em Criciúma",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Centro de saúde e beleza",
+  "address": "MILLENIUM SAÚDE CENTER - R. Cel. Pedro Benedet, 505 - Sl 305 - Centro, Criciúma - SC, 88801-250, Brasil",
+  "neighborhood": "Centro",
+  "street": "MILLENIUM SAÚDE CENTER - R. Cel. Pedro Benedet, 505 - Sl 305",
+  "city": "Criciúma",
+  "postalCode": "88801-250",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "http://www.unabelle.com.br/",
+  "phone": "+55 48 99651-9869",
+  "phoneUnformatted": "+5548996519869",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6745108,
+    "lng": -49.3652563
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 4.9,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJM80vqqaDIZURUCbs5PQ3GHs",
+  "categories": [
+    "Centro de saúde e beleza",
+    "Serviço de depilação a laser",
+    "Clínica especializada"
+  ],
+  "fid": "0x952183a6aa2fcd33:0x7b1837f4e4ec2650",
+  "cid": "8869900991058421328",
+  "reviewsCount": 62,
+  "imagesCount": 141,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:35.524Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 12:00, 14:00 to 20:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 12:00, 14:00 to 20:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 12:00, 14:00 to 18:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:00 to 12:00, 14:00 to 20:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 12:00, 14:00 to 20:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Da empresa": [
+      {
+        "Se identifica como uma empresa de empreendedoras": true
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Assento com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Banheiro com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Aro de indução magnética": false
+      }
+    ],
+    "Planejamento": [
+      {
+        "Necessário fazer agendamento": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ],
+    "Estacionamento": [
+      {
+        "Estacionamento coberto pago": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Clinica%20de%20Est%C3%A9tica%20UnaBelle%20Em%20Crici%C3%BAma&query_place_id=ChIJM80vqqaDIZURUCbs5PQ3GHs",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.774461643798716,-49.46388721441443,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 16,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmJzkF6-5_ruf-Qo67EuaRpa_3NuN-ImeYWlIkr74o1kACQnBvDljoKT1eh14pKNjuf0hEUC8I-EWrKW8ACErIsDSj9fLapAI6aWtt7YX-w7nB9vr9jJsYHqRJus1dGl6vP92M=w408-h273-k-no",
+  "kgmid": "/g/11l8y8tpz0",
+  "businessProfileId": "14522066818520280577"
+},
+{
+  "title": "Paula Budny Clínica - Harmonização Facial",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Clínica especializada",
+  "address": "R. Cel. Marcos Rovaris, 230 - Sl 804 - Centro, Criciúma - SC, 88801-100, Brasil",
+  "neighborhood": "Centro",
+  "street": "R. Cel. Marcos Rovaris, 230 - Sl 804",
+  "city": "Criciúma",
+  "postalCode": "88801-100",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://www.instagram.com/drapaulabudny",
+  "phone": "+55 48 99956-2729",
+  "phoneUnformatted": "+5548999562729",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6783558,
+    "lng": -49.3659098
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJOQPlERqDIZURdeOJpffMdcI",
+  "categories": [
+    "Clínica especializada"
+  ],
+  "fid": "0x9521831a11e50339:0xc275ccf7a589e375",
+  "cid": "14012331179639432053",
+  "reviewsCount": 125,
+  "imagesCount": 5,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:35.524Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 20:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Acessibilidade": [
+      {
+        "Banheiro com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro": true
+      }
+    ],
+    "Planejamento": [
+      {
+        "É recomendado marcar hora": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Paula%20Budny%20Cl%C3%ADnica%20-%20Harmoniza%C3%A7%C3%A3o%20Facial&query_place_id=ChIJOQPlERqDIZURdeOJpffMdcI",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.774461643798716,-49.46388721441443,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 17,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWklJR9M5feUi7JZCo60a5eKsf2yUNHQfuHJxdEPylCRS7zr-IrMFxLvwLUmB7cGzFY7FMzznEnq1ZXwj-N-GXI6xynxYhr1T753-_9sXehL1K_tbWNU7XDz2MAuGbEkOi4M30TIRmiJuupn=w408-h612-k-no",
+  "kgmid": "/g/11szfwdmyp",
+  "businessProfileId": "15128799287192028293"
+},
+{
+  "title": "Ad Clinic - Criciuma",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Centro de saúde e beleza",
+  "address": "R. Princesa Isabel, 300 - Centro, Criciúma - SC, 88801-130, Brasil",
+  "neighborhood": "Centro",
+  "street": "R. Princesa Isabel, 300",
+  "city": "Criciúma",
+  "postalCode": "88801-130",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "phone": "+55 48 3056-2577",
+  "phoneUnformatted": "+554830562577",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6804524,
+    "lng": -49.3648903
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 4.7,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJu6yi5QZ5IZURXaPgbyJ1vAA",
+  "categories": [
+    "Centro de saúde e beleza"
+  ],
+  "fid": "0x95217906e5a2acbb:0xbc75226fe0a35d",
+  "cid": "53046086387934045",
+  "reviewsCount": 72,
+  "imagesCount": 31,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:35.524Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 21:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:00 to 21:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 21:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Opções de serviço": [
+      {
+        "Compras na loja": true
+      },
+      {
+        "Entrega": false
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Assento com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Banheiro com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Wi-Fi": true
+      },
+      {
+        "Wi-Fi gratuito": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ],
+    "Estacionamento": [
+      {
+        "Estacionamento descoberto gratuito": true
+      },
+      {
+        "Estacionamento no local": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Ad%20Clinic%20-%20Criciuma&query_place_id=ChIJu6yi5QZ5IZURXaPgbyJ1vAA",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.774461643798716,-49.46388721441443,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 18,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmszAPlHaZBHQl6Nf26LEbda6dDznMvj--SUFKPXsUc1JhTgG4GxwQct6Q6fR7Az7gXWwG3dXUZYmoBt2kAKdz7U-wXsURyPMpAPDQkBaZXeRPArUSuGHn5Hg1EsGwRmneOyBtbTC0i1wbi=w408-h272-k-no",
+  "kgmid": "/g/11nms4_8ds",
+  "businessProfileId": "2135761158126263359"
+},
+{
+  "title": "Flora | Clinica de Estética em Criciúma",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Esteticista",
+  "address": "R. Princesa Isabel, 300 - Centro, Criciúma - SC, 88801-130, Brasil",
+  "neighborhood": "Centro",
+  "street": "R. Princesa Isabel, 300",
+  "city": "Criciúma",
+  "postalCode": "88801-130",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://bio.site/floraclinicadeestetica",
+  "phone": "+55 48 3056-2577",
+  "phoneUnformatted": "+554830562577",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6804493,
+    "lng": -49.3648565
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJT9-Fk855IZURlbZV--xYFFE",
+  "categories": [
+    "Esteticista"
+  ],
+  "fid": "0x952179ce9385df4f:0x511458ecfb55b695",
+  "cid": "5842392391458600597",
+  "reviewsCount": 25,
+  "imagesCount": 3,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:35.524Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 21:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:00 to 21:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 21:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Flora%20%7C%20Clinica%20de%20Est%C3%A9tica%20em%20Crici%C3%BAma&query_place_id=ChIJT9-Fk855IZURlbZV--xYFFE",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.774461643798716,-49.46388721441443,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 19,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmypgRRThMyKJTAfpH-2RrPrVnQdy0CBKx5EpDsPm4AxdWpkXyvmCksTsqH14ojssJmi9ZOzYeFRDjgvkev9eflk94jZ9XmrQH-lQlFepksjbEzVQq0o8voWbEFB3IhjvY-QFF92O82ADw0=w432-h240-k-no",
+  "kgmid": "/g/11npxm3ctv",
+  "businessProfileId": "2745680050611551196"
+},
+{
+  "title": "Dra. Vitória Gois - Clinica Estética Especializada",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Centro de saúde e beleza",
+  "address": "Edifício Comercial Titanium Trade Center - R. Araranguá, 35 - Sala 502 - Centro, Criciúma - SC, 88801-600, Brasil",
+  "neighborhood": "Centro",
+  "street": "Edifício Comercial Titanium Trade Center - R. Araranguá, 35 - Sala 502",
+  "city": "Criciúma",
+  "postalCode": "88801-600",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "phone": "+55 48 99651-3522",
+  "phoneUnformatted": "+5548996513522",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6751379,
+    "lng": -49.3733282
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJ4w-pm7-DIZURo_BieGbyOqo",
+  "categories": [
+    "Centro de saúde e beleza"
+  ],
+  "fid": "0x952183bf9ba90fe3:0xaa3af2667862f0a3",
+  "cid": "12266383057017303203",
+  "reviewsCount": 13,
+  "imagesCount": 11,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:35.524Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "09:00 to 18:00"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 20:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Acessibilidade": [
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Dra.%20Vit%C3%B3ria%20Gois%20-%20Clinica%20Est%C3%A9tica%20Especializada&query_place_id=ChIJ4w-pm7-DIZURo_BieGbyOqo",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.774461643798716,-49.46388721441443,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 20,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWk06AWqIHkkHZqjzxZ0YQDFqTY_t63O-KmN73dWJFTyuq9Zcni92uyVK6h4jq3vyvqNcjyiU19zuYu481stf8FfAQFBZl2I2EX4Yw-fN9MDrHqvxwUhO1JtnbLV6CrWzzY0k7JeU4SKt8Q=w408-h612-k-no",
+  "kgmid": "/g/11pr8pfgn0",
+  "businessProfileId": "3955855850479415605"
+},
+{
+  "title": "Clínica Gi Rosso | Micropigmentação em Criciúma",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Clínica especializada",
+  "address": "R. José Salvador, 30 - Quarta Linha, Criciúma - SC, 88812-350, Brasil",
+  "neighborhood": "Quarta Linha",
+  "street": "R. José Salvador, 30",
+  "city": "Criciúma",
+  "postalCode": "88812-350",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://agendaagil.com/girosso/",
+  "phone": "+55 48 99619-8042",
+  "phoneUnformatted": "+5548996198042",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.787871,
+    "lng": -49.3646791
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 4.8,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJfxTglPx_IZURTgUGUQjAX0c",
+  "categories": [
+    "Clínica especializada"
+  ],
+  "fid": "0x95217ffc94e0147f:0x475fc0085106054e",
+  "cid": "5143040441432016206",
+  "reviewsCount": 39,
+  "imagesCount": 13,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:35.609Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "13:00 to 21:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "08:00 to 11:00, 13:00 to 18:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "13:00 to 21:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "13:00 to 21:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "08:00 to 11:00, 13:00 to 18:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Da empresa": [
+      {
+        "Se identifica como uma empresa de empreendedoras": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro": true
+      }
+    ],
+    "Planejamento": [
+      {
+        "É recomendado marcar hora": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Cl%C3%ADnica%20Gi%20Rosso%20%7C%20Micropigmenta%C3%A7%C3%A3o%20em%20Crici%C3%BAma&query_place_id=ChIJfxTglPx_IZURTgUGUQjAX0c",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.834796231396147,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 1,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnCbBJKBCSpRzrKd15d-zrP4PJ9KmqLs-b0faE0UmR5wWCQ3WjwYgVtRFDGnj78OKv_av_t2PQek6ijxPBDJAMK_VfOPrTzqqTitJGaha5hLQ52r83aX551diNcRFLAP-CvjhRHazsMdbA=w426-h240-k-no",
+  "kgmid": "/g/11c6sxl1pw",
+  "businessProfileId": "7367623228571965327"
+},
+{
+  "title": "Benessere - Odontologia e Biomedicina Estética",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Centro de saúde e beleza",
+  "address": "R. José Salvador - Quarta Linha, Criciúma - SC, 88820-000, Brasil",
+  "neighborhood": "Quarta Linha",
+  "street": "R. José Salvador",
+  "city": "Criciúma",
+  "postalCode": "88820-000",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "phone": "+55 48 99658-6695",
+  "phoneUnformatted": "+5548996586695",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.7877918,
+    "lng": -49.3623351
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 4.8,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJOcGlkWx_IZURfbxOWg3KM3k",
+  "categories": [
+    "Centro de saúde e beleza",
+    "Clínica odontológica",
+    "Clínica especializada"
+  ],
+  "fid": "0x95217f6c91a5c139:0x7933ca0d5a4ebc7d",
+  "cid": "8733546261100018813",
+  "reviewsCount": 16,
+  "imagesCount": 13,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:35.609Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "08:00 to 20:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "08:00 to 20:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "08:00 to 20:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "13:00 to 20:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "08:00 to 20:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Acessibilidade": [
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro": true
+      }
+    ],
+    "Planejamento": [
+      {
+        "É recomendado marcar hora": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ],
+    "Estacionamento": [
+      {
+        "Estacionamento no local": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Benessere%20-%20Odontologia%20e%20Biomedicina%20Est%C3%A9tica&query_place_id=ChIJOcGlkWx_IZURfbxOWg3KM3k",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.834796231396147,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 2,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWk3kev4HUUkLGaEwl2Pi9WQfngPgEsKS57iw1RO5wQ62ut6Om70wltxqTMqcAyTpsrPDgsESCiHRR8O6xKAXzqI3qZFo85Kv_Vr14adVcbusGEPusx6P8QK03gPDa9n2oRE4f20ajzm4yc=w408-h544-k-no",
+  "kgmid": "/g/11hf_b6ymc",
+  "businessProfileId": "1018606035254964355"
+},
+{
+  "title": "Botoclinic Criciúma",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Centro de saúde e beleza",
+  "address": "R. Afonso Célso, 182 - Centro, Criciúma - SC, 88803-000, Brasil",
+  "neighborhood": "Centro",
+  "street": "R. Afonso Célso, 182",
+  "city": "Criciúma",
+  "postalCode": "88803-000",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "phone": "+55 48 99135-6866",
+  "phoneUnformatted": "+5548991356866",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6821414,
+    "lng": -49.3697374
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 4.8,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJ40m_K3N5IZUR5fLbgjcZdqI",
+  "categories": [
+    "Centro de saúde e beleza",
+    "Esteticista",
+    "Clínica de dermatologia"
+  ],
+  "fid": "0x952179732bbf49e3:0xa276193782dbf2e5",
+  "cid": "11706572007605531365",
+  "reviewsCount": 50,
+  "imagesCount": 81,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:35.610Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "10:00 to 20:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "10:00 to 20:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "10:00 to 20:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "10:00 to 13:00"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "10:00 to 20:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "13:30 to 20:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Opções de serviço": [
+      {
+        "Entrega": true
+      },
+      {
+        "Compras na loja": true
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Banheiro com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Wi-Fi": true
+      },
+      {
+        "Wi-Fi gratuito": true
+      }
+    ],
+    "Planejamento": [
+      {
+        "Necessário fazer agendamento": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ],
+    "Estacionamento": [
+      {
+        "Estacionamento pago na rua": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Botoclinic%20Crici%C3%BAma&query_place_id=ChIJ40m_K3N5IZUR5fLbgjcZdqI",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.834796231396147,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 19,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmOcMa4inefBBBkXjwZkyNrmq9y281PSAaGeSeKXP6FakRCfHvINKlPUudwTvVRZTrKdp08vnCdaV8Ebp0BcA9Q0MiLtPRdB8g_4cWWBS3uBEn1rHO_J69Fsi2tSOUf-xdChmNq=w408-h306-k-no",
+  "kgmid": "/g/11jj24jfzl",
+  "businessProfileId": "11587942917685366472"
+},
+{
+  "title": "Slim Clinic | Diana Sartor - Clínica de Estética em Criciúma",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Centro de saúde e beleza",
+  "address": "R. Domingos Darós, 50 - Centro, Criciúma - SC, 88801-210, Brasil",
+  "neighborhood": "Centro",
+  "street": "R. Domingos Darós, 50",
+  "city": "Criciúma",
+  "postalCode": "88801-210",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "phone": "+55 48 99642-5055",
+  "phoneUnformatted": "+5548996425055",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6776034,
+    "lng": -49.3651364
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 4.9,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJ1Z0q9QaDIZUR2poGDo3pFao",
+  "categories": [
+    "Centro de saúde e beleza",
+    "Centro de massagem",
+    "Massoterapeuta",
+    "Clínica especializada",
+    "Serviço de emagrecimento"
+  ],
+  "fid": "0x95218306f52a9dd5:0xaa15e98d0e069ada",
+  "cid": "12255958752993647322",
+  "reviewsCount": 36,
+  "imagesCount": 18,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:39.229Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "Fechado"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 19:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Da empresa": [
+      {
+        "Se identifica como uma empresa de empreendedoras": true
+      }
+    ],
+    "Opções de serviço": [
+      {
+        "Serviços no local": true
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Assento com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Wi-Fi": true
+      },
+      {
+        "Wi-Fi gratuito": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Slim%20Clinic%20%7C%20Diana%20Sartor%20-%20Cl%C3%ADnica%20de%20Est%C3%A9tica%20em%20Crici%C3%BAma&query_place_id=ChIJ1Z0q9QaDIZUR2poGDo3pFao",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.774461643798716,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 20,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlFChruTr-bzAMMA1gZn6Fu8eEBuoTikB-vevIYOMIm6TaL5eV9OgttUjBwACGKpYiFIhygWx3Ee5trGkrsDJF6pCHJsmChLUV5g29OIPX51oCwKiAbOWN_CT9McBbjDaNdYbE6kU4OWIQ=w408-h544-k-no",
+  "kgmid": "/g/11lcsyg4_l",
+  "businessProfileId": "16679758212202309316"
+},
+{
+  "title": "Clínica Clean Saúde Estética e Bem Estar Criciúma",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Centro de saúde e beleza",
+  "address": "R. Alm. Barroso, 370 - Sl 07 - Comerciario, Criciúma - SC, 88802-250, Brasil",
+  "neighborhood": "Comerciario",
+  "street": "R. Alm. Barroso, 370 - Sl 07",
+  "city": "Criciúma",
+  "postalCode": "88802-250",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://beacons.ai/clinicaclean",
+  "phone": "+55 48 99169-0714",
+  "phoneUnformatted": "+5548991690714",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6849849,
+    "lng": -49.3666326
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 4.8,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJO9VZuXiCIZURCBFfpjNZo4M",
+  "categories": [
+    "Centro de saúde e beleza",
+    "Clínica especializada",
+    "Terapeuta de drenagem linfática",
+    "Clínica da saúde da mulher",
+    "Terapeuta"
+  ],
+  "fid": "0x95218278b959d53b:0x83a35933a65f1108",
+  "cid": "9485523318541848840",
+  "reviewsCount": 21,
+  "imagesCount": 33,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:39.366Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "09:00 to 13:00"
+    },
+    {
+      "day": "domingo",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 20:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Da empresa": [
+      {
+        "Se identifica como uma empresa de empreendedoras": true
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Banheiro com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro": true
+      }
+    ],
+    "Planejamento": [
+      {
+        "Necessário fazer agendamento": true
+      },
+      {
+        "É recomendado marcar hora": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Cl%C3%ADnica%20Clean%20Sa%C3%BAde%20Est%C3%A9tica%20e%20Bem%20Estar%20Crici%C3%BAma&query_place_id=ChIJO9VZuXiCIZURCBFfpjNZo4M",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 4,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWl3c_kqq2QlG6o3zGyi9JdPckS1NRcwCvbVQjN2AQ3-due4tqoo2y7Gxb8_mA2Js1tvWoaXBF_H6FolX2Pe433NreAu2skR6iaEzrtCXAdAYFPmuNzRQHI9kE5SlmR9IvZRs4Kg9A=w408-h271-k-no",
+  "kgmid": "/g/11b7gs66zj",
+  "businessProfileId": "9633757898037573252"
+},
+{
+  "title": "Clínica Vieny",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Centro de saúde e beleza",
+  "address": "R. Imigrante Meller, 1745 - Universitário, Criciúma - SC, 88805-300, Brasil",
+  "neighborhood": "Universitário",
+  "street": "R. Imigrante Meller, 1745",
+  "city": "Criciúma",
+  "postalCode": "88805-300",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "phone": "+55 48 99816-3505",
+  "phoneUnformatted": "+5548998163505",
+  "claimThisBusiness": true,
+  "location": {
+    "lat": -28.699915,
+    "lng": -49.4065398
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJucBHD8aDIZURvBT5agQ6t3s",
+  "categories": [
+    "Centro de saúde e beleza"
+  ],
+  "fid": "0x952183c60f47c0b9:0x7bb73a046af914bc",
+  "cid": "8914657778052175036",
+  "reviewsCount": 7,
+  "imagesCount": 1,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:39.367Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "09:00 to 17:00"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 19:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Opções de serviço": [
+      {
+        "Entrega": false
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Cl%C3%ADnica%20Vieny&query_place_id=ChIJucBHD8aDIZURvBT5agQ6t3s",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 5,
+  "isAdvertisement": false,
+  "imageUrl": "https://streetviewpixels-pa.googleapis.com/v1/thumbnail?panoid=bip4agbfxu_gvA1JJmj8rw&cb_client=search.gws-prod.gps&w=408&h=240&yaw=171.53528&pitch=0&thumbfov=100",
+  "kgmid": "/g/11s3_8pg1w",
+  "businessProfileId": null
+},
+{
+  "title": "Sculpt Clínica de Biomedicina Estética",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Clínica especializada",
+  "address": "R. Des. Pedro Silva, 490 - Centro, Criciúma - SC, 88802-186, Brasil",
+  "neighborhood": "Centro",
+  "street": "R. Des. Pedro Silva, 490",
+  "city": "Criciúma",
+  "postalCode": "88802-186",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://www.instagram.com/sculptestetic",
+  "phone": "+55 48 99195-4562",
+  "phoneUnformatted": "+5548991954562",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6846881,
+    "lng": -49.369263
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJc9WOvQWDIZURpT0lSEs5oGQ",
+  "categories": [
+    "Clínica especializada",
+    "Salão de Beleza"
+  ],
+  "fid": "0x95218305bd8ed573:0x64a0394b48253da5",
+  "cid": "7250858395562229157",
+  "reviewsCount": 1,
+  "imagesCount": 45,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:39.367Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 19:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Acessibilidade": [
+      {
+        "Banheiro com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro": true
+      }
+    ],
+    "Planejamento": [
+      {
+        "É recomendado marcar hora": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Sculpt%20Cl%C3%ADnica%20de%20Biomedicina%20Est%C3%A9tica&query_place_id=ChIJc9WOvQWDIZURpT0lSEs5oGQ",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 6,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWl381bPQcGiWW-ybIp9XnDweJ8MuQHsr1LKKYEF598v13jiQzXQKfK6JL-hSZjSajdmBmN8KYTspNZOJ5dcYcZ7H2U2cnkSVwDpXzgsKjFoqWbNG5AH_G4-9SicDPTns7TntVdw=w408-h272-k-no",
+  "kgmid": "/g/11t9rh4gqc",
+  "businessProfileId": "14110136467001611200"
+},
+{
+  "title": "Embelezz - Estética Facial e Beleza",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Esteticista",
+  "address": "R. Alm. Barroso, 1025 - Sl 13, Térreo - Comerciario, Criciúma - SC, 88802-249, Brasil",
+  "neighborhood": "Comerciario",
+  "street": "R. Alm. Barroso, 1025 - Sl 13, Térreo",
+  "city": "Criciúma",
+  "postalCode": "88802-249",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://instagram.com/missio.aline?igshid=NGVhN2U2NjQ0Yg==",
+  "phone": "+55 48 99215-0694",
+  "phoneUnformatted": "+5548992150694",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6852912,
+    "lng": -49.3751352
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJfURpFD6DIZURMjMZoeEArZY",
+  "categories": [
+    "Esteticista"
+  ],
+  "fid": "0x9521833e1469447d:0x96ad00e1a1193332",
+  "cid": "10857335245730558770",
+  "reviewsCount": 9,
+  "imagesCount": 9,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:39.367Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "09:00 to 13:00"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 19:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Acessibilidade": [
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Embelezz%20-%20Est%C3%A9tica%20Facial%20e%20Beleza&query_place_id=ChIJfURpFD6DIZURMjMZoeEArZY",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 7,
+  "isAdvertisement": false,
+  "imageUrl": "https://streetviewpixels-pa.googleapis.com/v1/thumbnail?panoid=5RJv12FrJQPhC1YnthieVg&cb_client=search.gws-prod.gps&w=408&h=240&yaw=200.79028&pitch=0&thumbfov=100",
+  "kgmid": "/g/11l6bsm096",
+  "businessProfileId": "7954844911753012778"
+},
+{
+  "title": "Clínica de massoterapia e Estética Bressan",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Salão de Beleza",
+  "address": "R. Alm. Barroso, 370 - Sl 2 - Comerciario, Criciúma - SC, 88802-250, Brasil",
+  "neighborhood": "Comerciario",
+  "street": "R. Alm. Barroso, 370 - Sl 2",
+  "city": "Criciúma",
+  "postalCode": "88802-250",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://www.facebook.com/byNanyBressan/",
+  "phone": "+55 48 99945-0408",
+  "phoneUnformatted": "+5548999450408",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.68502,
+    "lng": -49.3665974
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 4.9,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJLQgE1niCIZUROmi8HG1lasY",
+  "categories": [
+    "Salão de Beleza",
+    "Spa de saúde"
+  ],
+  "fid": "0x95218278d604082d:0xc66a656d1cbc683a",
+  "cid": "14297351486349011002",
+  "reviewsCount": 9,
+  "imagesCount": 11,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:39.367Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 22:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 22:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 22:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "09:00 to 22:00"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:00 to 22:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 22:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Comodidades": [
+      {
+        "Banheiro": true
+      },
+      {
+        "Restaurante": false
+      }
+    ],
+    "Planejamento": [
+      {
+        "É recomendado marcar hora": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Cl%C3%ADnica%20de%20massoterapia%20e%20Est%C3%A9tica%20Bressan&query_place_id=ChIJLQgE1niCIZUROmi8HG1lasY",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 8,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmPPR5YTL-JNmSmMGSKiLM3H2FpQG_0edIjbcp8qektO_bIhMvVNf6Cs8-9VheabF0T029NYRcPLFivXcH68z03A5mosuZmcpv9MG0j_qnjGQap8NuKLdvcHlQgrz-oDkrpEYJwKg=w408-h240-k-no-pi0-ya0-ro0-fo100",
+  "kgmid": "/g/11f4_3d4kv",
+  "businessProfileId": "1428482255321595702"
+},
+{
+  "title": "Inova Dermato Estética Criciúma | Botox Preenchimento Microagulhamento e Procedimentos Personalizados",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Centro de saúde e beleza",
+  "address": "R. Jorge da Cunha Carneiro, 136 - Michel, Criciúma - SC, 88803-010, Brasil",
+  "neighborhood": "Michel",
+  "street": "R. Jorge da Cunha Carneiro, 136",
+  "city": "Criciúma",
+  "postalCode": "88803-010",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "phone": "+55 48 99963-5191",
+  "phoneUnformatted": "+5548999635191",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6855426,
+    "lng": -49.3705109
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJqw4Jk2eDIZURZDibM8NyhaE",
+  "categories": [
+    "Centro de saúde e beleza",
+    "Clínica especializada"
+  ],
+  "fid": "0x9521836793090eab:0xa18572c3339b3864",
+  "cid": "11638834994718914660",
+  "reviewsCount": 3,
+  "imagesCount": 29,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:39.367Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "10:00 to 20:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "10:00 to 20:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "10:00 to 20:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "10:00 to 20:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "10:00 to 20:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Acessibilidade": [
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Planejamento": [
+      {
+        "Necessário fazer agendamento": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Inova%20Dermato%20Est%C3%A9tica%20Crici%C3%BAma%20%7C%20Botox%20Preenchimento%20Microagulhamento%20e%20Procedimentos%20Personalizados&query_place_id=ChIJqw4Jk2eDIZURZDibM8NyhaE",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 9,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkJWC4ULPWFWsq6aP67Mob6BVDQEdiuN0zlFjEt0BgockXp04pPtAJucxfFJEphdew3sRUGT4luSk46WW3eG0d75wP6wND3DnfO5ZuBSsSlKjs3BXHKVRYjktp1P1sUI_YTTkqYeQ=w408-h286-k-no",
+  "kgmid": "/g/11j0rgt92f",
+  "businessProfileId": "13759533371217166495"
+},
+{
+  "title": "Ser Fit - Laser e Estética Avançada",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Serviço de emagrecimento",
+  "address": "R. João Batista Rita, 385 - Santa Luzia, Criciúma - SC, 88807-213, Brasil",
+  "neighborhood": "Santa Luzia",
+  "street": "R. João Batista Rita, 385",
+  "city": "Criciúma",
+  "postalCode": "88807-213",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "http://www.instagram.com/clinicaserfit",
+  "phone": "+55 48 99864-4727",
+  "phoneUnformatted": "+5548998644727",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.7017887,
+    "lng": -49.4275191
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJ4zWqeCqDIZURxbnPRRo7ev8",
+  "categories": [
+    "Serviço de emagrecimento",
+    "Serviço de depilação a laser",
+    "Serviço de remoção de tatuagens"
+  ],
+  "fid": "0x9521832a78aa35e3:0xff7a3b1a45cfb9c5",
+  "cid": "18409091410856753605",
+  "reviewsCount": 7,
+  "imagesCount": 10,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:39.367Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [],
+  "wasOpenAtScrapeTime": null,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Acessibilidade": [
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      }
+    ],
+    "Estacionamento": [
+      {
+        "Estacionamento no local": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Ser%20Fit%20-%20Laser%20e%20Est%C3%A9tica%20Avan%C3%A7ada&query_place_id=ChIJ4zWqeCqDIZURxbnPRRo7ev8",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 10,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnaa9OzpQXuKw9cctpmhOdjkIQ6E3NJT1eq6b9QddgeZYQiO6nwP5cPVRjvgreqJfu3JvmGsOBC0617F6BO0PGrtcv8F3OCDdsnmL9eS2JZ5wi_9kU3MSMBvxBZMl1srT_ovCF_vg=w408-h544-k-no",
+  "kgmid": "/g/11fqdhx2z3",
+  "businessProfileId": "17970972760351474274"
+},
+{
+  "title": "Estética Pepper",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Centro de saúde e beleza",
+  "address": "Edifício Carp Diem - R. Helvécio Coelho, 105 - Sl 03 - Centro, Criciúma - SC, 88802-040, Brasil",
+  "neighborhood": "Centro",
+  "street": "Edifício Carp Diem - R. Helvécio Coelho, 105 - Sl 03",
+  "city": "Criciúma",
+  "postalCode": "88802-040",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://esteticapepper.com.br/",
+  "phone": "+55 48 99100-2122",
+  "phoneUnformatted": "+5548991002122",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6833807,
+    "lng": -49.3770974
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJocVBbamDIZURA2zx8tlo3NU",
+  "categories": [
+    "Centro de saúde e beleza"
+  ],
+  "fid": "0x952183a96d41c5a1:0xd5dc68d9f2f16c03",
+  "cid": "15410307310248094723",
+  "reviewsCount": 24,
+  "imagesCount": 5,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:39.367Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 18:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 19:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Acessibilidade": [
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Est%C3%A9tica%20Pepper&query_place_id=ChIJocVBbamDIZURA2zx8tlo3NU",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 11,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnz-3YMia4RWGiyU6P0_GPAwU1V1unsVa5K1Op1-FOWbfAZyINrPSwbOzWO4cN5lZcOlqsaaJCR_89nvqiZRGbZpGDbRxu62ApdkqVSrnm34-OBVrZVqiB7HawGbAcvL5RW8io=w408-h544-k-no",
+  "kgmid": "/g/11kqxq_hy1",
+  "businessProfileId": "11951004030318290910"
+},
+{
+  "title": "Elaine",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Esteticista",
+  "address": "R. Duarte da Costa, 608 - Michel, Criciúma - SC, 88803-150, Brasil",
+  "neighborhood": "Michel",
+  "street": "R. Duarte da Costa, 608",
+  "city": "Criciúma",
+  "postalCode": "88803-150",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "phone": "+55 48 99670-4207",
+  "phoneUnformatted": "+5548996704207",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.690532,
+    "lng": -49.375326
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 4.7,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJU1iD10uDIZURfy5h_hb7XtI",
+  "categories": [
+    "Esteticista",
+    "Spa facial",
+    "Depilação",
+    "Massoterapeuta",
+    "Terapeuta",
+    "Spa"
+  ],
+  "fid": "0x9521834bd7835853:0xd25efb16fe612e7f",
+  "cid": "15158829471951302271",
+  "reviewsCount": 13,
+  "imagesCount": 6,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:39.367Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "13:00 to 22:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "13:00 to 22:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "13:00 to 22:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "13:00 to 22:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "13:00 to 22:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Da empresa": [
+      {
+        "Se identifica como uma empresa de empreendedoras": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro de gênero neutro": true
+      }
+    ],
+    "Público": [
+      {
+        "Empresa que acolhe a comunidade LGBTQ+": true
+      },
+      {
+        "Espaço seguro para pessoas transgênero": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Elaine&query_place_id=ChIJU1iD10uDIZURfy5h_hb7XtI",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 14,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWltwRMGVLhyeuct9GbUqm5udxN3eDbaDhBLRAbjOzzyeQHvnwpCifwNkWLIgcz0vuTMmal5VWzdgAnGdIid89UvhZdJASK9Cg09n3PjEB7OE-ubg6mw9kJiI9BC2UrONFOP6DDU2c8z4e7Y=w408-h272-k-no",
+  "kgmid": "/g/11bxgxh11g",
+  "businessProfileId": "16938202505353889651"
+},
+{
+  "title": "Clínica de Massoterapia e Estética Janaina Ferrari",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Massoterapeuta",
+  "address": "Edifício Jaime Scremin - R. Des. Pedro Silva, 540 - Comerciario, Criciúma - SC, 88803-290, Brasil",
+  "neighborhood": "Comerciario",
+  "street": "Edifício Jaime Scremin - R. Des. Pedro Silva, 540",
+  "city": "Criciúma",
+  "postalCode": "88803-290",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "phone": "",
+  "phoneUnformatted": "",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.685249,
+    "lng": -49.369414
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJg4ZwjfuDIZURQDGb8GSWE9s",
+  "categories": [
+    "Massoterapeuta"
+  ],
+  "fid": "0x952183fb8d708683:0xdb139664f09b3140",
+  "cid": "15786126479141318976",
+  "reviewsCount": 1,
+  "imagesCount": 5,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:39.367Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [],
+  "wasOpenAtScrapeTime": null,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Acessibilidade": [
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Cl%C3%ADnica%20de%20Massoterapia%20e%20Est%C3%A9tica%20Janaina%20Ferrari&query_place_id=ChIJg4ZwjfuDIZURQDGb8GSWE9s",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 15,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmL3_zSPXJTErNad09YNp4XZS-7kgNMEiqai5jZnsaXJA5Z2FazwvSglnODAWROnfYTm6KOZEUw9Y9MH7roTQ4t3FMwGoZGDY7LFzmaB3UtSoqryRQWf24lhLTYaxeNjJ6HiZtPdw=w408-h306-k-no",
+  "kgmid": "/g/11h8043vzx",
+  "businessProfileId": "17751846928100524251"
+},
+{
+  "title": "Clínica Kaiana Kelin | Harmonização Orofacial",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Clínica odontológica",
+  "address": "R. Artur Pescador, 10 - Santa Barbara, Criciúma - SC, 88804-030, Brasil",
+  "neighborhood": "Santa Barbara",
+  "street": "R. Artur Pescador, 10",
+  "city": "Criciúma",
+  "postalCode": "88804-030",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "phone": "+55 48 99905-2957",
+  "phoneUnformatted": "+5548999052957",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6835156,
+    "lng": -49.3830243
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 4.9,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJf6qbPOmDIZURtGMWh7ds-hc",
+  "categories": [
+    "Clínica odontológica",
+    "Dentista"
+  ],
+  "fid": "0x952183e93c9baa7f:0x17fa6cb7871663b4",
+  "cid": "1727812942551212980",
+  "reviewsCount": 210,
+  "imagesCount": 44,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:39.367Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 12:00, 14:00 to 18:30"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 12:00, 14:00 to 18:30"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 12:00, 14:00 to 18:30"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:00 to 12:00, 14:00 to 18:30"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 12:00, 14:00 to 18:30"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Acessibilidade": [
+      {
+        "Banheiro com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro": true
+      }
+    ],
+    "Planejamento": [
+      {
+        "É recomendado marcar hora": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Cl%C3%ADnica%20Kaiana%20Kelin%20%7C%20Harmoniza%C3%A7%C3%A3o%20Orofacial&query_place_id=ChIJf6qbPOmDIZURtGMWh7ds-hc",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 16,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnw4bBBhZEMbNHK7jRpvXojh249VoHEEWKvdwqhkPPdyjILdb95pR9IjXd8_EkdMe06PHqqhclKL8rz4YOlpJo-I47OdqWbZDnXcshZ6bCfQHxjNyW8zu_RWzgohKJxTH8Z_V-gsA=w408-h313-k-no",
+  "kgmid": "/g/11syth4z97",
+  "businessProfileId": "6629812516137357437"
+},
+{
+  "title": "Voghiera Slim - Emagrecimento e Estética",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Serviço de emagrecimento",
+  "address": "R. Jorge da Cunha Carneiro, 136 - Sala 01, 02, 03 - Michel, Criciúma - SC, 88803-010, Brasil",
+  "neighborhood": "Michel",
+  "street": "R. Jorge da Cunha Carneiro, 136 - Sala 01, 02, 03",
+  "city": "Criciúma",
+  "postalCode": "88803-010",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://voghieraslim.com.br/",
+  "phone": "+55 48 99923-1791",
+  "phoneUnformatted": "+5548999231791",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6855967,
+    "lng": -49.3705815
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJ10FnOBSDIZURnTdR1NBxcJw",
+  "categories": [
+    "Serviço de emagrecimento",
+    "Centro de saúde e beleza"
+  ],
+  "fid": "0x95218314386741d7:0x9c7071d0d451379d",
+  "cid": "11272635009037580189",
+  "reviewsCount": 27,
+  "imagesCount": 7,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:39.367Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "08:00 to 12:00, 13:30 to 18:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "08:00 to 12:00, 13:30 to 18:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "08:00 to 12:00, 13:30 to 18:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "08:00 to 12:00, 13:30 to 18:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "08:00 to 12:00, 13:30 to 18:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Da empresa": [
+      {
+        "Se identifica como uma empresa de empreendedoras": true
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Banheiro com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Público": [
+      {
+        "Espaço seguro para pessoas transgênero": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Voghiera%20Slim%20-%20Emagrecimento%20e%20Est%C3%A9tica&query_place_id=ChIJ10FnOBSDIZURnTdR1NBxcJw",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 17,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlvs6aYfFGAgqFfSxMHf1jRuSOneSYLmJbj9XnnGaBOpOxGsfn3HXPhh7QbeensUilDj9apaqTf2qxSC_aeW4skiIVWOoIDbFH74FfSWuHZqfGM-3VJVke7UTR80532qStnbVZW=w408-h306-k-no",
+  "kgmid": "/g/11rc07sv2_",
+  "businessProfileId": "10037586015685356257"
+},
+{
+  "title": "Dentall - Estética e Implantes",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Clínica odontológica",
+  "address": "R. São Vicente de Paula, 315 - Michel, Criciúma - SC, 88803-110, Brasil",
+  "neighborhood": "Michel",
+  "street": "R. São Vicente de Paula, 315",
+  "city": "Criciúma",
+  "postalCode": "88803-110",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://www.instagram.com/clinica.dentall/",
+  "phone": "+55 48 99151-7297",
+  "phoneUnformatted": "+5548991517297",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6889836,
+    "lng": -49.3724942
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJU-I7v_T9k0AR-9i1qEPvJ_U",
+  "categories": [
+    "Clínica odontológica"
+  ],
+  "fid": "0x4093fdf4bf3be253:0xf527ef43a8b5d8fb",
+  "cid": "17665351137256397051",
+  "reviewsCount": 5,
+  "reviewsDistribution": {
+    "oneStar": 0,
+    "twoStar": 0,
+    "threeStar": 0,
+    "fourStar": 0,
+    "fiveStar": 5
+  },
+  "imagesCount": 15,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:40.097Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "08:00 to 12:00, 13:30 to 18:30"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "08:00 to 12:00, 13:30 to 18:30"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "08:00 to 12:00, 13:30 to 17:30"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "08:00 to 12:00, 13:30 to 18:30"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "08:00 to 12:00, 13:30 to 18:30"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Acessibilidade": [
+      {
+        "Banheiro com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro": true
+      }
+    ],
+    "Planejamento": [
+      {
+        "É recomendado marcar hora": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Dentall%20-%20Est%C3%A9tica%20e%20Implantes&query_place_id=ChIJU-I7v_T9k0AR-9i1qEPvJ_U",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 22,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWm2kBP8ptCe1kqfQ99-QXSkgHi00i1KqVtN2-AOC09w7h8Sw1JNqwokA2vwIOB7yoPPBtIDhpNtQdM0krZ1H-1eovIAWQQ1-6znl6KgbAgX5TtolgW06nfec93Icapfdd1uBSrj=w408-h272-k-no",
+  "kgmid": "/g/11ss8d693m",
+  "businessProfileId": "18330095282156094072"
+},
+{
+  "title": "Rubiane Vitali - Implantes Dentários",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Dentista",
+  "address": "Próximo a Escola João Frassetto - Av. Monte Negro, 1420 - Sl 01 - Santa Luzia, Criciúma - SC, 88807-211, Brasil",
+  "neighborhood": "Santa Luzia",
+  "street": "Próximo a Escola João Frassetto - Av. Monte Negro, 1420 - Sl 01",
+  "city": "Criciúma",
+  "postalCode": "88807-211",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://implantes.drarubianevitali.com.br/",
+  "phone": "+55 48 99844-0060",
+  "phoneUnformatted": "+5548998440060",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.7017892,
+    "lng": -49.4259382
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJpW7iBKCDIZURtIqTEmB92Qs",
+  "categories": [
+    "Dentista",
+    "Clínica de implante dentário"
+  ],
+  "fid": "0x952183a004e26ea5:0xbd97d6012938ab4",
+  "cid": "853851455945411252",
+  "reviewsCount": 456,
+  "reviewsDistribution": {
+    "oneStar": 2,
+    "twoStar": 0,
+    "threeStar": 1,
+    "fourStar": 3,
+    "fiveStar": 450
+  },
+  "imagesCount": 65,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:40.097Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "08:00 to 20:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "08:00 to 20:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "08:00 to 20:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "08:00 to 20:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "08:00 to 20:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Da empresa": [
+      {
+        "Se identifica como uma empresa de empreendedoras": true
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Banheiro com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro": true
+      }
+    ],
+    "Planejamento": [
+      {
+        "É recomendado marcar hora": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      }
+    ],
+    "Estacionamento": [
+      {
+        "Estacionamento descoberto gratuito": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Rubiane%20Vitali%20-%20Implantes%20Dent%C3%A1rios&query_place_id=ChIJpW7iBKCDIZURtIqTEmB92Qs",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 23,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWll9YbNDqFXhbV6xIo-cg7QP9Ij-7el8rvvR7_NK_Qaqrr5TXeV2ZLndeW6_b24EuCGWFEO0R_IJMozC44L6DZB6nWOAVU_s8zWrvoLiXYplCqyPvvcrr56bhKJzrL_ZiYXHr9G=w408-h725-k-no",
+  "kgmid": "/g/11dyn_qcp8",
+  "businessProfileId": "14599090213615637666"
+},
+{
+  "title": "FinaDepil | Depilação com cera em Criciúma | Designer de Sobrancelha",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Serviço de depilação a cera",
+  "address": "R. Afonso Pena, 60 - Sl 3 Térreo - Michel, Criciúma - SC, 88803-060, Brasil",
+  "neighborhood": "Michel",
+  "street": "R. Afonso Pena, 60 - Sl 3 Térreo",
+  "city": "Criciúma",
+  "postalCode": "88803-060",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://linktr.ee/finadepil",
+  "phone": "+55 48 99152-4280",
+  "phoneUnformatted": "+5548991524280",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.685493,
+    "lng": -49.374798
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJ41D_f3yCIZURjB1VGChKUeM",
+  "categories": [
+    "Serviço de depilação a cera",
+    "Salão de sobrancelhas",
+    "Centro de saúde e beleza"
+  ],
+  "fid": "0x9521827c7fff50e3:0xe3514a2818551d8c",
+  "cid": "16379954855790583180",
+  "reviewsCount": 398,
+  "reviewsDistribution": {
+    "oneStar": 1,
+    "twoStar": 0,
+    "threeStar": 0,
+    "fourStar": 7,
+    "fiveStar": 390
+  },
+  "imagesCount": 88,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:40.097Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "13:30 to 19:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 19:00"
+    }
+  ],
+  "additionalOpeningHours": {
+    "Horário de atendimento on-line": [
+      {
+        "day": "quarta-feira",
+        "hours": "Atendimento 24 horas"
+      },
+      {
+        "day": "quinta-feira",
+        "hours": "Atendimento 24 horas"
+      },
+      {
+        "day": "sexta-feira",
+        "hours": "Atendimento 24 horas"
+      },
+      {
+        "day": "sábado",
+        "hours": "Fechado"
+      },
+      {
+        "day": "domingo",
+        "hours": "Fechado"
+      },
+      {
+        "day": "segunda-feira",
+        "hours": "Atendimento 24 horas"
+      },
+      {
+        "day": "terça-feira",
+        "hours": "Atendimento 24 horas"
+      }
+    ]
+  },
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Da empresa": [
+      {
+        "Se identifica como uma empresa de empreendedoras": true
+      }
+    ],
+    "Opções de serviço": [
+      {
+        "Serviços no local": true
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Banheiro com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro": true
+      },
+      {
+        "Banheiro de gênero neutro": true
+      },
+      {
+        "Wi-Fi gratuito": true
+      }
+    ],
+    "Público": [
+      {
+        "Empresa que acolhe a comunidade LGBTQ+": true
+      },
+      {
+        "Espaço seguro para pessoas transgênero": true
+      }
+    ],
+    "Planejamento": [
+      {
+        "Necessário fazer agendamento": true
+      },
+      {
+        "É recomendado marcar hora": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ],
+    "Crianças": [
+      {
+        "Bom para ir com crianças": true
+      }
+    ],
+    "Estacionamento": [
+      {
+        "Estacionamento gratuito na rua": true
+      },
+      {
+        "Estacionamento pago na rua": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=FinaDepil%20%7C%20Depila%C3%A7%C3%A3o%20com%20cera%20em%20Crici%C3%BAma%20%7C%20Designer%20de%20Sobrancelha&query_place_id=ChIJ41D_f3yCIZURjB1VGChKUeM",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 24,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmcMUx44mCX-fR8q2TFr84SgZyr5pK2Z8NRhXlKgCYGcRaX9pYbiOKdlfJpFtlMZFRpbf__jwNaPSKBhTmRBmPatqJJCzjNGgu12_3eTljb6m5t_NahsKIaXgCxnKmtyg3RZtNRSXnk0Hg=w408-h271-k-no",
+  "kgmid": "/g/11c5srkjjp",
+  "businessProfileId": "9488366358260581913"
+},
+{
+  "title": "Sibecesc Sind. dos Institutos de Beleza de SC",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Associação / organização",
+  "address": "Rua Ludovico Mário Mangili, 330, Criciúma - SC, 88803-330, Brasil",
+  "neighborhood": "Fábio Silva",
+  "street": "Rua Ludovico Mário Mangili, 330",
+  "city": "Criciúma",
+  "postalCode": "88803-330",
+  "state": "SC",
+  "countryCode": "BR",
+  "website": "https://sibecesc-sindicato-sc.ueniweb.com/?utm_campaign=gmb",
+  "phone": "+55 48 99924-1306",
+  "phoneUnformatted": "+5548999241306",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6990384,
+    "lng": -49.3785977
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 3,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJWZ8zrtmDIZUR-EHElTluSso",
+  "categories": [
+    "Associação / organização"
+  ],
+  "fid": "0x952183d9ae339f59:0xca4a6e3995c441f8",
+  "cid": "14576584337542889976",
+  "reviewsCount": 2,
+  "reviewsDistribution": {
+    "oneStar": 1,
+    "twoStar": 0,
+    "threeStar": 0,
+    "fourStar": 0,
+    "fiveStar": 1
+  },
+  "imagesCount": 4,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:40.097Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 18:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 18:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 18:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:00 to 18:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 18:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Sibecesc%20Sind.%20dos%20Institutos%20de%20Beleza%20de%20SC&query_place_id=ChIJWZ8zrtmDIZUR-EHElTluSso",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 25,
+  "isAdvertisement": false,
+  "imageUrl": "https://streetviewpixels-pa.googleapis.com/v1/thumbnail?panoid=aKAlcay8LvWnrTN2uIybdQ&cb_client=search.gws-prod.gps&w=408&h=240&yaw=270.3277&pitch=0&thumbfov=100",
+  "kgmid": "/g/11jv494rb_",
+  "businessProfileId": "3440231546663949300"
+},
+{
+  "title": "BioSante Coworking da Saúde, beleza e Bem-estar",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Espaço de coworking",
+  "address": "R. São Vicente de Paula, 315 - 1° andar - Michel, Criciúma - SC, 88803-110, Brasil",
+  "neighborhood": "Michel",
+  "street": "R. São Vicente de Paula, 315 - 1° andar",
+  "city": "Criciúma",
+  "postalCode": "88803-110",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "phone": "+55 48 99121-6769",
+  "phoneUnformatted": "+5548991216769",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6888974,
+    "lng": -49.3724919
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 4.8,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJPzuh6KODIZURATuJKbRNrhU",
+  "categories": [
+    "Espaço de coworking"
+  ],
+  "fid": "0x952183a3e8a13b3f:0x15ae4db429893b01",
+  "cid": "1562271556930452225",
+  "reviewsCount": 11,
+  "reviewsDistribution": {
+    "oneStar": 0,
+    "twoStar": 0,
+    "threeStar": 1,
+    "fourStar": 0,
+    "fiveStar": 10
+  },
+  "imagesCount": 21,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:40.097Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 18:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 20:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Acessibilidade": [
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=BioSante%20Coworking%20da%20Sa%C3%BAde%2C%20beleza%20e%20Bem-estar&query_place_id=ChIJPzuh6KODIZURATuJKbRNrhU",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 26,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWm_BewJmlBE6-Vgm3wwchnqip_Wa9wK6JwcYgZGwNoV7CVnUq6s_XfWl06EVPsypV1KL9PwZ9ZFZi8Ymetq4yKjN6a8a_SmJRVWLUEfdUk_PIgGwwO1KFv_4O9AsIuW7LIC8pBWI5G97YE=w408-h503-k-no",
+  "kgmid": "/g/11qb0m6w5h",
+  "businessProfileId": "7101924677229579678"
+},
+{
+  "title": "Dr. Regis Meller - Reabilitação Oral e Estética",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Clínica odontológica",
+  "address": "térrea (em frente a Droga Raia - R. Des. Pedro Silva, 575 - Sala 5 - Comerciario, Criciúma - SC, 88802-265, Brasil",
+  "neighborhood": "Comerciario",
+  "street": "térrea (em frente a Droga Raia - R. Des. Pedro Silva, 575 - Sala 5",
+  "city": "Criciúma",
+  "postalCode": "88802-265",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "phone": "+55 48 99638-7847",
+  "phoneUnformatted": "+5548996387847",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.685406,
+    "lng": -49.3689976
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJ1wRsvJ-DIZURuwviWrtU9CY",
+  "categories": [
+    "Clínica odontológica"
+  ],
+  "fid": "0x9521839fbc6c04d7:0x26f454bb5ae20bbb",
+  "cid": "2806961631419042747",
+  "reviewsCount": 6,
+  "reviewsDistribution": {
+    "oneStar": 0,
+    "twoStar": 0,
+    "threeStar": 0,
+    "fourStar": 0,
+    "fiveStar": 6
+  },
+  "imagesCount": 10,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:40.097Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "08:30 to 12:00, 13:30 to 18:30"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "08:30 to 12:00, 13:30 to 18:30"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "08:30 to 12:00, 13:30 to 18:30"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "08:30 to 12:00, 13:30 to 18:30"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "08:30 to 12:00, 13:30 to 18:30"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Acessibilidade": [
+      {
+        "Banheiro com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro": true
+      }
+    ],
+    "Planejamento": [
+      {
+        "É recomendado marcar hora": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Dr.%20Regis%20Meller%20-%20Reabilita%C3%A7%C3%A3o%20Oral%20e%20Est%C3%A9tica&query_place_id=ChIJ1wRsvJ-DIZURuwviWrtU9CY",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 27,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlAxu31R8uH03lpaHnNhpuh6JyLPwwfmfbrmaipc2Vi2EqqPkvO_M467tZprkGuBiVF51M7dHYjjyoFVIoEU7oqhEcry5R090_9OanLUYTTGhzJPHfRKxN9HpOWbmNs9wWW7kAGyw=w408-h725-k-no",
+  "kgmid": "/g/11n5qr5w94",
+  "businessProfileId": "266834795969006522"
+},
+{
+  "title": "Ediane Gonçalves - Clínica de Fisioterapia em Criciúma",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Clínica de Fisioterapia",
+  "address": "Avenida Professor Nicolau Destri Napoleão - Jardim Angelica, Criciúma - SC, 88804-000, Brasil",
+  "neighborhood": "Jardim Angelica",
+  "street": "Avenida Professor Nicolau Destri Napoleão",
+  "city": "Criciúma",
+  "postalCode": "88804-000",
+  "state": "SC",
+  "countryCode": "BR",
+  "phone": "+55 48 99696-6250",
+  "phoneUnformatted": "+5548996966250",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.7009638,
+    "lng": -49.4022748
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJb889YyeDIZURTy9BBj9rfd8",
+  "categories": [
+    "Clínica de Fisioterapia"
+  ],
+  "fid": "0x95218327633dcf6f:0xdf7d6b3f06412f4f",
+  "cid": "16104145760978808655",
+  "reviewsCount": 14,
+  "reviewsDistribution": {
+    "oneStar": 0,
+    "twoStar": 0,
+    "threeStar": 0,
+    "fourStar": 0,
+    "fiveStar": 14
+  },
+  "imagesCount": 11,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:40.097Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "08:00 to 19:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "08:00 to 19:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "08:00 to 19:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "08:00 to 19:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "08:00 to 19:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Da empresa": [
+      {
+        "Se identifica como uma empresa de empreendedoras": true
+      }
+    ],
+    "Opções de serviço": [
+      {
+        "Português": true
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Assento com acessibilidade para pessoas em cadeira de rodas": false
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro": true
+      },
+      {
+        "Banheiro de gênero neutro": true
+      }
+    ],
+    "Público": [
+      {
+        "Empresa que acolhe a comunidade LGBTQ+": true
+      },
+      {
+        "Espaço seguro para pessoas transgênero": true
+      }
+    ],
+    "Planejamento": [
+      {
+        "Necessário fazer agendamento": true
+      },
+      {
+        "É recomendado marcar hora": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Ediane%20Gon%C3%A7alves%20-%20Cl%C3%ADnica%20de%20Fisioterapia%20em%20Crici%C3%BAma&query_place_id=ChIJb889YyeDIZURTy9BBj9rfd8",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 28,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmTqQACoOvrbU5v04KDmyOwK-pfPm110rIb91cnh2tEez_yRmciejPTUmm3cZ_BRPHxNHfItGPJmJ2sIf7uAAy-NCoB3K4lT28iBllwg00n_0vglP1BlW7pSzwEJ5yIz1O2lklYXA=w408-h906-k-no",
+  "kgmid": "/g/11y45wj28n",
+  "businessProfileId": "6589593732672474013"
+},
+{
+  "title": "Massoterapeuta Luana",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Massoterapeuta",
+  "address": "Pinheirinho, Criciúma - SC, 88805-050, Brasil",
+  "neighborhood": "Pinheirinho",
+  "street": null,
+  "city": "Criciúma",
+  "postalCode": null,
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "phone": "",
+  "phoneUnformatted": "",
+  "claimThisBusiness": true,
+  "location": {
+    "lat": -28.6898451,
+    "lng": -49.396294
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJe8j1BviCIZUR7-G64R73408",
+  "categories": [
+    "Massoterapeuta"
+  ],
+  "fid": "0x952182f806f5c87b:0x4fe3f71ee1bae1ef",
+  "cid": "5756716460717826543",
+  "reviewsCount": 3,
+  "reviewsDistribution": {
+    "oneStar": 0,
+    "twoStar": 0,
+    "threeStar": 0,
+    "fourStar": 0,
+    "fiveStar": 3
+  },
+  "imagesCount": 2,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:40.097Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "18:00 to 22:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "18:00 to 22:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "18:00 to 22:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "14:00 to 18:00"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "18:00 to 22:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "18:00 to 22:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Massoterapeuta%20Luana&query_place_id=ChIJe8j1BviCIZUR7-G64R73408",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 29,
+  "isAdvertisement": false,
+  "imageUrl": "https://streetviewpixels-pa.googleapis.com/v1/thumbnail?panoid=gXwlImP-iRc02QQ6g9ZNUA&cb_client=search.gws-prod.gps&w=408&h=240&yaw=252.40947&pitch=0&thumbfov=100",
+  "kgmid": "/g/11f4ldbc5r",
+  "businessProfileId": null
+},
+{
+  "title": "Bella Cliniche - Lentes de Contato Dental",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Dentista",
+  "address": "R. Visc. de Cairú, 930 - Santa Barbara, Criciúma - SC, 88804-320, Brasil",
+  "neighborhood": "Santa Barbara",
+  "street": "R. Visc. de Cairú, 930",
+  "city": "Criciúma",
+  "postalCode": "88804-320",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://bellacliniche.comercialmkt.com.br/?utm_source=GMN",
+  "phone": "+55 48 99158-9944",
+  "phoneUnformatted": "+5548991589944",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6901651,
+    "lng": -49.3846785
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 4.9,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJKYy3FvmDIZURdRyE914V79I",
+  "categories": [
+    "Dentista",
+    "Dentista cosmético",
+    "Clínica odontológica"
+  ],
+  "fid": "0x952183f916b78c29:0xd2ef155ef7841c75",
+  "cid": "15199390765022452853",
+  "reviewsCount": 62,
+  "reviewsDistribution": {
+    "oneStar": 1,
+    "twoStar": 0,
+    "threeStar": 0,
+    "fourStar": 0,
+    "fiveStar": 61
+  },
+  "imagesCount": 42,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:40.097Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:00 to 20:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 20:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Da empresa": [
+      {
+        "Se identifica como uma empresa de empreendedoras": true
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Banheiro com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro": true
+      }
+    ],
+    "Planejamento": [
+      {
+        "Necessário fazer agendamento": true
+      },
+      {
+        "É recomendado marcar hora": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Planos de pagamento": true
+      }
+    ],
+    "Estacionamento": [
+      {
+        "Estacionamento no local": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Bella%20Cliniche%20-%20Lentes%20de%20Contato%20Dental&query_place_id=ChIJKYy3FvmDIZURdRyE914V79I",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 30,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlCAPU-hMyoG83DVYhwR8S-WvBVVvf9FS9NcU_zIzOTG-J-N2Hc3V_xtX_s0WsIqO2IFr0bx19BK7xfGd2g8NHYDYCU8q6sfdQ8btTZ8xr6OCuZbgAsN-JuxIV-01HtLxP4qNZE=w519-h240-k-no",
+  "kgmid": "/g/11n8p76dwd",
+  "businessProfileId": "740284053291535592"
+},
+{
+  "title": "Dr Samuel Orige - Cirurgia Plástica",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Cirurgião plástico",
+  "address": "Av. Estevão Emílio de Souza, 24 - Sl 507 - Ceará, Criciúma - SC, 88815-180, Brasil",
+  "neighborhood": "Ceará",
+  "street": "Av. Estevão Emílio de Souza, 24 - Sl 507",
+  "city": "Criciúma",
+  "postalCode": "88815-180",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://www.samuelorige.com.br/",
+  "phone": "+55 48 99169-5449",
+  "phoneUnformatted": "+5548991695449",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6875314,
+    "lng": -49.3493592
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJF8TI7n14IZURpvvTiC7C3eE",
+  "categories": [
+    "Cirurgião plástico"
+  ],
+  "fid": "0x9521787deec8c417:0xe1ddc22e88d3fba6",
+  "cid": "16275378133506718630",
+  "reviewsCount": 89,
+  "reviewsDistribution": {
+    "oneStar": 0,
+    "twoStar": 1,
+    "threeStar": 0,
+    "fourStar": 1,
+    "fiveStar": 87
+  },
+  "imagesCount": 12,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:40.100Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [],
+  "wasOpenAtScrapeTime": null,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Acessibilidade": [
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro de gênero neutro": true
+      },
+      {
+        "Banheiro": false
+      }
+    ],
+    "Planejamento": [
+      {
+        "É recomendado marcar hora": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Dr%20Samuel%20Orige%20-%20Cirurgia%20Pl%C3%A1stica&query_place_id=ChIJF8TI7n14IZURpvvTiC7C3eE",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 31,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWn8rBisHE7ykoAXzsvKgK_WqvbltJPaXnXPp8u8gJzBVDat0g1H0uAx22MhuBBBnXhIYI31B5lZ93Kz_iOtTlkBp6g0Ier1izls2LV8fScqw1UpymXEK75R5oA1oAuqpiRm9Hx7kw=w408-h725-k-no",
+  "kgmid": "/g/11h0tfc6z",
+  "businessProfileId": "5112079679562740335"
+},
+{
+  "title": "Clínica Fontana",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Clínica de implante dentário",
+  "address": "Bairro: Michel, Rua Men de Sá, 69 - Santa Barbara, Criciúma - SC, 88803-160, Brasil",
+  "neighborhood": "Santa Barbara",
+  "street": "Bairro: Michel, Rua Men de Sá, 69",
+  "city": "Criciúma",
+  "postalCode": "88803-160",
+  "state": "SC",
+  "countryCode": "BR",
+  "website": "https://clinicasfontana.com/",
+  "phone": "+55 48 99198-8369",
+  "phoneUnformatted": "+5548991988369",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6915761,
+    "lng": -49.369945
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJzYzzu9yDIZURnQJK7L5R3zs",
+  "categories": [
+    "Clínica de implante dentário",
+    "Clínica odontológica",
+    "Nutrólogo",
+    "Endodontista",
+    "Nutricionista",
+    "Ortodontista",
+    "Periodontista",
+    "Psicólogo"
+  ],
+  "fid": "0x952183dcbbf38ccd:0x3bdf51beec4a029d",
+  "cid": "4314256848494133917",
+  "reviewsCount": 70,
+  "reviewsDistribution": {
+    "oneStar": 0,
+    "twoStar": 0,
+    "threeStar": 0,
+    "fourStar": 0,
+    "fiveStar": 70
+  },
+  "imagesCount": 22,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:40.100Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "08:00 to 19:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "08:00 to 19:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "08:00 to 19:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "08:00 to 19:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "08:00 to 19:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Acessibilidade": [
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Cl%C3%ADnica%20Fontana&query_place_id=ChIJzYzzu9yDIZURnQJK7L5R3zs",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.714127056201285,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 32,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnq2fV5126Vb8wLcYgEp5jms8vmLus6yFMpjIrqq7jopnSBW-iXHN9ZHftuYSjSbZrnOhSNpbXYw-ibMj47Ot2FRs06UOre6iLGdvPbDH23BWg-onftJ252Qxb07YbwKXkexwXcXA=w408-h507-k-no",
+  "kgmid": "/g/11tmrgz2mv",
+  "businessProfileId": "13457710402805039256"
+},
+{
+  "title": "Consultório Dra. Jéssica Bonelli",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Clínica especializada",
+  "address": "Edifício Titanium - R. Araranguá, 35 - Centro, Criciúma - SC, 88801-600, Brasil",
+  "neighborhood": "Centro",
+  "street": "Edifício Titanium - R. Araranguá, 35",
+  "city": "Criciúma",
+  "postalCode": "88801-600",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "phone": "+55 48 99172-0322",
+  "phoneUnformatted": "+5548991720322",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6751379,
+    "lng": -49.3733282
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 4.9,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJlbPyXY14IZURrlyTI0YlYyU",
+  "categories": [
+    "Clínica especializada",
+    "Consultório médico"
+  ],
+  "fid": "0x9521788d5df2b395:0x2563254623935cae",
+  "cid": "2694037985272487086",
+  "reviewsCount": 15,
+  "imagesCount": 16,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:45.230Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 12:00, 13:00 to 19:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 12:00, 13:00 to 19:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 12:00, 13:00 to 18:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:00 to 12:00, 13:00 to 19:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 12:00, 13:00 to 19:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Acessibilidade": [
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Consult%C3%B3rio%20Dra.%20J%C3%A9ssica%20Bonelli&query_place_id=ChIJlbPyXY14IZURrlyTI0YlYyU",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.653792468603854,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 11,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmVH2uqiMrPKUSOJ7GN3bX-lh2rHXZTyNtpMOXJjeYyWol6NGlAH0eFVRAB9lu4sLCzVN6myDYPDUNbMB-I5RGUs1L8yXQ6guG0n_6ik8DMFmopQjAs8jphY7Z9wDePF8LZZI0t=w408-h240-k-no-pi-20-ya160-ro-0-fo100",
+  "kgmid": "/g/11cr___z3f",
+  "businessProfileId": "10766763643003055651"
+},
+{
+  "title": "Roberta Rocha Estética Avançada",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Centro de saúde e beleza",
+  "address": "R. Cel. Pedro Benedet, 433 - And 01 Sala 02 - Pio Corrêa, Criciúma - SC, 88801-250, Brasil",
+  "neighborhood": "Pio Corrêa",
+  "street": "R. Cel. Pedro Benedet, 433 - And 01 Sala 02",
+  "city": "Criciúma",
+  "postalCode": "88801-250",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://instagram.com/robertarochaenf.esteta?igshid=NjIwNzIyMDk2Mg==",
+  "phone": "+55 48 99604-9145",
+  "phoneUnformatted": "+5548996049145",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6751788,
+    "lng": -49.365652
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJSR2M3K-DIZURqomAUi64P0M",
+  "categories": [
+    "Centro de saúde e beleza",
+    "Esteticista",
+    "Clínica especializada"
+  ],
+  "fid": "0x952183afdc8c1d49:0x433fb82e528089aa",
+  "cid": "4845794233166105002",
+  "reviewsCount": 14,
+  "imagesCount": 15,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:45.230Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "08:30 to 17:30"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "08:30 to 17:30"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "08:30 to 17:30"
+    },
+    {
+      "day": "sábado",
+      "hours": "08:30 to 12:30"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "08:30 to 17:30"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "08:30 to 17:30"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Acessibilidade": [
+      {
+        "Assento com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Roberta%20Rocha%20Est%C3%A9tica%20Avan%C3%A7ada&query_place_id=ChIJSR2M3K-DIZURqomAUi64P0M",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.653792468603854,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 12,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWk-ervO92r4fkQKTeXIJcWw99VkmanMRF4GJx6A5DkgeWGsGYc81LZWEwPLa_Bn5bmr6zreE8XSuQPb0XjSzgnkku0C2qsegTNHlzuDJH9LI1J7_5P9raIYDCtUWt2iTxDfOh2N=w408-h544-k-no",
+  "kgmid": "/g/11vdgtjxt2",
+  "businessProfileId": "10367121834379260124"
+},
+{
+  "title": "Mais Bella Estética Avançada",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Centro de saúde e beleza",
+  "address": "R. Mal. Floriano Peixoto, 180 - Sl 01 - Centro, Criciúma - SC, 88801-040, Brasil",
+  "neighborhood": "Centro",
+  "street": "R. Mal. Floriano Peixoto, 180 - Sl 01",
+  "city": "Criciúma",
+  "postalCode": "88801-040",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "phone": "+55 48 99186-5057",
+  "phoneUnformatted": "+5548991865057",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6786182,
+    "lng": -49.3713973
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 4.8,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJQx7iwfCDIZURcFSbuP-lL0Y",
+  "categories": [
+    "Centro de saúde e beleza"
+  ],
+  "fid": "0x952183f0c1e21e43:0x462fa5ffb89b5470",
+  "cid": "5057443424292787312",
+  "reviewsCount": 13,
+  "imagesCount": 11,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:45.231Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:00 to 19:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:00 to 19:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Da empresa": [
+      {
+        "Se identifica como uma empresa de empreendedoras": true
+      }
+    ],
+    "Opções de serviço": [
+      {
+        "Serviços no local": true
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro de gênero neutro": true
+      },
+      {
+        "Wi-Fi": true
+      },
+      {
+        "Wi-Fi gratuito": true
+      }
+    ],
+    "Público": [
+      {
+        "Empresa que acolhe a comunidade LGBTQ+": true
+      },
+      {
+        "Espaço seguro para pessoas transgênero": true
+      }
+    ],
+    "Planejamento": [
+      {
+        "Necessário fazer agendamento": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Mais%20Bella%20Est%C3%A9tica%20Avan%C3%A7ada&query_place_id=ChIJQx7iwfCDIZURcFSbuP-lL0Y",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.653792468603854,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 14,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWl9tLMEc6LoMjUIhgkB1MOr3p2z6l8ubKrfq1aTFfBCQlQmH2cutL_b0lO-nRP6IakJatyB_J3pAX3Mt8bH9HdQBakaAF7bfs7JQYJSco3P84UZPL8XG44amSsIF5sU_1auagaBAKcDM3MD=w408-h544-k-no",
+  "kgmid": "/g/11rtbtpkt1",
+  "businessProfileId": "12266753406097552562"
+},
+{
+  "title": "IF's Estética Avançada",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Centro de saúde e beleza",
+  "address": "Av. dos Imigrantes, 2060 - Rio Maina, Criciúma - SC, 88818-410, Brasil",
+  "neighborhood": "Rio Maina",
+  "street": "Av. dos Imigrantes, 2060",
+  "city": "Criciúma",
+  "postalCode": "88818-410",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://sites.google.com/view/ifsestetica/p%C3%A1gina-inicial",
+  "phone": "+55 48 98472-9929",
+  "phoneUnformatted": "+5548984729929",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6678744,
+    "lng": -49.4238664
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 4.7,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJIzkvYQSDIZURZ9566Pbuuc4",
+  "categories": [
+    "Centro de saúde e beleza"
+  ],
+  "fid": "0x95218304612f3923:0xceb9eef6e87ade67",
+  "cid": "14896199986734358119",
+  "reviewsCount": 12,
+  "imagesCount": 25,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:45.231Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:30 to 19:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:30 to 19:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:30 to 19:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "09:30 to 15:00"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "Fechado"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:30 to 19:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Da empresa": [
+      {
+        "Se identifica como uma empresa de empreendedoras": true
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=IF's%20Est%C3%A9tica%20Avan%C3%A7ada&query_place_id=ChIJIzkvYQSDIZURZ9566Pbuuc4",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.653792468603854,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 16,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkT_tRHqyHsKQ7fam_AiRYxEC93c2zNjnAiwAKREv5qM0lvkz81DIBuF5YpnBpkz2z2julnyij8avk50seTNheJiDQu_tcUs1UW-PecnWfp0RKmRxigeFbI3hzR1VYKvEe6Utq4=w408-h725-k-no",
+  "kgmid": "/g/11ss5csy34",
+  "businessProfileId": "6657984361244601981"
+},
+{
+  "title": "Kyze Clauman - Clínica de Estética",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Centro de saúde e beleza",
+  "address": "R. Cel. Pedro Benedet, 190 - Sl 15 - Pio Corrêa, Criciúma - SC, 88801-250, Brasil",
+  "neighborhood": "Pio Corrêa",
+  "street": "R. Cel. Pedro Benedet, 190 - Sl 15",
+  "city": "Criciúma",
+  "postalCode": "88801-250",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://instagram.com/kyzeclaumanclinicaestetica?igshid=YmMyMTA2M2Y=",
+  "phone": "+55 48 99680-5400",
+  "phoneUnformatted": "+5548996805400",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6767894,
+    "lng": -49.3670204
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 4.8,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJo4MHuYGCIZURJHVPO2iECRg",
+  "categories": [
+    "Centro de saúde e beleza"
+  ],
+  "fid": "0x95218281b90783a3:0x180984683b4f7524",
+  "cid": "1732061114907194660",
+  "reviewsCount": 25,
+  "imagesCount": 11,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:45.231Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "08:00 to 18:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "08:00 to 18:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "08:00 to 18:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "Fechado"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "08:00 to 18:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "08:00 to 18:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Opções de serviço": [
+      {
+        "Entrega": false
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Kyze%20Clauman%20-%20Cl%C3%ADnica%20de%20Est%C3%A9tica&query_place_id=ChIJo4MHuYGCIZURJHVPO2iECRg",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.653792468603854,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 17,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkchNguhzLQoTb4m6PBTWCf2uv9kv_4_YJEzKXbVHCIAvoP-CcywlHPBqLheQg968O4cMZ0XFw8XGtDYkhnJVy7Y_O46gMQD2kmUmPMFbxx4mQO7wzXPefzCPeWlXvztA0E1ee3=w408-h544-k-no",
+  "kgmid": "/g/11f0kxkbb7",
+  "businessProfileId": "9538951034912936189"
+},
+{
+  "title": "Bio Soft Clinic",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Esteticista",
+  "address": "R. Princesa Isabel, 40 - Centro, Criciúma - SC, 88801-130, Brasil",
+  "neighborhood": "Centro",
+  "street": "R. Princesa Isabel, 40",
+  "city": "Criciúma",
+  "postalCode": "88801-130",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://biosoftclinic.com.br/",
+  "phone": "",
+  "phoneUnformatted": "",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6786997,
+    "lng": -49.3668617
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJo8pBFMV5IZURj5jjFK2KYMQ",
+  "categories": [
+    "Esteticista"
+  ],
+  "fid": "0x952179c51441caa3:0xc4608aad14e3988f",
+  "cid": "14150462505182533775",
+  "reviewsCount": 40,
+  "imagesCount": 15,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:45.231Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "09:30 to 19:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "09:30 to 19:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "09:30 to 19:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "09:30 to 12:00"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "09:30 to 19:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "09:30 to 19:00"
+    }
+  ],
+  "additionalOpeningHours": {
+    "Horário de atendimento on-line": [
+      {
+        "day": "quarta-feira",
+        "hours": "09:00–19:00"
+      },
+      {
+        "day": "quinta-feira",
+        "hours": "09:00–19:00"
+      },
+      {
+        "day": "sexta-feira",
+        "hours": "09:00–19:00"
+      },
+      {
+        "day": "sábado",
+        "hours": "Fechado"
+      },
+      {
+        "day": "domingo",
+        "hours": "Fechado"
+      },
+      {
+        "day": "segunda-feira",
+        "hours": "09:00–19:00"
+      },
+      {
+        "day": "terça-feira",
+        "hours": "09:00–19:00"
+      }
+    ]
+  },
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Acessibilidade": [
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Assento com acessibilidade para pessoas em cadeira de rodas": false
+      },
+      {
+        "Banheiro com acessibilidade para pessoas em cadeira de rodas": false
+      }
+    ],
+    "Comodidades": [
+      {
+        "Banheiro de gênero neutro": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Bio%20Soft%20Clinic&query_place_id=ChIJo8pBFMV5IZURj5jjFK2KYMQ",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.653792468603854,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 18,
+  "isAdvertisement": false,
+  "imageUrl": "https://streetviewpixels-pa.googleapis.com/v1/thumbnail?panoid=PPuJgzcwKiX8q0Y4nK-LrA&cb_client=search.gws-prod.gps&w=408&h=240&yaw=219.19737&pitch=0&thumbfov=100",
+  "kgmid": "/g/11lfpt01wh",
+  "businessProfileId": "6873964423619311432"
+},
+{
+  "title": "Vitalize Estética Avançada",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Centro de saúde e beleza",
+  "address": "Ed. Millenium Saúde Center - R. Cel. Pedro Benedet, 505 - Sl 503 - Centro, Criciúma - SC, 88801-250, Brasil",
+  "neighborhood": "Centro",
+  "street": "Ed. Millenium Saúde Center - R. Cel. Pedro Benedet, 505 - Sl 503",
+  "city": "Criciúma",
+  "postalCode": "88801-250",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://www.instagram.com/esteticavitalize/",
+  "phone": "+55 48 99954-6592",
+  "phoneUnformatted": "+5548999546592",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6753183,
+    "lng": -49.3658153
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJT_SFyl6DIZURDom4ELjF91s",
+  "categories": [
+    "Centro de saúde e beleza"
+  ],
+  "fid": "0x9521835eca85f44f:0x5bf7c5b810b8890e",
+  "cid": "6626982771044157710",
+  "reviewsCount": 14,
+  "imagesCount": 20,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:45.231Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "08:00 to 21:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "08:00 to 21:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "08:00 to 21:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "08:00 to 18:00"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "08:00 to 21:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "08:00 to 21:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Da empresa": [
+      {
+        "Se identifica como uma empresa de empreendedoras": true
+      }
+    ],
+    "Opções de serviço": [
+      {
+        "Entrega": false
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Comodidades": [
+      {
+        "Wi-Fi": true
+      },
+      {
+        "Wi-Fi gratuito": true
+      }
+    ],
+    "Planejamento": [
+      {
+        "Necessário fazer agendamento": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Vitalize%20Est%C3%A9tica%20Avan%C3%A7ada&query_place_id=ChIJT_SFyl6DIZURDom4ELjF91s",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.653792468603854,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 19,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkXxfXIvKJv02o7nkQKQY-YnPeyR9tOc3uZLahU9x9oa8nR5YoPjdRrErms0UBtMx4PHcHugHT-1qFRQQuy11kMD7yID4fTrxgCzhw05ctrCCGz7s4TrMJLlPOJsShVEYV-Ukw9iYL2Dytu=w408-h543-k-no",
+  "kgmid": "/g/11pb8h_njj",
+  "businessProfileId": "9925367194585794438"
+},
+{
+  "title": "Lays Marcon Estética",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Centro de saúde e beleza",
+  "address": "R. Luiz Carlos Valente, 220 - Vila Isabel, Criciúma - SC, 88817-507, Brasil",
+  "neighborhood": "Vila Isabel",
+  "street": "R. Luiz Carlos Valente, 220",
+  "city": "Criciúma",
+  "postalCode": "88817-507",
+  "state": "Santa Catarina",
+  "countryCode": "BR",
+  "website": "https://www.instagram.com/laysmarcon.estetica",
+  "phone": "+55 48 99995-0242",
+  "phoneUnformatted": "+5548999950242",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -28.6762506,
+    "lng": -49.4249071
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": null,
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 5,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJv74mzd2DIZURn4UMtzV6clE",
+  "categories": [
+    "Centro de saúde e beleza"
+  ],
+  "fid": "0x952183ddcd26bebf:0x51727a35b70c859f",
+  "cid": "5868887635540084127",
+  "reviewsCount": 17,
+  "imagesCount": 10,
+  "imageCategories": [],
+  "scrapedAt": "2026-09-02T03:20:45.231Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "quarta-feira",
+      "hours": "08:00 to 22:00"
+    },
+    {
+      "day": "quinta-feira",
+      "hours": "08:00 to 22:00"
+    },
+    {
+      "day": "sexta-feira",
+      "hours": "08:00 to 22:00"
+    },
+    {
+      "day": "sábado",
+      "hours": "08:00 to 12:00"
+    },
+    {
+      "day": "domingo",
+      "hours": "Fechado"
+    },
+    {
+      "day": "segunda-feira",
+      "hours": "08:00 to 22:00"
+    },
+    {
+      "day": "terça-feira",
+      "hours": "08:00 to 22:00"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [],
+  "placesTags": [],
+  "reviewsTags": [],
+  "additionalInfo": {
+    "Opções de serviço": [
+      {
+        "Entrega": false
+      }
+    ],
+    "Acessibilidade": [
+      {
+        "Entrada com acessibilidade para pessoas em cadeira de rodas": true
+      },
+      {
+        "Estacionamento com acessibilidade para pessoas em cadeira de rodas": true
+      }
+    ],
+    "Pagamentos": [
+      {
+        "Cartão de crédito": true
+      },
+      {
+        "Cartão de débito": true
+      },
+      {
+        "Pagamentos por dispositivo móvel via NFC": true
+      },
+      {
+        "Cartões de crédito": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "url": "https://www.google.com/maps/search/?api=1&query=Lays%20Marcon%20Est%C3%A9tica&query_place_id=ChIJv74mzd2DIZURn4UMtzV6clE",
+  "searchPageUrl": "https://www.google.com/maps/search/clinica%20estetica/@-28.653792468603854,-49.394999671471474,14z?hl=pt-BR",
+  "searchString": "clinica estetica",
+  "language": "pt-BR",
+  "rank": 20,
+  "isAdvertisement": false,
+  "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWl4W_IPgZ0wXzggCQrSQOJ-IpyU6OAPSuXrozMOvjmN9tGDWK4LTnPe__UVVvXLGPM72hEU9uBmBxk6SQ31LwBv6DEb3BthTyT12EuaiF7iSldUiC6qowpfJFeHJPm50_VZEXnaTyX-FC5A=w408-h533-k-no",
+  "kgmid": "/g/11mvm6mgc2",
+  "businessProfileId": "15041531371776990242"
+}]
