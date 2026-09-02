@@ -17,7 +17,7 @@ import { auth } from './firebase'
 import Login from './Login'
 import ImportExport from './ImportExport'
 import type { ColumnId, KanbanState, Lead, LeadWithMeta, Temperature } from './types'
-import { loadKanbanStates, saveKanbanStates, loadCustomLeads, saveCustomLeads } from './storage'
+import { loadKanbanStates, saveKanbanStates } from './storage'
 import './App.css'
 
 const COLUMNS: { id: ColumnId; label: string; emoji: string; color: string }[] = [
@@ -65,7 +65,7 @@ const SOCIAL_HOSTS = [
 ]
 
 const fetchLeads = async (): Promise<Lead[]> => {
-  const res = await fetch('/data/leads.json')
+  const res = await fetch('/api/leads')
   if (!res.ok) throw new Error('Não foi possível carregar os dados')
   return res.json()
 }
@@ -459,7 +459,6 @@ function LeadModal({
 
 function App() {
   const [baseLeads, setBaseLeads] = useState<Lead[]>([])
-  const [customLeads, setCustomLeads] = useState<Lead[]>(() => loadCustomLeads())
   const [leadStates, setKanbanStates] = useState<Record<string, KanbanState>>(() =>
     loadKanbanStates(),
   )
@@ -493,11 +492,7 @@ function App() {
     saveKanbanStates(leadStates)
   }, [leadStates])
 
-  useEffect(() => {
-    saveCustomLeads(customLeads)
-  }, [customLeads])
-
-  const allLeads = useMemo<Lead[]>(() => [...baseLeads, ...customLeads], [baseLeads, customLeads])
+  const allLeads = baseLeads
 
   const categories = useMemo(
     () =>
@@ -580,18 +575,29 @@ function App() {
     setKanbanStates((prev) => ({ ...prev, [placeId]: state }))
   }
 
-  const handleImport = (leads: Lead[]) => {
-    const map = new Map(customLeads.map((l) => [l.placeId, l]))
-    const stateMap = { ...leadStates }
-    leads.forEach((item) => {
-      const meta = item as unknown as Partial<LeadWithMeta>
-      const { kanbanState, score: _score, temperature: _temperature, websiteKind: _websiteKind, ...rest } = meta as LeadWithMeta
-      const lead = rest as Lead
-      map.set(lead.placeId, lead)
-      if (kanbanState) stateMap[lead.placeId] = kanbanState as KanbanState
-    })
-    setCustomLeads(Array.from(map.values()))
-    setKanbanStates(stateMap)
+  const handleImport = async (leads: Lead[]) => {
+    try {
+      const res = await fetch('/api/leads/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(leads),
+      })
+      if (!res.ok) throw new Error('Erro ao importar leads')
+
+      const stateMap = { ...leadStates }
+      leads.forEach((item) => {
+        const meta = item as unknown as Partial<LeadWithMeta>
+        const { kanbanState } = meta
+        if (kanbanState) stateMap[item.placeId] = kanbanState as KanbanState
+      })
+      setKanbanStates(stateMap)
+
+      const fresh = await fetchLeads()
+      setBaseLeads(fresh)
+    } catch (err) {
+      console.error(err)
+      setError(err instanceof Error ? err.message : 'Erro ao importar leads')
+    }
   }
 
   const handleExport = () => {
