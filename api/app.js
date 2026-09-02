@@ -14,6 +14,11 @@ const __dirname = path.dirname(__filename)
 
 const app = express()
 
+app.use((req, _res, next) => {
+  console.log('[api] request', req.method, req.url, req.path)
+  next()
+})
+
 app.use(cors())
 app.use(express.json({ limit: '10mb' }))
 
@@ -103,6 +108,11 @@ app.post('/api/leads/seed', async (_req, res) => {
 app.get('/api/health', (_req, res) => {
   console.log('[api] health hit')
   res.json({ ok: true })
+})
+
+app.use((_req, res) => {
+  console.log('[api] 404')
+  res.status(404).json({ error: 'Not found' })
 })
 
 export default app
