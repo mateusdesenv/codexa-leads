@@ -200,18 +200,30 @@ function isValidUrl(url: string): boolean {
   }
 }
 
+function getWhatsAppUrl(phone: string | null | undefined): string | null {
+  if (!phone) return null
+  let digits = phone.replace(/\D/g, '')
+  if (!digits) return null
+  if (digits.length === 11 && !digits.startsWith('55')) {
+    digits = `55${digits}`
+  }
+  return `https://wa.me/${digits}`
+}
+
 function Actions({ lead }: { lead: Lead }) {
   return (
     <div className="lead-actions" onClick={(e) => e.stopPropagation()}>
       {lead.phone && (
         <AnchorButton
           as="a"
-          href={`tel:${lead.phoneUnformatted ?? lead.phone}`}
+          href={getWhatsAppUrl(lead.phoneUnformatted ?? lead.phone)}
+          target="_blank"
+          rel="noopener noreferrer"
           variant="primary"
           size="small"
           leadingIcon={<Icon name="message" size={14} />}
         >
-          Ligar
+          WhatsApp
         </AnchorButton>
       )}
       {lead.website && isValidUrl(lead.website) && (
