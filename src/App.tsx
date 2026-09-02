@@ -215,6 +215,15 @@ function formatDate(dateStr?: string): string {
   return new Date(dateStr).toLocaleDateString('pt-BR')
 }
 
+function getUserInitials(user: User): string {
+  const name = user.displayName ?? user.email ?? 'U'
+  return name
+    .split(/[\s@]+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('')
+}
+
 function isValidUrl(url: string): boolean {
   try {
     new URL(url)
@@ -649,7 +658,14 @@ function App() {
           <p>Kanban de prospecção comercial. Arraste os cards entre as etapas.</p>
         </div>
         <div className="prospect-header__user">
-          <span>{user.email ?? user.displayName ?? 'Usuário'}</span>
+          <div className="user-avatar" title={user.displayName ?? user.email ?? 'Usuário'}>
+            {user.photoURL ? (
+              <img src={user.photoURL} alt="" />
+            ) : (
+              <span>{getUserInitials(user)}</span>
+            )}
+          </div>
+          <span className="user-name">{user.displayName ?? user.email ?? 'Usuário'}</span>
           <button
             type="button"
             className="action-btn action-btn--secondary"

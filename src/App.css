@@ -562,6 +562,38 @@
   color: var(--ds-charcoal);
 }
 
+.user-avatar {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 38px;
+  background: var(--ds-green);
+  color: var(--ds-graphite);
+  border-radius: 50%;
+  overflow: hidden;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 2px solid var(--ds-green-dark);
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-avatar span {
+  line-height: 1;
+}
+
+.user-name {
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .login-page {
   min-height: 100vh;
   display: grid;
