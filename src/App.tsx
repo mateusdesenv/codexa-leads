@@ -15,58 +15,10 @@ import { CSS } from '@dnd-kit/utilities'
 import { onAuthStateChanged, signOut, type User } from 'firebase/auth'
 import { auth } from './firebase'
 import Login from './Login'
+import ImportExport from './ImportExport'
+import type { ColumnId, KanbanState, Lead, LeadWithMeta, Temperature } from './types'
+import { loadKanbanStates, saveKanbanStates, loadCustomLeads, saveCustomLeads } from './storage'
 import './App.css'
-
-interface Lead {
-  title: string
-  subTitle: string | null
-  categoryName: string | null
-  address: string | null
-  neighborhood: string | null
-  street: string | null
-  city: string | null
-  state: string | null
-  postalCode: string | null
-  website: string | null
-  phone: string | null
-  phoneUnformatted: string | null
-  totalScore: number | null
-  reviewsCount: number | null
-  permanentlyClosed: boolean
-  temporarilyClosed: boolean
-  categories: string[]
-  placeId: string
-}
-
-type ColumnId =
-  | 'open'
-  | 'contato'
-  | 'conversa'
-  | 'followup'
-  | 'proposta'
-  | 'negociacao'
-  | 'fechado'
-  | 'perdido'
-
-type Temperature = 'quente' | 'medio' | 'frio'
-
-interface KanbanState {
-  column: ColumnId
-  nextAction?: string
-  dueDate?: string
-  lostReason?: string
-  proposalValue?: string
-  proposalReturnDate?: string
-}
-
-interface LeadWithMeta extends Lead {
-  kanbanState: KanbanState
-  score: number
-  temperature: Temperature
-  websiteKind: 'proprio' | 'social' | 'sem'
-}
-
-const STORAGE_KEY = 'codexa-leads-kanban'
 
 const COLUMNS: { id: ColumnId; label: string; emoji: string; color: string }[] = [
   { id: 'open', label: 'Open', emoji: '🟢', color: '#25BF44' },
@@ -116,23 +68,6 @@ const fetchLeads = async (): Promise<Lead[]> => {
   const res = await fetch('/data/leads.json')
   if (!res.ok) throw new Error('Não foi possível carregar os dados')
   return res.json()
-}
-
-function loadKanbanStates(): Record<string, KanbanState> {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as Record<string, KanbanState>) : {}
-  } catch {
-    return {}
-  }
-}
-
-function saveKanbanStates(states: Record<string, KanbanState>) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(states))
-  } catch {
-    // noop
-  }
 }
 
 function getHost(website: string): string | null {
@@ -523,7 +458,8 @@ function LeadModal({
 }
 
 function App() {
-  const [rawLeads, setRawLeads] = useState<Lead[]>([])
+  const [baseLeads, setBaseLeads] = useState<Lead[]>([])
+  const [customLeads, setCustomLeads] = useState<Lead[]>(() => loadCustomLeads())
   const [leadStates, setKanbanStates] = useState<Record<string, KanbanState>>(() =>
     loadKanbanStates(),
   )
@@ -534,6 +470,7 @@ function App() {
   const [selectedLead, setSelectedLead] = useState<LeadWithMeta | null>(null)
   const [activeDrag, setActiveDrag] = useState<LeadWithMeta | null>(null)
   const [user, setUser] = useState<User | null | undefined>(undefined)
+  const [currentView, setCurrentView] = useState<'home' | 'import'>('home')
   const didDrag = useRef(false)
 
   useEffect(() => {
@@ -543,7 +480,7 @@ function App() {
   useEffect(() => {
     fetchLeads()
       .then((data) => {
-        setRawLeads(data)
+        setBaseLeads(data)
         setLoading(false)
       })
       .catch((err) => {
@@ -556,16 +493,22 @@ function App() {
     saveKanbanStates(leadStates)
   }, [leadStates])
 
+  useEffect(() => {
+    saveCustomLeads(customLeads)
+  }, [customLeads])
+
+  const allLeads = useMemo<Lead[]>(() => [...baseLeads, ...customLeads], [baseLeads, customLeads])
+
   const categories = useMemo(
     () =>
       Array.from(
-        new Set(rawLeads.map((l) => l.categoryName).filter((c): c is string => !!c)),
+        new Set(allLeads.map((l) => l.categoryName).filter((c): c is string => !!c)),
       ).sort(),
-    [rawLeads],
+    [allLeads],
   )
 
   const leadsWithMeta = useMemo<LeadWithMeta[]>(() => {
-    return rawLeads.map((lead) => {
+    return allLeads.map((lead) => {
       const state = leadStates[lead.placeId] ?? { column: 'open' }
       return {
         ...lead,
@@ -575,7 +518,7 @@ function App() {
         websiteKind: classifyWebsite(lead.website),
       }
     })
-  }, [rawLeads, leadStates])
+  }, [allLeads, leadStates])
 
   const filteredLeads = useMemo(() => {
     return leadsWithMeta.filter((lead) => {
@@ -637,6 +580,33 @@ function App() {
     setKanbanStates((prev) => ({ ...prev, [placeId]: state }))
   }
 
+  const handleImport = (leads: Lead[]) => {
+    const map = new Map(customLeads.map((l) => [l.placeId, l]))
+    const stateMap = { ...leadStates }
+    leads.forEach((item) => {
+      const meta = item as unknown as Partial<LeadWithMeta>
+      const { kanbanState, score: _score, temperature: _temperature, websiteKind: _websiteKind, ...rest } = meta as LeadWithMeta
+      const lead = rest as Lead
+      map.set(lead.placeId, lead)
+      if (kanbanState) stateMap[lead.placeId] = kanbanState as KanbanState
+    })
+    setCustomLeads(Array.from(map.values()))
+    setKanbanStates(stateMap)
+  }
+
+  const handleExport = () => {
+    const data = JSON.stringify(leadsWithMeta, null, 2)
+    const blob = new Blob([data], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `codexa-leads-${new Date().toISOString().slice(0, 10)}.json`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
+  }
+
   const handleCardClick = (lead: LeadWithMeta) => {
     if (didDrag.current) return
     setSelectedLead(lead)
@@ -653,10 +623,28 @@ function App() {
   return (
     <div className="prospect-app">
       <header className="prospect-header prospect-header--logged">
-        <div>
+        <div className="prospect-header__brand">
           <h1>Prospecção Codexa</h1>
-          <p>Kanban de prospecção comercial. Arraste os cards entre as etapas.</p>
+          <p>Kanban de prospecção comercial</p>
         </div>
+
+        <nav className="prospect-nav" aria-label="Navegação principal">
+          <button
+            type="button"
+            className={`prospect-nav__item ${currentView === 'home' ? 'prospect-nav__item--active' : ''}`}
+            onClick={() => setCurrentView('home')}
+          >
+            Home
+          </button>
+          <button
+            type="button"
+            className={`prospect-nav__item ${currentView === 'import' ? 'prospect-nav__item--active' : ''}`}
+            onClick={() => setCurrentView('import')}
+          >
+            Importar / Exportar
+          </button>
+        </nav>
+
         <div className="prospect-header__user">
           <div className="user-avatar" title={user.displayName ?? user.email ?? 'Usuário'}>
             {user.photoURL ? (
@@ -676,89 +664,95 @@ function App() {
         </div>
       </header>
 
-      <div className="prospect-toolbar">
-        <div className="prospect-field" style={{ flex: '2 1 300px' }}>
-          <label htmlFor="search">Buscar</label>
-          <input
-            id="search"
-            type="text"
-            placeholder="Nome, endereço, telefone..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-        <div className="prospect-field" style={{ flex: '1 1 220px' }}>
-          <label htmlFor="category">Categoria</label>
-          <select
-            id="category"
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-          >
-            <option value="">Todas</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {loading ? (
-        <div className="prospect-loading">Carregando leads...</div>
-      ) : error ? (
-        <div className="prospect-empty">{error}</div>
-      ) : (
-        <DndContext
-          sensors={sensors}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-        >
-          <div className="kanban-board">
-            {COLUMNS.map((column) => (
-              <KanbanColumn
-                key={column.id}
-                column={column}
-                leads={leadsByColumn[column.id]}
-                onCardClick={handleCardClick}
+      {currentView === 'home' ? (
+        <>
+          <div className="prospect-toolbar">
+            <div className="prospect-field" style={{ flex: '2 1 300px' }}>
+              <label htmlFor="search">Buscar</label>
+              <input
+                id="search"
+                type="text"
+                placeholder="Nome, endereço, telefone..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
               />
-            ))}
+            </div>
+            <div className="prospect-field" style={{ flex: '1 1 220px' }}>
+              <label htmlFor="category">Categoria</label>
+              <select
+                id="category"
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+              >
+                <option value="">Todas</option>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-          <DragOverlay dropAnimation={null}>
-            {activeDrag ? (
-              <div className="kanban-card kanban-card--dragging">
-                <div className="kanban-card__header">
-                  <div className="kanban-card__title-wrap">
-                    <h3 className="kanban-card__title">{activeDrag.title}</h3>
-                  </div>
-                  <span className={`temperature-badge temperature-badge--${activeDrag.temperature}`}>
-                    {getTemperatureEmoji(activeDrag.temperature)} {activeDrag.score}
-                  </span>
-                </div>
-                <div className="kanban-card__body">
-                  <div className="kanban-card__meta">
-                    {activeDrag.totalScore !== null && activeDrag.totalScore !== undefined && (
-                      <span className="kanban-card__rating">
-                        ⭐ {activeDrag.totalScore.toFixed(1)} ({activeDrag.reviewsCount ?? 0})
-                      </span>
-                    )}
-                    <span className={`kanban-card__website kanban-card__website--${activeDrag.websiteKind}`}>
-                      {getWebsiteLabel(activeDrag.websiteKind)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ) : null}
-          </DragOverlay>
-        </DndContext>
-      )}
 
-      {selectedLead && (
-        <LeadModal
-          lead={selectedLead}
-          onClose={() => setSelectedLead(null)}
-          onSave={handleSaveLead}
-        />
+          {loading ? (
+            <div className="prospect-loading">Carregando leads...</div>
+          ) : error ? (
+            <div className="prospect-empty">{error}</div>
+          ) : (
+            <DndContext
+              sensors={sensors}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+            >
+              <div className="kanban-board">
+                {COLUMNS.map((column) => (
+                  <KanbanColumn
+                    key={column.id}
+                    column={column}
+                    leads={leadsByColumn[column.id]}
+                    onCardClick={handleCardClick}
+                  />
+                ))}
+              </div>
+              <DragOverlay dropAnimation={null}>
+                {activeDrag ? (
+                  <div className="kanban-card kanban-card--dragging">
+                    <div className="kanban-card__header">
+                      <div className="kanban-card__title-wrap">
+                        <h3 className="kanban-card__title">{activeDrag.title}</h3>
+                      </div>
+                      <span className={`temperature-badge temperature-badge--${activeDrag.temperature}`}>
+                        {getTemperatureEmoji(activeDrag.temperature)} {activeDrag.score}
+                      </span>
+                    </div>
+                    <div className="kanban-card__body">
+                      <div className="kanban-card__meta">
+                        {activeDrag.totalScore !== null && activeDrag.totalScore !== undefined && (
+                          <span className="kanban-card__rating">
+                            ⭐ {activeDrag.totalScore.toFixed(1)} ({activeDrag.reviewsCount ?? 0})
+                          </span>
+                        )}
+                        <span className={`kanban-card__website kanban-card__website--${activeDrag.websiteKind}`}>
+                          {getWebsiteLabel(activeDrag.websiteKind)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
+              </DragOverlay>
+            </DndContext>
+          )}
+
+          {selectedLead && (
+            <LeadModal
+              lead={selectedLead}
+              onClose={() => setSelectedLead(null)}
+              onSave={handleSaveLead}
+            />
+          )}
+        </>
+      ) : (
+        <ImportExport leads={leadsWithMeta} onImport={handleImport} onExport={handleExport} />
       )}
     </div>
   )

@@ -552,6 +552,31 @@
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
+  padding: 16px 20px;
+  background: var(--ds-white);
+  border: 1px solid var(--ds-line);
+  border-radius: 16px;
+  box-shadow: var(--ds-shadow-subtle);
+  margin-bottom: 24px;
+}
+
+.prospect-header__brand {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.prospect-header__brand h1 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 650;
+  color: var(--ds-graphite);
+}
+
+.prospect-header__brand p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--ds-gray);
 }
 
 .prospect-header__user {
@@ -683,4 +708,138 @@
 
 .action-btn--full {
   width: 100%;
+}
+
+.prospect-nav {
+  display: flex;
+  gap: 6px;
+  background: #f4f6f7;
+  padding: 4px;
+  border-radius: 10px;
+}
+
+.prospect-nav__item {
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ds-charcoal);
+  font-size: 0.85rem;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.prospect-nav__item:hover {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.prospect-nav__item--active {
+  background: var(--ds-white);
+  color: var(--ds-graphite);
+  box-shadow: 0 1px 3px rgba(17, 19, 26, 0.08);
+}
+
+.import-export-page {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.import-export__header {
+  margin-bottom: 24px;
+}
+
+.import-export__header h2 {
+  margin: 0 0 6px;
+  font-size: 1.4rem;
+  font-weight: 650;
+  color: var(--ds-graphite);
+}
+
+.import-export__header p {
+  margin: 0;
+  color: var(--ds-gray);
+  font-size: 0.9rem;
+}
+
+.import-export__grid {
+  display: grid;
+  gap: 20px;
+}
+
+.import-card,
+.export-card {
+  padding: 24px;
+  background: var(--ds-white);
+  border: 1px solid var(--ds-line);
+  border-radius: 16px;
+  box-shadow: var(--ds-shadow-subtle);
+}
+
+.import-card h3,
+.export-card h3 {
+  margin: 0 0 6px;
+  font-size: 1.1rem;
+  font-weight: 650;
+  color: var(--ds-graphite);
+}
+
+.import-card > p,
+.export-card > p {
+  margin: 0 0 20px;
+  color: var(--ds-gray);
+  font-size: 0.9rem;
+}
+
+.import-card .prospect-field {
+  gap: 10px;
+}
+
+.import-card input[type='file'] {
+  padding: 10px;
+  border: 1px dashed #cfd4db;
+  border-radius: 10px;
+  background: var(--ds-white);
+  font-size: 0.85rem;
+  color: var(--ds-charcoal);
+  cursor: pointer;
+}
+
+.import-card input[type='file']:hover {
+  border-color: var(--ds-green-dark);
+  background: var(--ds-green-ice);
+}
+
+.import-export__message {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.import-export__message--success {
+  color: #13782b;
+  background: #eaf9ee;
+}
+
+.import-export__message--error {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+@media (max-width: 760px) {
+  .prospect-header--logged {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .prospect-nav {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .prospect-header__user {
+    justify-content: flex-end;
+  }
 }
