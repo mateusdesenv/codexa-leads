@@ -1,9 +1,12 @@
-require('dotenv').config()
+import 'dotenv/config'
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import { connectToDatabase } from '../api/lib/db.js'
+import { Lead } from '../api/lib/lead.js'
 
-const fs = require('fs')
-const path = require('path')
-const { connectToDatabase } = require('../api/lib/db.cjs')
-const { Lead } = require('../api/lib/lead.cjs')
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 async function main() {
   try {
@@ -18,7 +21,7 @@ async function main() {
       await Lead.findOneAndUpdate(
         { placeId: item.placeId },
         { $set: item },
-        { upsert: true, new: true },
+        { upsert: true, returnDocument: 'after' },
       )
       count++
     }

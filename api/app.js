@@ -1,9 +1,14 @@
-require('dotenv').config()
+import 'dotenv/config'
+import express from 'express'
+import cors from 'cors'
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import { connectToDatabase } from './lib/db.js'
+import { Lead } from './lib/lead.js'
 
-const express = require('express')
-const cors = require('cors')
-const { connectToDatabase } = require('./lib/db.cjs')
-const { Lead } = require('./lib/lead.cjs')
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const app = express()
 
@@ -43,7 +48,7 @@ app.post('/api/leads/import', async (req, res) => {
       const lead = await Lead.findOneAndUpdate(
         { placeId: item.placeId },
         { $set: item },
-        { upsert: true, new: true },
+        { upsert: true, returnDocument: 'after' },
       )
       result.push(lead)
     }
@@ -72,8 +77,6 @@ app.get('/api/leads/export', async (_req, res) => {
 app.post('/api/leads/seed', async (_req, res) => {
   try {
     await connectToDatabase()
-    const fs = require('fs')
-    const path = require('path')
     const seedPath = path.join(process.cwd(), 'public', 'data', 'leads.json')
     const seedData = JSON.parse(fs.readFileSync(seedPath, 'utf8'))
 
@@ -83,7 +86,7 @@ app.post('/api/leads/seed', async (_req, res) => {
       const lead = await Lead.findOneAndUpdate(
         { placeId: item.placeId },
         { $set: item },
-        { upsert: true, new: true },
+        { upsert: true, returnDocument: 'after' },
       )
       result.push(lead)
     }
@@ -99,4 +102,4 @@ app.get('/api/health', (_req, res) => {
   res.json({ ok: true })
 })
 
-module.exports = app
+export default app

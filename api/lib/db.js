@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 
 if (!process.env.MONGODB_URI) {
   throw new Error('MONGODB_URI environment variable is not set')
@@ -10,7 +10,7 @@ if (!cached) {
   cached = global.mongoose = { conn: null, promise: null }
 }
 
-async function connectToDatabase() {
+export async function connectToDatabase() {
   if (cached.conn) {
     return cached.conn
   }
@@ -27,5 +27,3 @@ async function connectToDatabase() {
   cached.conn = await cached.promise
   return cached.conn
 }
-
-module.exports = { connectToDatabase }
