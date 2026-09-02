@@ -17,6 +17,7 @@ import { auth } from './firebase'
 import Login from './Login'
 import ImportExport from './ImportExport'
 import Help from './Help'
+import MessageSuggestions from './MessageSuggestions'
 import codexaLogo from 'codexa-ui/logos/logos-fundo-transparente/primary-logo.png'
 import codexaLogoDark from 'codexa-ui/logos/logos-fundo-transparente/primary-logo-reversed.png'
 import {
@@ -498,6 +499,8 @@ function LeadModal({
           </Button>
         </div>
       </form>
+
+      <MessageSuggestions lead={lead} />
     </Dialog>
   )
 }

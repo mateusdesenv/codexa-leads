@@ -1043,3 +1043,45 @@
   justify-content: flex-end;
   gap: 10px;
 }
+
+.message-suggestions {
+  margin-top: 24px;
+}
+
+.message-suggestions__title {
+  margin: 0 0 12px;
+  font-size: 0.9rem;
+  font-weight: 650;
+  color: var(--ds-graphite);
+}
+
+.message-suggestions__list {
+  display: grid;
+  gap: 10px;
+}
+
+.message-suggestion {
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.message-suggestion__text {
+  margin: 0;
+  color: var(--ds-charcoal);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  flex: 1;
+}
+
+@media (max-width: 480px) {
+  .message-suggestion {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .message-suggestion button {
+    width: 100%;
+  }
+}
