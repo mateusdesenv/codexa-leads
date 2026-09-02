@@ -12,6 +12,9 @@ import {
   type DragStartEvent,
 } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
+import { onAuthStateChanged, signOut, type User } from 'firebase/auth'
+import { auth } from './firebase'
+import Login from './Login'
 import './App.css'
 
 interface Lead {
@@ -521,7 +524,12 @@ function App() {
   const [categoryFilter, setCategoryFilter] = useState('')
   const [selectedLead, setSelectedLead] = useState<LeadWithMeta | null>(null)
   const [activeDrag, setActiveDrag] = useState<LeadWithMeta | null>(null)
+  const [user, setUser] = useState<User | null | undefined>(undefined)
   const didDrag = useRef(false)
+
+  useEffect(() => {
+    return onAuthStateChanged(auth, (u) => setUser(u))
+  }, [])
 
   useEffect(() => {
     fetchLeads()
@@ -625,11 +633,31 @@ function App() {
     setSelectedLead(lead)
   }
 
+  if (user === undefined) {
+    return <div className="prospect-loading">Inicializando…</div>
+  }
+
+  if (user === null) {
+    return <Login />
+  }
+
   return (
     <div className="prospect-app">
-      <header className="prospect-header">
-        <h1>Prospecção Codexa</h1>
-        <p>Kanban de prospecção comercial. Arraste os cards entre as etapas.</p>
+      <header className="prospect-header prospect-header--logged">
+        <div>
+          <h1>Prospecção Codexa</h1>
+          <p>Kanban de prospecção comercial. Arraste os cards entre as etapas.</p>
+        </div>
+        <div className="prospect-header__user">
+          <span>{user.email ?? user.displayName ?? 'Usuário'}</span>
+          <button
+            type="button"
+            className="action-btn action-btn--secondary"
+            onClick={() => signOut(auth)}
+          >
+            Sair
+          </button>
+        </div>
       </header>
 
       <div className="prospect-toolbar">
