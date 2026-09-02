@@ -17,6 +17,7 @@ export interface Lead {
   temporarilyClosed: boolean
   categories: string[]
   placeId: string
+  kanbanState?: KanbanState
 }
 
 export type ColumnId =

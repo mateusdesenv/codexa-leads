@@ -46,9 +46,11 @@ app.post('/api/leads/import', async (req, res) => {
 
     for (const item of leads) {
       if (!item.title || !item.placeId) continue
+      const update = { ...item }
+      if (!item.kanbanState) delete update.kanbanState
       const lead = await Lead.findOneAndUpdate(
         { placeId: item.placeId },
-        { $set: item },
+        { $set: update },
         { upsert: true, returnDocument: 'after' },
       )
       result.push(lead)
@@ -84,9 +86,11 @@ app.post('/api/leads/seed', async (_req, res) => {
     const result = []
     for (const item of seedData) {
       if (!item.title || !item.placeId) continue
+      const update = { ...item }
+      if (!item.kanbanState) delete update.kanbanState
       const lead = await Lead.findOneAndUpdate(
         { placeId: item.placeId },
-        { $set: item },
+        { $set: update },
         { upsert: true, returnDocument: 'after' },
       )
       result.push(lead)
@@ -96,6 +100,22 @@ app.post('/api/leads/seed', async (_req, res) => {
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: err instanceof Error ? err.message : 'Erro ao popular leads' })
+  }
+})
+
+app.put('/api/leads/:placeId', async (req, res) => {
+  try {
+    await connectToDatabase()
+    const lead = await Lead.findOneAndUpdate(
+      { placeId: req.params.placeId },
+      { $set: { kanbanState: req.body.kanbanState } },
+      { returnDocument: 'after' },
+    )
+    if (!lead) return res.status(404).json({ error: 'Lead não encontrado' })
+    res.json(lead)
+  } catch (err) {
+    console.error(err)
+    res.status(400).json({ error: err instanceof Error ? err.message : 'Erro ao atualizar lead' })
   }
 })
 

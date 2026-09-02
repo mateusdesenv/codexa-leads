@@ -18,9 +18,11 @@ async function main() {
     let count = 0
     for (const item of seedData) {
       if (!item.title || !item.placeId) continue
+      const update = { ...item }
+      if (!item.kanbanState) delete update.kanbanState
       await Lead.findOneAndUpdate(
         { placeId: item.placeId },
-        { $set: item },
+        { $set: update },
         { upsert: true, returnDocument: 'after' },
       )
       count++

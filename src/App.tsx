@@ -41,7 +41,7 @@ import type { ColumnId, KanbanState, Lead, LeadWithMeta, Temperature } from './t
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const AnchorButton = Button as any
-import { loadKanbanStates, saveKanbanStates } from './storage'
+import { loadKanbanStates } from './storage'
 import './App.css'
 
 const COLUMNS: { id: ColumnId; label: string; emoji: string; color: string; icon: IconName }[] = [
@@ -92,6 +92,42 @@ const fetchLeads = async (): Promise<Lead[]> => {
   const res = await fetch('/api/leads')
   if (!res.ok) throw new Error('Não foi possível carregar os dados')
   return res.json()
+}
+
+const updateLeadState = async (placeId: string, kanbanState: KanbanState): Promise<Lead> => {
+  const res = await fetch(`/api/leads/${placeId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ kanbanState }),
+  })
+  if (!res.ok) throw new Error('Erro ao atualizar lead')
+  return res.json()
+}
+
+const migrateLocalStates = async (leads: Lead[]) => {
+  const local = loadKanbanStates()
+  const placeIds = Object.keys(local)
+  if (!placeIds.length) return
+
+  const updates: Promise<Lead>[] = []
+  for (const lead of leads) {
+    const localState = local[lead.placeId]
+    if (!localState) continue
+    const remoteState = lead.kanbanState ?? { column: 'open' }
+    if (JSON.stringify(localState) !== JSON.stringify(remoteState)) {
+      updates.push(updateLeadState(lead.placeId, localState))
+    }
+  }
+
+  if (updates.length) {
+    await Promise.all(updates)
+  }
+
+  try {
+    localStorage.removeItem('codexa-leads-kanban')
+  } catch {
+    // noop
+  }
 }
 
 function getHost(website: string): string | null {
@@ -507,9 +543,6 @@ function LeadModal({
 
 function App() {
   const [baseLeads, setBaseLeads] = useState<Lead[]>([])
-  const [leadStates, setKanbanStates] = useState<Record<string, KanbanState>>(() =>
-    loadKanbanStates(),
-  )
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
@@ -536,8 +569,11 @@ function App() {
 
   useEffect(() => {
     fetchLeads()
-      .then((data) => {
+      .then(async (data) => {
         setBaseLeads(data)
+        await migrateLocalStates(data)
+        const fresh = await fetchLeads()
+        setBaseLeads(fresh)
         setLoading(false)
       })
       .catch((err) => {
@@ -545,10 +581,6 @@ function App() {
         setLoading(false)
       })
   }, [])
-
-  useEffect(() => {
-    saveKanbanStates(leadStates)
-  }, [leadStates])
 
   const allLeads = baseLeads
 
@@ -562,16 +594,16 @@ function App() {
 
   const leadsWithMeta = useMemo<LeadWithMeta[]>(() => {
     return allLeads.map((lead) => {
-      const state = leadStates[lead.placeId] ?? { column: 'open' }
+      const state = lead.kanbanState ?? { column: 'open' }
       return {
         ...lead,
         kanbanState: state,
         score: scoreLead(lead),
         temperature: getTemperature(scoreLead(lead)),
         websiteKind: classifyWebsite(lead.website),
-      }
+      } as LeadWithMeta
     })
-  }, [allLeads, leadStates])
+  }, [allLeads])
 
   const filteredLeads = useMemo(() => {
     return leadsWithMeta.filter((lead) => {
@@ -623,14 +655,26 @@ function App() {
     const newColumn = over.id as ColumnId
     const placeId = active.id as string
     if (!COLUMNS.some((c) => c.id === newColumn)) return
-    setKanbanStates((prev) => ({
-      ...prev,
-      [placeId]: { ...(prev[placeId] ?? { column: 'open' }), column: newColumn },
-    }))
+    const lead = baseLeads.find((l) => l.placeId === placeId)
+    if (!lead) return
+    const newState = { ...(lead.kanbanState ?? { column: 'open' as ColumnId }), column: newColumn }
+    setBaseLeads((prev) =>
+      prev.map((l) => (l.placeId === placeId ? { ...l, kanbanState: newState } : l)),
+    )
+    updateLeadState(placeId, newState).catch((err) => {
+      console.error(err)
+      setError('Erro ao salvar mudança de coluna')
+    })
   }
 
   const handleSaveLead = (placeId: string, state: KanbanState) => {
-    setKanbanStates((prev) => ({ ...prev, [placeId]: state }))
+    setBaseLeads((prev) =>
+      prev.map((l) => (l.placeId === placeId ? { ...l, kanbanState: state } : l)),
+    )
+    updateLeadState(placeId, state).catch((err) => {
+      console.error(err)
+      setError('Erro ao salvar lead')
+    })
   }
 
   const handleImport = async (leads: Lead[]) => {
@@ -641,14 +685,6 @@ function App() {
         body: JSON.stringify(leads),
       })
       if (!res.ok) throw new Error('Erro ao importar leads')
-
-      const stateMap = { ...leadStates }
-      leads.forEach((item) => {
-        const meta = item as unknown as Partial<LeadWithMeta>
-        const { kanbanState } = meta
-        if (kanbanState) stateMap[item.placeId] = kanbanState as KanbanState
-      })
-      setKanbanStates(stateMap)
 
       const fresh = await fetchLeads()
       setBaseLeads(fresh)

@@ -20,6 +20,14 @@ const leadSchema = new mongoose.Schema(
     temporarilyClosed: { type: Boolean, default: false },
     categories: { type: [String], default: [] },
     placeId: { type: String, required: true, unique: true },
+    kanbanState: {
+      column: { type: String, default: 'open' },
+      nextAction: { type: String, default: null },
+      dueDate: { type: String, default: null },
+      lostReason: { type: String, default: null },
+      proposalValue: { type: String, default: null },
+      proposalReturnDate: { type: String, default: null },
+    },
   },
   {
     timestamps: true,
