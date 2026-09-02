@@ -55,13 +55,20 @@ function App() {
   }, [])
 
   const cities = useMemo(
-    () => Array.from(new Set(leads.map((l) => l.city).filter(Boolean))).sort(),
+    () =>
+      Array.from(
+        new Set(leads.map((l) => l.city).filter((c): c is string => !!c)),
+      ).sort(),
     [leads],
   )
 
   const categories = useMemo(
     () =>
-      Array.from(new Set(leads.map((l) => l.categoryName).filter(Boolean))).sort(),
+      Array.from(
+        new Set(
+          leads.map((l) => l.categoryName).filter((c): c is string => !!c),
+        ),
+      ).sort(),
     [leads],
   )
 
