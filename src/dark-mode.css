@@ -204,6 +204,18 @@ html[data-theme="dark"] .ds-field__message {
   color: var(--ds-gray);
 }
 
+html[data-theme="dark"] .ds-field--error .ds-field__message {
+  color: #f87171;
+}
+
+html[data-theme="dark"] .ds-field--error .ds-input-wrap {
+  border-color: #f87171;
+}
+
+html[data-theme="dark"] .ds-field--error .ds-input-wrap:focus-within {
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.2);
+}
+
 /* Select */
 html[data-theme="dark"] .ds-select,
 html[data-theme="dark"] .ds-select-menu {
@@ -225,15 +237,15 @@ html[data-theme="dark"] .ds-select-option.is-selected {
   background: var(--ds-green-ice);
 }
 
-/* Buttons */
-html[data-theme="dark"] .ds-button--primary {
-  color: var(--ds-graphite);
+/* Buttons — primary keeps dark text on bright green for contrast */
+html[data-theme="dark"] .ds-button--primary,
+html[data-theme="dark"] .ds-button--primary:hover:not(:disabled) {
+  color: #11131a;
   background: var(--ds-green);
   border-color: var(--ds-green);
 }
 
 html[data-theme="dark"] .ds-button--primary:hover:not(:disabled) {
-  color: var(--ds-graphite);
   background: var(--ds-green-dark);
   border-color: var(--ds-green-dark);
 }
@@ -261,6 +273,54 @@ html[data-theme="dark"] .ds-button--ghost:hover:not(:disabled) {
 /* Empty state */
 html[data-theme="dark"] .ds-empty {
   border-color: var(--ds-line);
+}
+
+/* Select selected icon */
+html[data-theme="dark"] .ds-select-option.is-selected > svg {
+  color: var(--ds-green);
+}
+
+/* App-specific surfaces */
+html[data-theme="dark"] .kanban-column__header {
+  background: var(--ds-white);
+}
+
+html[data-theme="dark"] .kanban-column--over {
+  box-shadow: 0 0 0 3px rgba(46, 204, 78, 0.25);
+}
+
+html[data-theme="dark"] .modal-overlay {
+  background: rgba(0, 0, 0, 0.65);
+}
+
+html[data-theme="dark"] .modal {
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme="dark"] .import-card input[type='file'] {
+  border-color: var(--ds-line);
+  background: var(--ds-white);
+  color: var(--ds-charcoal);
+}
+
+html[data-theme="dark"] .import-card input[type='file']:hover {
+  border-color: var(--ds-green);
+  background: var(--ds-green-ice);
+}
+
+html[data-theme="dark"] .login-card__error {
+  color: #f87171;
+  background: #3d1f23;
+}
+
+html[data-theme="dark"] .import-export__message--success {
+  color: #4ade80;
+  background: #14331f;
+}
+
+html[data-theme="dark"] .import-export__message--error {
+  color: #f87171;
+  background: #3d1f23;
 }
 
 /* Switch */

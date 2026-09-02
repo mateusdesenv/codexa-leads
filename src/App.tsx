@@ -18,6 +18,7 @@ import Login from './Login'
 import ImportExport from './ImportExport'
 import Help from './Help'
 import codexaLogo from 'codexa-ui/logos/logos-fundo-transparente/primary-logo.png'
+import codexaLogoDark from 'codexa-ui/logos/logos-fundo-transparente/primary-logo-reversed.png'
 import {
   Alert,
   Avatar,
@@ -672,7 +673,7 @@ function App() {
     <div className="prospect-app">
       <aside className="prospect-sidebar">
         <div className="prospect-sidebar__brand">
-          <img src={codexaLogo} alt="Codexa" className="prospect-sidebar__logo" />
+          <img src={theme === 'dark' ? codexaLogoDark : codexaLogo} alt="Codexa" className="prospect-sidebar__logo" />
         </div>
 
         <nav className="prospect-nav" aria-label="Navegação principal">
