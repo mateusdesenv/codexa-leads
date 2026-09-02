@@ -104,20 +104,17 @@ function App() {
     return sortedList
   }, [filtered, sort])
 
-  const handleSort = (key: SortKey) => {
-    setSort((prev) => ({
-      key,
-      dir: prev.key === key && prev.dir === 'asc' ? 'desc' : 'asc',
-    }))
-  }
+  const sortOptions: { key: SortKey; label: string }[] = [
+    { key: 'title', label: 'Nome' },
+    { key: 'categoryName', label: 'Categoria' },
+    { key: 'city', label: 'Cidade' },
+    { key: 'totalScore', label: 'Nota' },
+    { key: 'reviewsCount', label: 'Reviews' },
+  ]
 
   const scoreBadge = (score: number | null) => {
     if (score == null) return '-'
-    return (
-      <span className="cell-score">
-        {score.toFixed(1)}
-      </span>
-    )
+    return <span className="card-score">{score.toFixed(1)}</span>
   }
 
   const statusTag = (lead: Lead) => {
@@ -189,6 +186,34 @@ function App() {
             ))}
           </select>
         </div>
+        <div className="prospect-field">
+          <label htmlFor="sort">Ordenar</label>
+          <div className="prospect-sort">
+            <select
+              id="sort"
+              value={sort.key}
+              onChange={(e) =>
+                setSort((prev) => ({ ...prev, key: e.target.value as SortKey }))
+              }
+            >
+              {sortOptions.map((opt) => (
+                <option key={opt.key} value={opt.key}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              className="sort-direction"
+              onClick={() =>
+                setSort((prev) => ({ ...prev, dir: prev.dir === 'asc' ? 'desc' : 'asc' }))
+              }
+              aria-label={sort.dir === 'asc' ? 'Ordenar decrescente' : 'Ordenar crescente'}
+            >
+              {sort.dir === 'asc' ? '↑' : '↓'}
+            </button>
+          </div>
+        </div>
       </div>
 
       {loading ? (
@@ -196,85 +221,101 @@ function App() {
       ) : error ? (
         <div className="prospect-empty">{error}</div>
       ) : (
-        <div className="table-wrap">
-          <table className="prospect-table">
-            <thead>
-              <tr>
-                <th onClick={() => handleSort('title')}>
-                  Nome {sort.key === 'title' && <span className="sort">{sort.dir === 'asc' ? '↑' : '↓'}</span>}
-                </th>
-                <th onClick={() => handleSort('categoryName')}>
-                  Categoria {sort.key === 'categoryName' && <span className="sort">{sort.dir === 'asc' ? '↑' : '↓'}</span>}
-                </th>
-                <th onClick={() => handleSort('city')}>
-                  Cidade {sort.key === 'city' && <span className="sort">{sort.dir === 'asc' ? '↑' : '↓'}</span>}
-                </th>
-                <th onClick={() => handleSort('totalScore')}>
-                  Nota {sort.key === 'totalScore' && <span className="sort">{sort.dir === 'asc' ? '↑' : '↓'}</span>}
-                </th>
-                <th onClick={() => handleSort('reviewsCount')}>
-                  Reviews {sort.key === 'reviewsCount' && <span className="sort">{sort.dir === 'asc' ? '↑' : '↓'}</span>}
-                </th>
-                <th>Status</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sorted.map((lead) => (
-                <tr key={lead.placeId}>
-                  <td className="cell-title">{lead.title}</td>
-                  <td>
-                    {lead.categoryName ? (
-                      <span className="cell-category">{lead.categoryName}</span>
-                    ) : (
-                      <span className="cell-muted">-</span>
-                    )}
-                  </td>
-                  <td>
-                    {lead.city ? <span className="cell-city">{lead.city}</span> : '-'}
-                  </td>
-                  <td>{scoreBadge(lead.totalScore)}</td>
-                  <td>{lead.reviewsCount ?? '-'}</td>
-                  <td>{statusTag(lead)}</td>
-                  <td className="cell-actions">
-                    {lead.phone && (
-                      <a
-                        className="action-btn action-btn--primary"
-                        href={`tel:${lead.phoneUnformatted ?? lead.phone}`}
-                      >
-                        Ligar
-                      </a>
-                    )}
-                    {lead.website && (
-                      <a
-                        className="action-btn action-btn--secondary"
-                        href={lead.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Site
-                      </a>
-                    )}
+        <div className="cards-grid">
+          {sorted.map((lead) => (
+            <article key={lead.placeId} className="prospect-card">
+              <div className="prospect-card__header">
+                <div>
+                  <h2 className="prospect-card__title">{lead.title}</h2>
+                  {lead.categoryName && (
+                    <span className="prospect-card__category">{lead.categoryName}</span>
+                  )}
+                </div>
+                {statusTag(lead)}
+              </div>
+
+              <div className="prospect-card__body">
+                {lead.address && (
+                  <p className="prospect-card__row">
+                    <span>Endereço</span>
+                    <strong>{lead.address}</strong>
+                  </p>
+                )}
+                {lead.phone && (
+                  <p className="prospect-card__row">
+                    <span>Telefone</span>
                     <a
-                      className="action-btn action-btn--secondary"
-                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lead.title ?? '')}&query_place_id=${lead.placeId}`}
+                      href={`tel:${lead.phoneUnformatted ?? lead.phone}`}
+                      className="prospect-card__link"
+                    >
+                      {lead.phone}
+                    </a>
+                  </p>
+                )}
+                {lead.website && (
+                  <p className="prospect-card__row">
+                    <span>Site</span>
+                    <a
+                      href={lead.website}
                       target="_blank"
                       rel="noopener noreferrer"
+                      className="prospect-card__link"
                     >
-                      Maps
+                      {lead.website.replace(/^https?:\/\//, '')}
                     </a>
-                  </td>
-                </tr>
-              ))}
-              {sorted.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="prospect-empty">
-                    Nenhum lead encontrado.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                  </p>
+                )}
+                <div className="prospect-card__metrics">
+                  <div>
+                    <span>Nota</span>
+                    <strong>{scoreBadge(lead.totalScore)}</strong>
+                  </div>
+                  <div>
+                    <span>Reviews</span>
+                    <strong>{lead.reviewsCount ?? '-'}</strong>
+                  </div>
+                  {lead.city && (
+                    <div>
+                      <span>Cidade</span>
+                      <strong className="prospect-card__city">{lead.city}</strong>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="prospect-card__footer">
+                {lead.phone && (
+                  <a
+                    className="action-btn action-btn--primary"
+                    href={`tel:${lead.phoneUnformatted ?? lead.phone}`}
+                  >
+                    Ligar
+                  </a>
+                )}
+                {lead.website && (
+                  <a
+                    className="action-btn action-btn--secondary"
+                    href={lead.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Site
+                  </a>
+                )}
+                <a
+                  className="action-btn action-btn--secondary"
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lead.title ?? '')}&query_place_id=${lead.placeId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Maps
+                </a>
+              </div>
+            </article>
+          ))}
+          {sorted.length === 0 && (
+            <div className="prospect-empty">Nenhum lead encontrado.</div>
+          )}
         </div>
       )}
     </div>
