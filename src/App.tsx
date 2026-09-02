@@ -24,12 +24,14 @@ import {
   Button,
   Dialog,
   EmptyState,
+  Icon,
   Input,
   SearchInput,
   Select,
   Spinner,
   Tag,
 } from 'codexa-ui'
+import type { IconName } from 'codexa-ui'
 
 import type { ColumnId, KanbanState, Lead, LeadWithMeta, Temperature } from './types'
 
@@ -38,15 +40,15 @@ const AnchorButton = Button as any
 import { loadKanbanStates, saveKanbanStates } from './storage'
 import './App.css'
 
-const COLUMNS: { id: ColumnId; label: string; emoji: string; color: string }[] = [
-  { id: 'open', label: 'Open', emoji: '🟢', color: '#25BF44' },
-  { id: 'contato', label: 'Contato feito', emoji: '📞', color: '#3B82F6' },
-  { id: 'conversa', label: 'Em conversa', emoji: '💬', color: '#8B5CF6' },
-  { id: 'followup', label: 'Follow-up', emoji: '📅', color: '#F59E0B' },
-  { id: 'proposta', label: 'Proposta enviada', emoji: '📄', color: '#0EA5E9' },
-  { id: 'negociacao', label: 'Negociação', emoji: '🔥', color: '#EF4444' },
-  { id: 'fechado', label: 'Cliente fechado', emoji: '✅', color: '#13992F' },
-  { id: 'perdido', label: 'Perdido', emoji: '❌', color: '#6D7480' },
+const COLUMNS: { id: ColumnId; label: string; emoji: string; color: string; icon: IconName }[] = [
+  { id: 'open', label: 'Open', emoji: '🟢', color: '#25BF44', icon: 'check-circle' },
+  { id: 'contato', label: 'Contato feito', emoji: '📞', color: '#3B82F6', icon: 'send' },
+  { id: 'conversa', label: 'Em conversa', emoji: '💬', color: '#8B5CF6', icon: 'message' },
+  { id: 'followup', label: 'Follow-up', emoji: '📅', color: '#F59E0B', icon: 'calendar' },
+  { id: 'proposta', label: 'Proposta enviada', emoji: '📄', color: '#0EA5E9', icon: 'file' },
+  { id: 'negociacao', label: 'Negociação', emoji: '🔥', color: '#EF4444', icon: 'warning' },
+  { id: 'fechado', label: 'Cliente fechado', emoji: '✅', color: '#13992F', icon: 'check' },
+  { id: 'perdido', label: 'Perdido', emoji: '❌', color: '#6D7480', icon: 'x' },
 ]
 
 const LOST_REASONS = [
@@ -170,6 +172,12 @@ function getWebsiteTone(kind: LeadWithMeta['websiteKind']): 'success' | 'info' |
   return 'neutral'
 }
 
+function getWebsiteIcon(kind: LeadWithMeta['websiteKind']): IconName {
+  if (kind === 'proprio') return 'external-link'
+  if (kind === 'social') return 'share'
+  return 'x'
+}
+
 function isOverdue(dueDate?: string): boolean {
   if (!dueDate) return false
   return new Date(dueDate).getTime() < new Date().setHours(0, 0, 0, 0)
@@ -198,6 +206,7 @@ function Actions({ lead }: { lead: Lead }) {
           href={`tel:${lead.phoneUnformatted ?? lead.phone}`}
           variant="primary"
           size="small"
+          leadingIcon={<Icon name="message" size={14} />}
         >
           Ligar
         </AnchorButton>
@@ -210,6 +219,7 @@ function Actions({ lead }: { lead: Lead }) {
           rel="noopener noreferrer"
           variant="secondary"
           size="small"
+          leadingIcon={<Icon name="external-link" size={14} />}
         >
           Site
         </AnchorButton>
@@ -221,6 +231,7 @@ function Actions({ lead }: { lead: Lead }) {
         rel="noopener noreferrer"
         variant="secondary"
         size="small"
+        leadingIcon={<Icon name="link" size={14} />}
       >
         Maps
       </AnchorButton>
@@ -277,11 +288,11 @@ function LeadCard({
         <div className="kanban-card__meta">
           {lead.totalScore !== null && lead.totalScore !== undefined && (
             <span className="kanban-card__rating">
-              ⭐ {lead.totalScore.toFixed(1)} ({lead.reviewsCount ?? 0})
+              <Icon name="star" size={12} /> {lead.totalScore.toFixed(1)} ({lead.reviewsCount ?? 0})
             </span>
           )}
           <Badge tone={getWebsiteTone(lead.websiteKind)} size="small">
-            {getWebsiteLabel(lead.websiteKind)}
+            <Icon name={getWebsiteIcon(lead.websiteKind)} size={12} /> {getWebsiteLabel(lead.websiteKind)}
           </Badge>
         </div>
 
@@ -339,9 +350,7 @@ function KanbanColumn({
     >
       <header className="kanban-column__header" style={{ borderColor: column.color }}>
         <div className="kanban-column__title">
-          <span className="kanban-column__emoji" style={{ color: column.color }}>
-            {column.emoji}
-          </span>
+          <Icon name={column.icon} size={18} style={{ color: column.color }} label={column.label} />
           <h2>{column.label}</h2>
         </div>
         <span className="kanban-column__count" style={{ color: column.color }}>
@@ -415,6 +424,7 @@ function LeadModal({
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setState({ ...state, nextAction: e.target.value })
           }
+          leadingIcon={<Icon name="edit" size={16} />}
         />
 
         <Input
@@ -425,6 +435,7 @@ function LeadModal({
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setState({ ...state, dueDate: e.target.value })
           }
+          leadingIcon={<Icon name="calendar" size={16} />}
         />
 
         {state.column === 'proposta' && (
@@ -438,6 +449,7 @@ function LeadModal({
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setState({ ...state, proposalValue: e.target.value })
               }
+              leadingIcon={<Icon name="plus" size={16} />}
             />
             <Input
               label="Data prevista de retorno"
@@ -447,6 +459,7 @@ function LeadModal({
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setState({ ...state, proposalReturnDate: e.target.value })
               }
+              leadingIcon={<Icon name="calendar" size={16} />}
             />
           </>
         )}
@@ -656,6 +669,7 @@ function App() {
             variant={currentView === 'home' ? 'primary' : 'ghost'}
             fullWidth
             onClick={() => setCurrentView('home')}
+            leadingIcon={<Icon name="home" size={18} />}
           >
             Home
           </Button>
@@ -664,6 +678,7 @@ function App() {
             variant={currentView === 'import' ? 'primary' : 'ghost'}
             fullWidth
             onClick={() => setCurrentView('import')}
+            leadingIcon={<Icon name="upload" size={18} />}
           >
             Importar / Exportar
           </Button>
@@ -684,7 +699,13 @@ function App() {
               size="medium"
             />
             <span className="user-name">{user.displayName ?? user.email ?? 'Usuário'}</span>
-            <Button type="button" variant="secondary" size="small" onClick={() => signOut(auth)}>
+            <Button
+              type="button"
+              variant="secondary"
+              size="small"
+              onClick={() => signOut(auth)}
+              leadingIcon={<Icon name="logout" size={16} />}
+            >
               Sair
             </Button>
           </div>
@@ -731,10 +752,15 @@ function App() {
           ) : filteredLeads.length === 0 ? (
             <div className="prospect-empty">
               <EmptyState
+                icon="search"
                 title="Nenhum lead encontrado"
                 description="Tente ajustar os filtros ou importar novos leads."
                 action={
-                  <Button variant="primary" onClick={() => setCurrentView('import')}>
+                  <Button
+                    variant="primary"
+                    onClick={() => setCurrentView('import')}
+                    leadingIcon={<Icon name="upload" size={16} />}
+                  >
                     Importar leads
                   </Button>
                 }
