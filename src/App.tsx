@@ -628,10 +628,10 @@ function App() {
 
   return (
     <div className="prospect-app">
-      <header className="prospect-header prospect-header--logged">
-        <div className="prospect-header__brand">
-          <h1>Prospecção Codexa</h1>
-          <p>Kanban de prospecção comercial</p>
+      <aside className="prospect-sidebar">
+        <div className="prospect-sidebar__brand">
+          <h1>Codexa</h1>
+          <p>Prospecção</p>
         </div>
 
         <nav className="prospect-nav" aria-label="Navegação principal">
@@ -650,29 +650,38 @@ function App() {
             Importar / Exportar
           </button>
         </nav>
+      </aside>
 
-        <div className="prospect-header__user">
-          <div className="user-avatar" title={user.displayName ?? user.email ?? 'Usuário'}>
-            {user.photoURL ? (
-              <img src={user.photoURL} alt="" />
-            ) : (
-              <span>{getUserInitials(user)}</span>
-            )}
+      <main className="prospect-main">
+        <header className="prospect-header prospect-header--logged">
+          <div className="prospect-header__page">
+            <h2>{currentView === 'home' ? 'Home' : 'Importar / Exportar'}</h2>
+            <p>{currentView === 'home' ? 'Kanban de prospecção comercial' : 'Importe ou exporte seus leads'}</p>
           </div>
-          <span className="user-name">{user.displayName ?? user.email ?? 'Usuário'}</span>
-          <button
-            type="button"
-            className="action-btn action-btn--secondary"
-            onClick={() => signOut(auth)}
-          >
-            Sair
-          </button>
-        </div>
-      </header>
 
-      {currentView === 'home' ? (
-        <>
-          <div className="prospect-toolbar">
+          <div className="prospect-header__user">
+            <div className="user-avatar" title={user.displayName ?? user.email ?? 'Usuário'}>
+              {user.photoURL ? (
+                <img src={user.photoURL} alt="" />
+              ) : (
+                <span>{getUserInitials(user)}</span>
+              )}
+            </div>
+            <span className="user-name">{user.displayName ?? user.email ?? 'Usuário'}</span>
+            <button
+              type="button"
+              className="action-btn action-btn--secondary"
+              onClick={() => signOut(auth)}
+            >
+              Sair
+            </button>
+          </div>
+        </header>
+
+        <div className="prospect-content">
+          {currentView === 'home' ? (
+            <>
+              <div className="prospect-toolbar">
             <div className="prospect-field" style={{ flex: '2 1 300px' }}>
               <label htmlFor="search">Buscar</label>
               <input
@@ -760,6 +769,8 @@ function App() {
       ) : (
         <ImportExport leads={leadsWithMeta} onImport={handleImport} onExport={handleExport} />
       )}
+        </div>
+      </main>
     </div>
   )
 }

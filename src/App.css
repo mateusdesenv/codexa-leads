@@ -1,8 +1,54 @@
 .prospect-app {
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 24px 24px 48px;
+  display: flex;
   min-width: 320px;
+  min-height: 100vh;
+  background: var(--ds-off-white, #fafcfb);
+}
+
+.prospect-sidebar {
+  width: 240px;
+  flex: 0 0 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px 16px;
+  background: var(--ds-white);
+  border-right: 1px solid var(--ds-line);
+}
+
+.prospect-sidebar__brand {
+  padding: 0 8px;
+}
+
+.prospect-sidebar__brand h1 {
+  margin: 0 0 4px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ds-graphite);
+}
+
+.prospect-sidebar__brand p {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ds-green-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.prospect-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-width: calc(100% - 240px);
+}
+
+.prospect-content {
+  flex: 1;
+  padding: 0 24px 24px;
+  overflow: auto;
+  min-height: 0;
 }
 
 .prospect-header {
@@ -21,6 +67,36 @@
   margin: 0;
   color: var(--ds-gray);
   font-size: 0.9rem;
+}
+
+.prospect-header--logged {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--ds-line);
+  background: var(--ds-white);
+}
+
+.prospect-header__page {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.prospect-header__page h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 650;
+  color: var(--ds-graphite);
+}
+
+.prospect-header__page p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--ds-gray);
 }
 
 .prospect-toolbar {
@@ -520,7 +596,52 @@
 
 @media (max-width: 760px) {
   .prospect-app {
+    flex-direction: column;
+  }
+
+  .prospect-sidebar {
+    width: 100%;
+    flex: 0 0 auto;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-right: 0;
+    border-bottom: 1px solid var(--ds-line);
+  }
+
+  .prospect-sidebar__brand {
+    padding: 0;
+  }
+
+  .prospect-sidebar__brand h1 {
+    font-size: 1.2rem;
+  }
+
+  .prospect-sidebar__brand p {
+    display: none;
+  }
+
+  .prospect-nav {
+    flex-direction: row;
+    padding: 0;
+  }
+
+  .prospect-nav__item {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+
+  .prospect-main {
+    max-width: none;
+  }
+
+  .prospect-header--logged {
     padding: 16px;
+  }
+
+  .prospect-content {
+    padding: 0 16px 16px;
   }
 
   .prospect-toolbar {
@@ -544,39 +665,6 @@
   .modal {
     padding: 20px;
   }
-}
-
-.prospect-header--logged {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-  padding: 16px 20px;
-  background: var(--ds-white);
-  border: 1px solid var(--ds-line);
-  border-radius: 16px;
-  box-shadow: var(--ds-shadow-subtle);
-  margin-bottom: 24px;
-}
-
-.prospect-header__brand {
-  display: grid;
-  gap: 4px;
-  min-width: 0;
-}
-
-.prospect-header__brand h1 {
-  margin: 0;
-  font-size: 1.2rem;
-  font-weight: 650;
-  color: var(--ds-graphite);
-}
-
-.prospect-header__brand p {
-  margin: 0;
-  font-size: 0.8rem;
-  color: var(--ds-gray);
 }
 
 .prospect-header__user {
@@ -712,30 +800,31 @@
 
 .prospect-nav {
   display: flex;
+  flex-direction: column;
   gap: 6px;
-  background: #f4f6f7;
-  padding: 4px;
-  border-radius: 10px;
+  padding: 0 8px;
 }
 
 .prospect-nav__item {
-  padding: 8px 16px;
+  padding: 12px 16px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 10px;
   background: transparent;
   color: var(--ds-charcoal);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 650;
+  text-align: left;
   cursor: pointer;
   transition: background-color 160ms ease, color 160ms ease;
 }
 
 .prospect-nav__item:hover {
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--ds-green-ice);
+  color: var(--ds-green-dark);
 }
 
 .prospect-nav__item--active {
-  background: var(--ds-white);
+  background: var(--ds-green);
   color: var(--ds-graphite);
   box-shadow: 0 1px 3px rgba(17, 19, 26, 0.08);
 }
