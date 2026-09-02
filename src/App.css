@@ -932,3 +932,100 @@
     justify-content: flex-end;
   }
 }
+
+.help-page {
+  max-width: 840px;
+  margin: 0 auto;
+}
+
+.help-page__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.help-page__header h2 {
+  margin: 0 0 6px;
+  font-size: 1.4rem;
+  font-weight: 650;
+  color: var(--ds-graphite);
+}
+
+.help-page__header p {
+  margin: 0;
+  color: var(--ds-gray);
+  font-size: 0.9rem;
+}
+
+.help-page__toolbar {
+  margin-bottom: 24px;
+}
+
+.help-page__toolbar .prospect-field,
+.help-page__toolbar .ds-field {
+  max-width: 420px;
+}
+
+.help-page__loading {
+  text-align: center;
+  padding: 48px;
+  color: var(--ds-gray);
+}
+
+.help-page__grid {
+  display: grid;
+  gap: 16px;
+}
+
+.qna-card {
+  gap: 12px;
+}
+
+.qna-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.qna-card__question {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 650;
+  color: var(--ds-graphite);
+  line-height: 1.4;
+}
+
+.qna-card__actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.qna-card__answer {
+  margin: 0;
+  color: var(--ds-charcoal);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.qna-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.qna-form {
+  display: grid;
+  gap: 16px;
+}
+
+.qna-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}

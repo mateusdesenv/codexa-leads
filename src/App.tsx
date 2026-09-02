@@ -16,6 +16,7 @@ import { onAuthStateChanged, signOut, type User } from 'firebase/auth'
 import { auth } from './firebase'
 import Login from './Login'
 import ImportExport from './ImportExport'
+import Help from './Help'
 import codexaLogo from 'codexa-ui/logos/logos-fundo-transparente/primary-logo.png'
 import {
   Alert,
@@ -499,7 +500,7 @@ function App() {
   const [selectedLead, setSelectedLead] = useState<LeadWithMeta | null>(null)
   const [activeDrag, setActiveDrag] = useState<LeadWithMeta | null>(null)
   const [user, setUser] = useState<User | null | undefined>(undefined)
-  const [currentView, setCurrentView] = useState<'home' | 'import'>('home')
+  const [currentView, setCurrentView] = useState<'home' | 'import' | 'help'>('home')
   const didDrag = useRef(false)
 
   useEffect(() => {
@@ -682,14 +683,35 @@ function App() {
           >
             Importar / Exportar
           </Button>
+          <Button
+            type="button"
+            variant={currentView === 'help' ? 'primary' : 'ghost'}
+            fullWidth
+            onClick={() => setCurrentView('help')}
+            leadingIcon={<Icon name="help" size={18} />}
+          >
+            Help
+          </Button>
         </nav>
       </aside>
 
       <main className="prospect-main">
         <header className="prospect-header prospect-header--logged">
           <div className="prospect-header__page">
-            <h2>{currentView === 'home' ? 'Home' : 'Importar / Exportar'}</h2>
-            <p>{currentView === 'home' ? 'Kanban de prospecção comercial' : 'Importe ou exporte seus leads'}</p>
+            <h2>
+              {currentView === 'home'
+                ? 'Home'
+                : currentView === 'import'
+                  ? 'Importar / Exportar'
+                  : 'Help'}
+            </h2>
+            <p>
+              {currentView === 'home'
+                ? 'Kanban de prospecção comercial'
+                : currentView === 'import'
+                  ? 'Importe ou exporte seus leads'
+                  : 'Base de conhecimento para prospecções'}
+            </p>
           </div>
 
           <div className="prospect-header__user">
@@ -819,6 +841,8 @@ function App() {
             />
           )}
         </>
+      ) : currentView === 'help' ? (
+        <Help />
       ) : (
         <ImportExport leads={leadsWithMeta} onImport={handleImport} onExport={handleExport} />
       )}

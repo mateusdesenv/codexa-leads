@@ -6,6 +6,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { connectToDatabase } from './lib/db.js'
 import { Lead } from './lib/lead.js'
+import { QnA } from './lib/qna.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -95,6 +96,72 @@ app.post('/api/leads/seed', async (_req, res) => {
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: err instanceof Error ? err.message : 'Erro ao popular leads' })
+  }
+})
+
+app.get('/api/qna', async (_req, res) => {
+  try {
+    await connectToDatabase()
+    const items = await QnA.find({}).sort({ createdAt: -1 })
+    res.json(items)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Erro ao buscar perguntas' })
+  }
+})
+
+app.post('/api/qna', async (req, res) => {
+  try {
+    await connectToDatabase()
+    const { question, answer, tags } = req.body
+    if (!question || !answer) {
+      return res.status(400).json({ error: 'Pergunta e resposta são obrigatórias' })
+    }
+    const item = await QnA.create({
+      question: question.trim(),
+      answer: answer.trim(),
+      tags: Array.isArray(tags) ? tags.filter(Boolean) : [],
+    })
+    res.status(201).json(item)
+  } catch (err) {
+    console.error(err)
+    res.status(400).json({ error: err instanceof Error ? err.message : 'Erro ao criar pergunta' })
+  }
+})
+
+app.put('/api/qna/:id', async (req, res) => {
+  try {
+    await connectToDatabase()
+    const { question, answer, tags } = req.body
+    if (!question || !answer) {
+      return res.status(400).json({ error: 'Pergunta e resposta são obrigatórias' })
+    }
+    const item = await QnA.findByIdAndUpdate(
+      req.params.id,
+      {
+        question: question.trim(),
+        answer: answer.trim(),
+        tags: Array.isArray(tags) ? tags.filter(Boolean) : [],
+      },
+      { returnDocument: 'after' },
+    )
+    if (!item) return res.status(404).json({ error: 'Pergunta não encontrada' })
+    res.json(item)
+  } catch (err) {
+    console.error(err)
+    res.status(400).json({ error: err instanceof Error ? err.message : 'Erro ao atualizar pergunta' })
+  }
+})
+
+app.delete('/api/qna/:id', async (req, res) => {
+  try {
+    await connectToDatabase()
+    const item = await QnA.findByIdAndDelete(req.params.id)
+    if (!item) return res.status(404).json({ error: 'Pergunta não encontrada' })
+    res.status(204).end()
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Erro ao remover pergunta' })
   }
 })
 

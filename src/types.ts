@@ -46,3 +46,13 @@ export interface LeadWithMeta extends Lead {
   temperature: Temperature
   websiteKind: 'proprio' | 'social' | 'sem'
 }
+
+export interface QnA {
+  _id?: string
+  id?: string
+  question: string
+  answer: string
+  tags: string[]
+  createdAt?: string
+  updatedAt?: string
+}
