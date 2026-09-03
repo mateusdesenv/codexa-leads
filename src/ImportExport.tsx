@@ -1,10 +1,10 @@
 import { useRef, useState } from 'react'
-import { Button, Card, FormField, Alert } from 'codexa-ui'
+import { Button, Card, FormField, Alert, Input } from 'codexa-ui'
 import type { Lead, LeadWithMeta } from './types'
 
 interface ImportExportProps {
   leads: LeadWithMeta[]
-  onImport: (leads: Lead[]) => void
+  onImport: (title: string, leads: Lead[]) => void
   onExport: () => void
 }
 
@@ -18,6 +18,7 @@ function isLead(value: unknown): value is Lead {
 }
 
 export default function ImportExport({ leads, onImport, onExport }: ImportExportProps) {
+  const [groupTitle, setGroupTitle] = useState('')
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -42,8 +43,9 @@ export default function ImportExport({ leads, onImport, onExport }: ImportExport
         throw new Error('Nenhum lead válido encontrado no arquivo.')
       }
 
-      onImport(validLeads)
-      setMessage(`${validLeads.length} lead(s) importado(s) com sucesso.`)
+      const title = groupTitle.trim() || `Importação em ${new Date().toLocaleDateString('pt-BR')}`
+      onImport(title, validLeads)
+      setMessage(`${validLeads.length} lead(s) importado(s) no grupo "${title}".`)
       if (inputRef.current) inputRef.current.value = ''
     } catch (err) {
       setError(
@@ -66,6 +68,14 @@ export default function ImportExport({ leads, onImport, onExport }: ImportExport
             Selecione um arquivo JSON com os leads. Cada lead precisa ter pelo
             menos <code>title</code> e <code>placeId</code>.
           </p>
+          <Input
+            label="Título do grupo"
+            id="import-title"
+            type="text"
+            placeholder="Ex: Prospects setembro"
+            value={groupTitle}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGroupTitle(e.target.value)}
+          />
           <FormField label="Arquivo JSON" id="import-file">
             <input
               id="import-file"

@@ -16,9 +16,11 @@ async function main() {
     const seedData = JSON.parse(fs.readFileSync(seedPath, 'utf8'))
 
     let count = 0
+    const groupId = 'seed'
+    const groupTitle = 'Leads iniciais'
     for (const item of seedData) {
       if (!item.title || !item.placeId) continue
-      const update = { ...item }
+      const update = { ...item, groupId, groupTitle }
       if (!item.kanbanState) delete update.kanbanState
       await Lead.findOneAndUpdate(
         { placeId: item.placeId },

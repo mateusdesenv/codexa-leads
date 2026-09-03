@@ -41,12 +41,18 @@ app.post('/api/leads', async (req, res) => {
 app.post('/api/leads/import', async (req, res) => {
   try {
     await connectToDatabase()
-    const leads = Array.isArray(req.body) ? req.body : [req.body]
+    const payload = req.body ?? {}
+    const leads = Array.isArray(payload) ? payload : Array.isArray(payload.leads) ? payload.leads : []
+    const title = typeof payload.title === 'string' && payload.title.trim()
+      ? payload.title.trim()
+      : `Importação em ${new Date().toLocaleDateString('pt-BR')}`
+    const groupId = `group-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
+
     const result = []
 
     for (const item of leads) {
       if (!item.title || !item.placeId) continue
-      const update = { ...item }
+      const update = { ...item, groupId, groupTitle: title }
       if (!item.kanbanState) delete update.kanbanState
       const lead = await Lead.findOneAndUpdate(
         { placeId: item.placeId },
@@ -56,7 +62,7 @@ app.post('/api/leads/import', async (req, res) => {
       result.push(lead)
     }
 
-    res.json({ imported: result.length, leads: result })
+    res.json({ imported: result.length, groupId, groupTitle: title, leads: result })
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: err instanceof Error ? err.message : 'Erro ao importar leads' })
@@ -84,9 +90,11 @@ app.post('/api/leads/seed', async (_req, res) => {
     const seedData = JSON.parse(fs.readFileSync(seedPath, 'utf8'))
 
     const result = []
+    const groupId = 'seed'
+    const groupTitle = 'Leads iniciais'
     for (const item of seedData) {
       if (!item.title || !item.placeId) continue
-      const update = { ...item }
+      const update = { ...item, groupId, groupTitle }
       if (!item.kanbanState) delete update.kanbanState
       const lead = await Lead.findOneAndUpdate(
         { placeId: item.placeId },
@@ -187,6 +195,38 @@ app.delete('/api/qna/:id', async (req, res) => {
 
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true })
+})
+
+app.put('/api/leads/group/:groupId', async (req, res) => {
+  try {
+    await connectToDatabase()
+    const { groupTitle } = req.body ?? {}
+    if (!groupTitle || typeof groupTitle !== 'string' || !groupTitle.trim()) {
+      return res.status(400).json({ error: 'Título do grupo é obrigatório' })
+    }
+    const result = await Lead.updateMany(
+      { groupId: req.params.groupId },
+      { $set: { groupTitle: groupTitle.trim() } },
+    )
+    res.json({ updated: result.modifiedCount })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Erro ao atualizar grupo' })
+  }
+})
+
+app.delete('/api/leads/group/:groupId', async (req, res) => {
+  try {
+    await connectToDatabase()
+    const result = await Lead.updateMany(
+      { groupId: req.params.groupId },
+      { $set: { groupId: null, groupTitle: null } },
+    )
+    res.json({ updated: result.modifiedCount })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Erro ao excluir grupo' })
+  }
 })
 
 app.use((_req, res) => {

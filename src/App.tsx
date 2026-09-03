@@ -17,7 +17,8 @@ import { auth } from './firebase'
 import Login from './Login'
 import ImportExport from './ImportExport'
 import Help from './Help'
-import MessageSuggestions from './MessageSuggestions'
+import LeadGroupsTable, { type LeadGroup } from './LeadGroupsTable'
+import LeadsTable from './LeadsTable'
 import codexaLogo from 'codexa-ui/logos/logos-fundo-transparente/primary-logo.png'
 import codexaLogoDark from 'codexa-ui/logos/logos-fundo-transparente/primary-logo-reversed.png'
 import {
@@ -34,6 +35,7 @@ import {
   Spinner,
   Switch,
   Tag,
+  Textarea,
 } from 'codexa-ui'
 import type { IconName } from 'codexa-ui'
 
@@ -418,6 +420,18 @@ function KanbanColumn({
   )
 }
 
+const MESSAGE_TEMPLATE = `Oi, [nome]! Tudo bem? 😊
+
+Sou o Mateus, da Codexa. Dei uma olhada no perfil da [clínica] e identifiquei 2 pontos que, na minha visão, poderiam melhorar bastante a experiência de uma cliente que chega até vocês pelo Instagram.
+
+São coisas simples, mas que podem fazer diferença principalmente na hora de transformar uma pessoa interessada em uma cliente.
+
+Posso te mandar os 2 pontos? Prometo ser rapidinho`
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 function LeadModal({
   lead,
   onClose,
@@ -428,6 +442,33 @@ function LeadModal({
   onSave: (placeId: string, state: KanbanState) => void
 }) {
   const [state, setState] = useState<KanbanState>({ ...lead.kanbanState })
+
+  const [message, setMessage] = useState(() =>
+    MESSAGE_TEMPLATE
+      .replace(/\[nome\]/g, () => '[nome]')
+      .replace(/\[clínica\]/g, () => lead.title),
+  )
+  const [contactName, setContactName] = useState('')
+  const [clinicName, setClinicName] = useState(lead.title)
+
+  const updateMessageForName = (nextName: string) =>
+    setMessage((prev) => {
+      const restored = contactName ? prev.replace(new RegExp(escapeRegExp(contactName), 'g'), '[nome]') : prev
+      return restored.replace(/\[nome\]/g, () => nextName || '[nome]')
+    })
+
+  const updateMessageForClinic = (nextClinic: string) =>
+    setMessage((prev) => {
+      const restored = clinicName ? prev.replace(new RegExp(escapeRegExp(clinicName), 'g'), '[clínica]') : prev
+      return restored.replace(/\[clínica\]/g, () => nextClinic || '[clínica]')
+    })
+
+  useEffect(() => {
+    document.body.classList.add('lead-modal-open')
+    return () => {
+      document.body.classList.remove('lead-modal-open')
+    }
+  }, [])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -459,72 +500,114 @@ function LeadModal({
       </div>
 
       <form className="modal__form" onSubmit={handleSubmit}>
-        <Select
-          label="Etapa do funil"
-          id="status"
-          value={state.column}
-          onChange={(value: string) => setState({ ...state, column: value as ColumnId })}
-          options={statusOptions}
-        />
+        <div className="modal__column">
+          <h3 className="modal__column-title">Cliente</h3>
 
-        <Input
-          label="Próxima ação"
-          id="nextAction"
-          type="text"
-          placeholder="Ex: Enviar mensagem de apresentação"
-          value={state.nextAction ?? ''}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setState({ ...state, nextAction: e.target.value })
-          }
-          leadingIcon={<Icon name="edit" size={16} />}
-        />
-
-        <Input
-          label="Data de follow-up"
-          id="dueDate"
-          type="date"
-          value={state.dueDate ?? ''}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setState({ ...state, dueDate: e.target.value })
-          }
-          leadingIcon={<Icon name="calendar" size={16} />}
-        />
-
-        {state.column === 'proposta' && (
-          <>
-            <Input
-              label="Valor da proposta"
-              id="proposalValue"
-              type="text"
-              placeholder="R$ 0,00"
-              value={state.proposalValue ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setState({ ...state, proposalValue: e.target.value })
-              }
-              leadingIcon={<Icon name="plus" size={16} />}
-            />
-            <Input
-              label="Data prevista de retorno"
-              id="proposalReturnDate"
-              type="date"
-              value={state.proposalReturnDate ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setState({ ...state, proposalReturnDate: e.target.value })
-              }
-              leadingIcon={<Icon name="calendar" size={16} />}
-            />
-          </>
-        )}
-
-        {state.column === 'perdido' && (
           <Select
-            label="Motivo"
-            id="lostReason"
-            value={state.lostReason ?? ''}
-            onChange={(value: string) => setState({ ...state, lostReason: value })}
-            options={lostReasonOptions}
+            label="Etapa do funil"
+            id="status"
+            value={state.column}
+            onChange={(value: string) => setState({ ...state, column: value as ColumnId })}
+            options={statusOptions}
           />
-        )}
+
+          <Input
+            label="Próxima ação"
+            id="nextAction"
+            type="text"
+            placeholder="Ex: Enviar mensagem de apresentação"
+            value={state.nextAction ?? ''}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setState({ ...state, nextAction: e.target.value })
+            }
+            leadingIcon={<Icon name="edit" size={16} />}
+          />
+
+          <Input
+            label="Data de follow-up"
+            id="dueDate"
+            type="date"
+            value={state.dueDate ?? ''}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setState({ ...state, dueDate: e.target.value })
+            }
+            leadingIcon={<Icon name="calendar" size={16} />}
+          />
+
+          {state.column === 'proposta' && (
+            <>
+              <Input
+                label="Valor da proposta"
+                id="proposalValue"
+                type="text"
+                placeholder="R$ 0,00"
+                value={state.proposalValue ?? ''}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setState({ ...state, proposalValue: e.target.value })
+                }
+                leadingIcon={<Icon name="plus" size={16} />}
+              />
+              <Input
+                label="Data prevista de retorno"
+                id="proposalReturnDate"
+                type="date"
+                value={state.proposalReturnDate ?? ''}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setState({ ...state, proposalReturnDate: e.target.value })
+                }
+                leadingIcon={<Icon name="calendar" size={16} />}
+              />
+            </>
+          )}
+
+          {state.column === 'perdido' && (
+            <Select
+              label="Motivo"
+              id="lostReason"
+              value={state.lostReason ?? ''}
+              onChange={(value: string) => setState({ ...state, lostReason: value })}
+              options={lostReasonOptions}
+            />
+          )}
+        </div>
+
+        <div className="modal__column modal__column--contact">
+          <h3 className="modal__column-title">Contato</h3>
+
+          <Input
+            label="Nome"
+            id="contact-name"
+            type="text"
+            placeholder="Ex: Ana"
+            value={contactName}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setContactName(e.target.value)
+              updateMessageForName(e.target.value)
+            }}
+            leadingIcon={<Icon name="user" size={16} />}
+          />
+
+          <Input
+            label="Clínica"
+            id="clinic-name"
+            type="text"
+            value={clinicName}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setClinicName(e.target.value)
+              updateMessageForClinic(e.target.value)
+            }}
+            leadingIcon={<Icon name="home" size={16} />}
+          />
+
+          <Textarea
+            label="Mensagem"
+            id="lead-message"
+            value={message}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value)}
+            rows={8}
+            className="modal__message"
+          />
+        </div>
 
         <div className="modal__actions">
           <Button type="button" variant="secondary" onClick={onClose}>
@@ -536,7 +619,6 @@ function LeadModal({
         </div>
       </form>
 
-      <MessageSuggestions lead={lead} />
     </Dialog>
   )
 }
@@ -550,12 +632,14 @@ function App() {
   const [selectedLead, setSelectedLead] = useState<LeadWithMeta | null>(null)
   const [activeDrag, setActiveDrag] = useState<LeadWithMeta | null>(null)
   const [user, setUser] = useState<User | null | undefined>(undefined)
-  const [currentView, setCurrentView] = useState<'home' | 'import' | 'help'>('home')
+  const [currentView, setCurrentView] = useState<'home' | 'table' | 'import' | 'help'>('home')
+  const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     const saved = localStorage.getItem('codexa-theme')
     if (saved === 'dark' || saved === 'light') return saved
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   })
+
   const didDrag = useRef(false)
 
   useEffect(() => {
@@ -630,6 +714,16 @@ function App() {
     return map
   }, [filteredLeads])
 
+  const selectedGroupLeads = useMemo(() => {
+    if (!selectedGroup) return []
+    return filteredLeads.filter((lead) => lead.groupId === selectedGroup)
+  }, [filteredLeads, selectedGroup])
+
+  const selectedGroupTitle = useMemo(() => {
+    if (!selectedGroup) return ''
+    return leadsWithMeta.find((lead) => lead.groupId === selectedGroup)?.groupTitle?.trim() || 'Grupo'
+  }, [leadsWithMeta, selectedGroup])
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(TouchSensor, {
@@ -677,12 +771,12 @@ function App() {
     })
   }
 
-  const handleImport = async (leads: Lead[]) => {
+  const handleImport = async (title: string, leads: Lead[]) => {
     try {
       const res = await fetch('/api/leads/import', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(leads),
+        body: JSON.stringify({ title, leads }),
       })
       if (!res.ok) throw new Error('Erro ao importar leads')
 
@@ -712,6 +806,37 @@ function App() {
     setSelectedLead(lead)
   }
 
+  const handleEditGroup = async (group: LeadGroup, title: string) => {
+    if (!group.groupId) return
+    try {
+      const res = await fetch(`/api/leads/group/${group.groupId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ groupTitle: title }),
+      })
+      if (!res.ok) throw new Error('Erro ao editar grupo')
+      const fresh = await fetchLeads()
+      setBaseLeads(fresh)
+    } catch (err) {
+      console.error(err)
+      setError(err instanceof Error ? err.message : 'Erro ao editar grupo')
+    }
+  }
+
+  const handleDeleteGroup = async (group: LeadGroup) => {
+    if (!group.groupId) return
+    try {
+      const res = await fetch(`/api/leads/group/${group.groupId}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Erro ao excluir grupo')
+      const fresh = await fetchLeads()
+      setBaseLeads(fresh)
+      if (selectedGroup === group.groupId) setSelectedGroup(null)
+    } catch (err) {
+      console.error(err)
+      setError(err instanceof Error ? err.message : 'Erro ao excluir grupo')
+    }
+  }
+
   if (user === undefined) {
     return <div className="prospect-loading">Inicializando…</div>
   }
@@ -732,16 +857,25 @@ function App() {
             type="button"
             variant={currentView === 'home' ? 'primary' : 'ghost'}
             fullWidth
-            onClick={() => setCurrentView('home')}
+            onClick={() => { setSelectedGroup(null); setCurrentView('home') }}
             leadingIcon={<Icon name="home" size={18} />}
           >
             Home
           </Button>
           <Button
             type="button"
+            variant={currentView === 'table' ? 'primary' : 'ghost'}
+            fullWidth
+            onClick={() => { setSelectedGroup(null); setCurrentView('table') }}
+            leadingIcon={<Icon name="menu" size={18} />}
+          >
+            Tabela
+          </Button>
+          <Button
+            type="button"
             variant={currentView === 'import' ? 'primary' : 'ghost'}
             fullWidth
-            onClick={() => setCurrentView('import')}
+            onClick={() => { setSelectedGroup(null); setCurrentView('import') }}
             leadingIcon={<Icon name="upload" size={18} />}
           >
             Importar / Exportar
@@ -750,7 +884,7 @@ function App() {
             type="button"
             variant={currentView === 'help' ? 'primary' : 'ghost'}
             fullWidth
-            onClick={() => setCurrentView('help')}
+            onClick={() => { setSelectedGroup(null); setCurrentView('help') }}
             leadingIcon={<Icon name="help" size={18} />}
           >
             Help
@@ -764,16 +898,20 @@ function App() {
             <h2>
               {currentView === 'home'
                 ? 'Home'
-                : currentView === 'import'
-                  ? 'Importar / Exportar'
-                  : 'Help'}
+                : currentView === 'table'
+                  ? 'Tabela'
+                  : currentView === 'import'
+                    ? 'Importar / Exportar'
+                    : 'Help'}
             </h2>
             <p>
               {currentView === 'home'
                 ? 'Kanban de prospecção comercial'
-                : currentView === 'import'
-                  ? 'Importe ou exporte seus leads'
-                  : 'Base de conhecimento para prospecções'}
+                : currentView === 'table'
+                  ? 'Lista completa de leads'
+                  : currentView === 'import'
+                    ? 'Importe ou exporte seus leads'
+                    : 'Base de conhecimento para prospecções'}
             </p>
           </div>
 
@@ -806,118 +944,184 @@ function App() {
         </header>
 
         <div className="prospect-content">
+          {(currentView === 'home' || (currentView === 'table' && selectedGroup)) && (
+            <div className="prospect-toolbar">
+              <div className="prospect-toolbar__field prospect-toolbar__field--search">
+                <SearchInput
+                  label="Buscar"
+                  id="search"
+                  placeholder="Nome, endereço, telefone..."
+                  value={search}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
+                  onClear={() => setSearch('')}
+                />
+              </div>
+              <div className="prospect-toolbar__field prospect-toolbar__field--category">
+                <Select
+                  label="Categoria"
+                  id="category"
+                  value={categoryFilter}
+                  onChange={(value: string) => setCategoryFilter(value)}
+                  options={[
+                    { value: '', label: 'Todas' },
+                    ...categories.map((cat) => ({ value: cat, label: cat })),
+                  ]}
+                />
+              </div>
+            </div>
+          )}
+
           {currentView === 'home' ? (
             <>
-              <div className="prospect-toolbar">
-            <div className="prospect-toolbar__field prospect-toolbar__field--search">
-              <SearchInput
-                label="Buscar"
-                id="search"
-                placeholder="Nome, endereço, telefone..."
-                value={search}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
-                onClear={() => setSearch('')}
-              />
-            </div>
-            <div className="prospect-toolbar__field prospect-toolbar__field--category">
-              <Select
-                label="Categoria"
-                id="category"
-                value={categoryFilter}
-                onChange={(value: string) => setCategoryFilter(value)}
-                options={[
-                  { value: '', label: 'Todas' },
-                  ...categories.map((cat) => ({ value: cat, label: cat })),
-                ]}
-              />
-            </div>
-          </div>
-
-          {loading ? (
-            <div className="prospect-loading">
-              <Spinner size="medium" label="Carregando leads..." />
-            </div>
-          ) : error ? (
-            <div className="prospect-empty">
-              <Alert tone="danger" title="Erro ao carregar">
-                {error}
-              </Alert>
-            </div>
-          ) : filteredLeads.length === 0 ? (
-            <div className="prospect-empty">
-              <EmptyState
-                icon="search"
-                title="Nenhum lead encontrado"
-                description="Tente ajustar os filtros ou importar novos leads."
-                action={
-                  <Button
-                    variant="primary"
-                    onClick={() => setCurrentView('import')}
-                    leadingIcon={<Icon name="upload" size={16} />}
-                  >
-                    Importar leads
-                  </Button>
-                }
-              />
-            </div>
-          ) : (
-            <DndContext
-              sensors={sensors}
-              onDragStart={handleDragStart}
-              onDragEnd={handleDragEnd}
-            >
-              <div className="kanban-board">
-                {COLUMNS.map((column) => (
-                  <KanbanColumn
-                    key={column.id}
-                    column={column}
-                    leads={leadsByColumn[column.id]}
-                    onCardClick={handleCardClick}
+              {loading ? (
+                <div className="prospect-loading">
+                  <Spinner size="medium" label="Carregando leads..." />
+                </div>
+              ) : error ? (
+                <div className="prospect-empty">
+                  <Alert tone="danger" title="Erro ao carregar">
+                    {error}
+                  </Alert>
+                </div>
+              ) : filteredLeads.length === 0 ? (
+                <div className="prospect-empty">
+                  <EmptyState
+                    icon="search"
+                    title="Nenhum lead encontrado"
+                    description="Tente ajustar os filtros ou importar novos leads."
+                    action={
+                      <Button
+                        variant="primary"
+                        onClick={() => setCurrentView('import')}
+                        leadingIcon={<Icon name="upload" size={16} />}
+                      >
+                        Importar leads
+                      </Button>
+                    }
                   />
-                ))}
-              </div>
-              <DragOverlay dropAnimation={null}>
-                {activeDrag ? (
-                  <div className="kanban-card kanban-card--dragging">
-                    <div className="kanban-card__header">
-                      <div className="kanban-card__title-wrap">
-                        <h3 className="kanban-card__title">{activeDrag.title}</h3>
-                      </div>
-                      <span className={`temperature-badge temperature-badge--${activeDrag.temperature}`}>
-                        {getTemperatureEmoji(activeDrag.temperature)} {activeDrag.score}
-                      </span>
-                    </div>
-                    <div className="kanban-card__body">
-                      <div className="kanban-card__meta">
-                        {activeDrag.totalScore !== null && activeDrag.totalScore !== undefined && (
-                          <span className="kanban-card__rating">
-                            ⭐ {activeDrag.totalScore.toFixed(1)} ({activeDrag.reviewsCount ?? 0})
-                          </span>
-                        )}
-                        <span className={`kanban-card__website kanban-card__website--${activeDrag.websiteKind}`}>
-                          {getWebsiteLabel(activeDrag.websiteKind)}
-                        </span>
-                      </div>
-                    </div>
+                </div>
+              ) : (
+                <DndContext
+                  sensors={sensors}
+                  onDragStart={handleDragStart}
+                  onDragEnd={handleDragEnd}
+                >
+                  <div className="kanban-board">
+                    {COLUMNS.map((column) => (
+                      <KanbanColumn
+                        key={column.id}
+                        column={column}
+                        leads={leadsByColumn[column.id]}
+                        onCardClick={handleCardClick}
+                      />
+                    ))}
                   </div>
-                ) : null}
-              </DragOverlay>
-            </DndContext>
-          )}
+                  <DragOverlay dropAnimation={null}>
+                    {activeDrag ? (
+                      <div className="kanban-card kanban-card--dragging">
+                        <div className="kanban-card__header">
+                          <div className="kanban-card__title-wrap">
+                            <h3 className="kanban-card__title">{activeDrag.title}</h3>
+                          </div>
+                          <span className={`temperature-badge temperature-badge--${activeDrag.temperature}`}>
+                            {getTemperatureEmoji(activeDrag.temperature)} {activeDrag.score}
+                          </span>
+                        </div>
+                        <div className="kanban-card__body">
+                          <div className="kanban-card__meta">
+                            {activeDrag.totalScore !== null && activeDrag.totalScore !== undefined && (
+                              <span className="kanban-card__rating">
+                                ⭐ {activeDrag.totalScore.toFixed(1)} ({activeDrag.reviewsCount ?? 0})
+                              </span>
+                            )}
+                            <span className={`kanban-card__website kanban-card__website--${activeDrag.websiteKind}`}>
+                              {getWebsiteLabel(activeDrag.websiteKind)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ) : null}
+                  </DragOverlay>
+                </DndContext>
+              )}
 
-          {selectedLead && (
-            <LeadModal
-              lead={selectedLead}
-              onClose={() => setSelectedLead(null)}
-              onSave={handleSaveLead}
-            />
+              {selectedLead && (
+                <LeadModal
+                  lead={selectedLead}
+                  onClose={() => setSelectedLead(null)}
+                  onSave={handleSaveLead}
+                />
+              )}
+            </>
+          ) : currentView === 'table' ? (
+            <>
+              {loading ? (
+                <div className="prospect-loading">
+                  <Spinner size="medium" label="Carregando leads..." />
+                </div>
+              ) : error ? (
+                <div className="prospect-empty">
+                  <Alert tone="danger" title="Erro ao carregar">
+                    {error}
+                  </Alert>
+                </div>
+              ) : selectedGroup ? (
+                selectedGroupLeads.length === 0 ? (
+                  <div className="prospect-empty">
+                    <EmptyState
+                      icon="search"
+                      title="Nenhum lead encontrado"
+                      description="Tente ajustar os filtros ou importar novos leads."
+                      action={
+                        <Button
+                          variant="primary"
+                          onClick={() => setCurrentView('import')}
+                          leadingIcon={<Icon name="upload" size={16} />}
+                        >
+                          Importar leads
+                        </Button>
+                      }
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <div className="prospect-group-header">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="small"
+                        onClick={() => setSelectedGroup(null)}
+                        leadingIcon={<Icon name="arrow-left" size={16} />}
+                      >
+                        Voltar
+                      </Button>
+                      <h3 className="prospect-group-header__title">{selectedGroupTitle}</h3>
+                    </div>
+                    <LeadsTable leads={selectedGroupLeads} onLeadClick={handleCardClick} />
+                  </>
+                )
+              ) : (
+                <LeadGroupsTable
+                  leads={leadsWithMeta}
+                  onGroupClick={(group: LeadGroup) => setSelectedGroup(group.groupId)}
+                  onEditGroup={handleEditGroup}
+                  onDeleteGroup={handleDeleteGroup}
+                />
+              )}
+
+              {selectedLead && (
+                <LeadModal
+                  lead={selectedLead}
+                  onClose={() => setSelectedLead(null)}
+                  onSave={handleSaveLead}
+                />
+              )}
+            </>
+          ) : currentView === 'help' ? (
+            <Help />
+          ) : (
+            <ImportExport leads={leadsWithMeta} onImport={handleImport} onExport={handleExport} />
           )}
-        </>
-      ) : currentView === 'help' ? (
-        <Help />
-      ) : (
-        <ImportExport leads={leadsWithMeta} onImport={handleImport} onExport={handleExport} />
-      )}
         </div>
       </main>
     </div>
