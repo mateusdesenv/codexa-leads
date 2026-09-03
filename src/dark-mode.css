@@ -335,3 +335,18 @@ html[data-theme="dark"] .ds-switch__track > span {
 html[data-theme="dark"] .ds-switch > input:checked + .ds-switch__track {
   background: var(--ds-green);
 }
+
+/* DataTable dark mode overrides */
+html[data-theme="dark"] .ds-table-wrap {
+  background: var(--ds-white);
+  border-color: var(--ds-line);
+}
+
+html[data-theme="dark"] .ds-table th,
+html[data-theme="dark"] .ds-table td {
+  border-bottom-color: var(--ds-line);
+}
+
+html[data-theme="dark"] .ds-table tbody tr:hover {
+  background: var(--ds-line);
+}

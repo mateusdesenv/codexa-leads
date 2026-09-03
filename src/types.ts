@@ -17,6 +17,8 @@ export interface Lead {
   temporarilyClosed: boolean
   categories: string[]
   placeId: string
+  groupId?: string | null
+  groupTitle?: string | null
   kanbanState?: KanbanState
 }
 
