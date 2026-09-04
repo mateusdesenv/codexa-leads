@@ -26,6 +26,7 @@ import LeadsTable from './LeadsTable'
 import Packages from './Packages'
 import codexaLogo from 'codexa-ui/logos/logos-fundo-transparente/primary-logo.png'
 import codexaLogoDark from 'codexa-ui/logos/logos-fundo-transparente/primary-logo-reversed.png'
+import codexaIcon from 'codexa-ui/logos/logos-fundo-transparente/icon-only.png'
 import {
   Alert,
   Avatar,
@@ -976,6 +977,19 @@ function App() {
     setSelectedLead(lead)
   }
 
+  const handleRefresh = async () => {
+    try {
+      setLoading(true)
+      const fresh = await fetchLeads()
+      setBaseLeads(fresh)
+    } catch (err) {
+      console.error(err)
+      setError(err instanceof Error ? err.message : 'Erro ao atualizar')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleEditGroup = async (group: LeadGroup, title: string) => {
     if (!group.groupId) return
     try {
@@ -1149,6 +1163,11 @@ function App() {
               alt="Codexa"
               className="prospect-header__logo"
             />
+            <img
+              src={codexaIcon}
+              alt="Codexa"
+              className="prospect-header__logo-mobile"
+            />
             <div>
               <h2>
                 {currentView === 'home'
@@ -1170,6 +1189,17 @@ function App() {
               </p>
             </div>
           </div>
+          <Button
+            type="button"
+            className="prospect-header__menu"
+            variant="ghost"
+            size="small"
+            iconOnly
+            leadingIcon={<Icon name={navOpen ? 'x' : 'menu'} size={22} />}
+            onClick={() => setNavOpen((prev) => !prev)}
+            aria-label="Abrir menu"
+            aria-expanded={navOpen}
+          />
         </header>
 
         <div className="prospect-content">
@@ -1223,6 +1253,16 @@ function App() {
                   leadingIcon={<Icon name="filter" size={18} />}
                 >
                   Filtros
+                </Button>
+                <Button
+                  type="button"
+                  className="prospect-toolbar__refresh"
+                  variant="secondary"
+                  size="small"
+                  onClick={handleRefresh}
+                  leadingIcon={<Icon name="refresh" size={18} />}
+                >
+                  Atualizar
                 </Button>
               </div>
 

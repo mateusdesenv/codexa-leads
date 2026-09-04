@@ -212,8 +212,10 @@
   flex: 1 1 200px;
 }
 
-.prospect-toolbar__filter-toggle {
+.prospect-toolbar__filter-toggle,
+.prospect-toolbar__refresh {
   display: none;
+  flex: 1 1 calc(50% - 5px);
 }
 
 .prospect-filters {
@@ -768,39 +770,15 @@ body.lead-modal-open .ds-dialog {
     position: relative;
     width: 100%;
     flex: 0 0 auto;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-    padding: 12px 16px;
+    padding: 0;
     border-right: 0;
-    border-bottom: 1px solid var(--ds-line);
+    border-bottom: 0;
     z-index: 102;
-    background: var(--ds-white);
+    background: transparent;
   }
 
   .prospect-sidebar__brand {
-    justify-content: space-between;
-    padding: 0;
-    width: 100%;
-  }
-
-  .prospect-sidebar__logo {
-    display: block;
-    max-height: 40px;
-    max-width: 120px;
-  }
-
-  .prospect-sidebar__user {
     display: none;
-  }
-
-  .prospect-sidebar__menu {
-    display: inline-flex;
-    width: 40px;
-    height: 40px;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
   }
 
   .prospect-nav {
@@ -928,15 +906,19 @@ body.lead-modal-open .ds-dialog {
     gap: 10px;
     padding: 12px;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
   }
 
   .prospect-toolbar__fields {
     display: none;
   }
 
-  .prospect-toolbar__filter-toggle {
+  .prospect-toolbar__filter-toggle,
+  .prospect-toolbar__refresh {
     display: inline-flex;
+    width: 100%;
+    flex: 1 1 calc(50% - 5px);
+    justify-content: center;
   }
 
   .prospect-filters {
@@ -975,6 +957,21 @@ body.lead-modal-open .ds-dialog {
 .prospect-header__logo {
   max-height: 40px;
   width: auto;
+}
+
+.prospect-header__logo-mobile {
+  display: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: contain;
+}
+
+.prospect-header__menu {
+  display: none;
+  width: 40px;
+  height: 40px;
+  padding: 0;
 }
 
 .theme-toggle {
@@ -1204,17 +1201,41 @@ body.lead-modal-open .ds-dialog {
 
 @media (max-width: 760px) {
   .prospect-header--logged {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+  }
+
+  .prospect-header__page {
+    flex: 1 1 auto;
+    gap: 8px;
+  }
+
+  .prospect-header__page > div {
+    gap: 0;
+  }
+
+  .prospect-header__page p {
+    display: none;
+  }
+
+  .prospect-header__logo {
+    display: none;
+  }
+
+  .prospect-header__logo-mobile {
+    display: block;
+  }
+
+  .prospect-header__menu {
+    display: inline-flex;
   }
 
   .prospect-nav {
     width: 100%;
     justify-content: center;
-  }
-
-  .prospect-header__logo {
-    max-height: 32px;
   }
 }
 
