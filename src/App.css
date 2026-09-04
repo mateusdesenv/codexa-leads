@@ -648,7 +648,8 @@ body.lead-modal-open .ds-dialog {
     padding: 0;
   }
 
-  .prospect-nav__item {
+  .prospect-nav__btn {
+    width: auto;
     padding: 8px 12px;
     font-size: 0.8rem;
   }
@@ -836,32 +837,34 @@ body.lead-modal-open .ds-dialog {
 .prospect-nav {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 2px;
   padding: 0 8px;
 }
 
-.prospect-nav__item {
-  padding: 12px 16px;
-  border: 0;
-  border-radius: 10px;
-  background: transparent;
+.prospect-nav__btn {
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: var(--ds-radius-md, 10px);
+  font-size: 0.92rem;
+  font-weight: 600;
   color: var(--ds-charcoal);
-  font-size: 0.9rem;
-  font-weight: 650;
-  text-align: left;
-  cursor: pointer;
+  background: transparent;
   transition: background-color 160ms ease, color 160ms ease;
 }
 
-.prospect-nav__item:hover {
+.prospect-nav__btn:hover:not(:disabled),
+.prospect-nav__btn:focus-visible:not(:disabled) {
   background: var(--ds-green-ice);
   color: var(--ds-green-dark);
+  outline: none;
 }
 
-.prospect-nav__item--active {
-  background: var(--ds-green);
-  color: var(--ds-graphite);
-  box-shadow: 0 1px 3px rgba(17, 19, 26, 0.08);
+.prospect-nav__btn.ds-button--primary {
+  background: var(--ds-green-mist);
+  color: var(--ds-green-dark);
+  box-shadow: none;
 }
 
 .import-export-page {
