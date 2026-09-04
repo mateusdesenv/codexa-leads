@@ -39,7 +39,6 @@ import {
   SearchInput,
   Select,
   Spinner,
-  Switch,
   Tag,
   Textarea,
 } from 'codexa-ui'
@@ -709,17 +708,30 @@ function App() {
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
   const [navOpen, setNavOpen] = useState(false)
   const [filtersOpen, setFiltersOpen] = useState(false)
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>(() => {
     const saved = localStorage.getItem('codexa-theme')
-    if (saved === 'dark' || saved === 'light') return saved
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    if (saved === 'dark' || saved === 'light' || saved === 'system') return saved
+    return 'system'
   })
 
   const didDrag = useRef(false)
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
+    const resolved = theme === 'system'
+      ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      : theme
+    document.documentElement.setAttribute('data-theme', resolved)
     localStorage.setItem('codexa-theme', theme)
+  }, [theme])
+
+  useEffect(() => {
+    if (theme !== 'system') return
+    const media = window.matchMedia('(prefers-color-scheme: dark)')
+    const handler = () => {
+      document.documentElement.setAttribute('data-theme', media.matches ? 'dark' : 'light')
+    }
+    media.addEventListener('change', handler)
+    return () => media.removeEventListener('change', handler)
   }, [theme])
 
   useEffect(() => {
@@ -1038,6 +1050,68 @@ function App() {
         </div>
 
         <nav className={`prospect-nav ${navOpen ? 'prospect-nav--open' : ''}`} aria-label="Navegação principal">
+          <div className="prospect-nav__header">
+            <img
+              src={theme === 'dark' ? codexaLogoDark : codexaLogo}
+              alt="Codexa"
+              className="prospect-nav__logo"
+            />
+            <div className="prospect-nav__theme" role="group" aria-label="Tema">
+              <Button
+                type="button"
+                className={`prospect-nav__theme-btn ${theme === 'system' ? 'prospect-nav__theme-btn--active' : ''}`}
+                variant="ghost"
+                size="small"
+                iconOnly
+                onClick={() => setTheme('system')}
+                aria-label="Sistema"
+                leadingIcon={(
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2" y="3" width="20" height="14" rx="2" />
+                    <line x1="8" y1="21" x2="16" y2="21" />
+                    <line x1="12" y1="17" x2="12" y2="21" />
+                  </svg>
+                )}
+              />
+              <Button
+                type="button"
+                className={`prospect-nav__theme-btn ${theme === 'light' ? 'prospect-nav__theme-btn--active' : ''}`}
+                variant="ghost"
+                size="small"
+                iconOnly
+                onClick={() => setTheme('light')}
+                aria-label="Claro"
+                leadingIcon={(
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="5" />
+                    <line x1="12" y1="1" x2="12" y2="3" />
+                    <line x1="12" y1="21" x2="12" y2="23" />
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                    <line x1="1" y1="12" x2="3" y2="12" />
+                    <line x1="21" y1="12" x2="23" y2="12" />
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                  </svg>
+                )}
+              />
+              <Button
+                type="button"
+                className={`prospect-nav__theme-btn ${theme === 'dark' ? 'prospect-nav__theme-btn--active' : ''}`}
+                variant="ghost"
+                size="small"
+                iconOnly
+                onClick={() => setTheme('dark')}
+                aria-label="Escuro"
+                leadingIcon={(
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                  </svg>
+                )}
+              />
+            </div>
+          </div>
+
           <div className="prospect-nav__user">
             <Avatar
               name={user.displayName ?? user.email ?? 'Usuário'}
@@ -1104,17 +1178,6 @@ function App() {
           >
             Help
           </Button>
-
-          <div className="prospect-nav__footer">
-            <Switch
-              id="theme-toggle-mobile"
-              label="Modo escuro"
-              checked={theme === 'dark'}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setTheme(e.target.checked ? 'dark' : 'light')
-              }
-            />
-          </div>
         </nav>
       </aside>
 
