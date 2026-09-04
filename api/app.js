@@ -130,7 +130,7 @@ app.put('/api/leads/:placeId', async (req, res) => {
 app.get('/api/qna', async (_req, res) => {
   try {
     await connectToDatabase()
-    const items = await QnA.find({}).sort({ createdAt: -1 })
+    const items = await QnA.find({}).sort({ isFavorite: -1, createdAt: -1 })
     res.json(items)
   } catch (err) {
     console.error(err)
@@ -141,7 +141,7 @@ app.get('/api/qna', async (_req, res) => {
 app.post('/api/qna', async (req, res) => {
   try {
     await connectToDatabase()
-    const { question, answer, tags } = req.body
+    const { question, answer, tags, isFavorite } = req.body
     if (!question || !answer) {
       return res.status(400).json({ error: 'Pergunta e resposta são obrigatórias' })
     }
@@ -149,6 +149,7 @@ app.post('/api/qna', async (req, res) => {
       question: question.trim(),
       answer: answer.trim(),
       tags: Array.isArray(tags) ? tags.filter(Boolean) : [],
+      isFavorite: isFavorite === true,
     })
     res.status(201).json(item)
   } catch (err) {
@@ -160,7 +161,7 @@ app.post('/api/qna', async (req, res) => {
 app.put('/api/qna/:id', async (req, res) => {
   try {
     await connectToDatabase()
-    const { question, answer, tags } = req.body
+    const { question, answer, tags, isFavorite } = req.body
     if (!question || !answer) {
       return res.status(400).json({ error: 'Pergunta e resposta são obrigatórias' })
     }
@@ -170,6 +171,7 @@ app.put('/api/qna/:id', async (req, res) => {
         question: question.trim(),
         answer: answer.trim(),
         tags: Array.isArray(tags) ? tags.filter(Boolean) : [],
+        isFavorite: isFavorite === true,
       },
       { returnDocument: 'after' },
     )
@@ -178,6 +180,23 @@ app.put('/api/qna/:id', async (req, res) => {
   } catch (err) {
     console.error(err)
     res.status(400).json({ error: err instanceof Error ? err.message : 'Erro ao atualizar pergunta' })
+  }
+})
+
+app.patch('/api/qna/:id/favorite', async (req, res) => {
+  try {
+    await connectToDatabase()
+    const current = await QnA.findById(req.params.id)
+    if (!current) return res.status(404).json({ error: 'Pergunta não encontrada' })
+    const item = await QnA.findByIdAndUpdate(
+      req.params.id,
+      { isFavorite: !current.isFavorite },
+      { returnDocument: 'after' },
+    )
+    res.json(item)
+  } catch (err) {
+    console.error(err)
+    res.status(400).json({ error: err instanceof Error ? err.message : 'Erro ao favoritar pergunta' })
   }
 })
 

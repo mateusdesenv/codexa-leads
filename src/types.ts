@@ -41,6 +41,10 @@ export interface KanbanState {
   lostReason?: string
   proposalValue?: string
   proposalReturnDate?: string
+  collectedData?: string
+  interest?: 'alto' | 'medio' | 'baixo' | ''
+  budget?: string
+  returnDate?: string
 }
 
 export interface LeadWithMeta extends Lead {
@@ -56,6 +60,7 @@ export interface QnA {
   question: string
   answer: string
   tags: string[]
+  isFavorite?: boolean
   createdAt?: string
   updatedAt?: string
 }
