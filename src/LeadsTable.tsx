@@ -21,7 +21,7 @@ const COLUMN_ORDER: ColumnId[] = [
 
 const COLUMN_LABELS: Record<ColumnId, string> = {
   open: 'Open',
-  em_contato: 'Em contato',
+  em_contato: 'Tentativa de ligação',
   contato: 'Contato feito',
   conversa: 'Em conversa',
   followup: 'Follow-up',

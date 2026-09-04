@@ -40,11 +40,10 @@ import {
   Select,
   Spinner,
   Switch,
-  Tabs,
   Tag,
   Textarea,
 } from 'codexa-ui'
-import type { IconName, TabItem } from 'codexa-ui'
+import type { IconName } from 'codexa-ui'
 
 import type { ColumnId, KanbanState, Lead, LeadWithMeta, Temperature } from './types'
 
@@ -55,7 +54,7 @@ import './App.css'
 
 const COLUMNS: { id: ColumnId; label: string; emoji: string; color: string; icon: IconName }[] = [
   { id: 'open', label: 'Open', emoji: '🟢', color: '#25BF44', icon: 'check-circle' },
-  { id: 'em_contato', label: 'Em contato', emoji: '📞', color: '#3B82F6', icon: 'send' },
+  { id: 'em_contato', label: 'Tentativa de ligação', emoji: '📞', color: '#3B82F6', icon: 'send' },
   { id: 'contato', label: 'Contato feito', emoji: '✅', color: '#2DD4A0', icon: 'check' },
   { id: 'conversa', label: 'Em conversa', emoji: '💬', color: '#8B5CF6', icon: 'message' },
   { id: 'followup', label: 'Follow-up', emoji: '📅', color: '#F59E0B', icon: 'calendar' },
@@ -479,14 +478,6 @@ function LeadModal({
   )
   const [contactName, setContactName] = useState('')
   const [clinicName, setClinicName] = useState(lead.title)
-  const [activeTab, setActiveTab] = useState<'cliente' | 'contato' | 'dados'>('cliente')
-
-  const tabItems: TabItem[] = [
-    { id: 'cliente', label: 'Cliente' },
-    { id: 'contato', label: 'Contato' },
-    { id: 'dados', label: 'Dados' },
-  ]
-
   const interestOptions = [
     { value: '', label: 'Selecione' },
     { value: 'alto', label: 'Alto' },
@@ -543,172 +534,152 @@ function LeadModal({
       </div>
 
       <form className="modal__form" onSubmit={handleSubmit}>
-        <Tabs
-          items={tabItems}
-          value={activeTab}
-          onChange={(value) => setActiveTab(value as 'cliente' | 'contato' | 'dados')}
-        />
+        <div className="modal__column">
+          <h3 className="modal__column-title">Cliente</h3>
 
-        {activeTab === 'cliente' && (
-          <div className="modal__column">
-            <h3 className="modal__column-title">Cliente</h3>
+          <Select
+            label="Etapa do funil"
+            id="status"
+            value={state.column}
+            onChange={(value: string) => setState({ ...state, column: value as ColumnId })}
+            options={statusOptions}
+          />
 
-            <Select
-              label="Etapa do funil"
-              id="status"
-              value={state.column}
-              onChange={(value: string) => setState({ ...state, column: value as ColumnId })}
-              options={statusOptions}
-            />
+          <Input
+            label="Nome"
+            id="contact-name"
+            type="text"
+            placeholder="Ex: Ana"
+            value={contactName}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setContactName(e.target.value)
+              updateMessageForName(e.target.value)
+            }}
+            leadingIcon={<Icon name="user" size={16} />}
+          />
 
-            <Input
-              label="Próxima ação"
-              id="nextAction"
-              type="text"
-              placeholder="Ex: Enviar mensagem de apresentação"
-              value={state.nextAction ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setState({ ...state, nextAction: e.target.value })
-              }
-              leadingIcon={<Icon name="edit" size={16} />}
-            />
+          <Input
+            label="Clínica"
+            id="clinic-name"
+            type="text"
+            value={clinicName}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setClinicName(e.target.value)
+              updateMessageForClinic(e.target.value)
+            }}
+            leadingIcon={<Icon name="home" size={16} />}
+          />
 
-            <Input
-              label="Data de follow-up"
-              id="dueDate"
-              type="date"
-              value={state.dueDate ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setState({ ...state, dueDate: e.target.value })
-              }
-              leadingIcon={<Icon name="calendar" size={16} />}
-            />
+          <Input
+            label="Próxima ação"
+            id="nextAction"
+            type="text"
+            placeholder="Ex: Enviar mensagem de apresentação"
+            value={state.nextAction ?? ''}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setState({ ...state, nextAction: e.target.value })
+            }
+            leadingIcon={<Icon name="edit" size={16} />}
+          />
 
-            {state.column === 'proposta' && (
-              <>
-                <Input
-                  label="Valor da proposta"
-                  id="proposalValue"
-                  type="text"
-                  placeholder="R$ 0,00"
-                  value={state.proposalValue ?? ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setState({ ...state, proposalValue: e.target.value })
-                  }
-                  leadingIcon={<Icon name="plus" size={16} />}
-                />
-                <Input
-                  label="Data prevista de retorno"
-                  id="proposalReturnDate"
-                  type="date"
-                  value={state.proposalReturnDate ?? ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setState({ ...state, proposalReturnDate: e.target.value })
-                  }
-                  leadingIcon={<Icon name="calendar" size={16} />}
-                />
-              </>
-            )}
+          <Input
+            label="Data de follow-up"
+            id="dueDate"
+            type="date"
+            value={state.dueDate ?? ''}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setState({ ...state, dueDate: e.target.value })
+            }
+            leadingIcon={<Icon name="calendar" size={16} />}
+          />
 
-            {state.column === 'perdido' && (
-              <Select
-                label="Motivo"
-                id="lostReason"
-                value={state.lostReason ?? ''}
-                onChange={(value: string) => setState({ ...state, lostReason: value })}
-                options={lostReasonOptions}
+          {state.column === 'proposta' && (
+            <>
+              <Input
+                label="Valor da proposta"
+                id="proposalValue"
+                type="text"
+                placeholder="R$ 0,00"
+                value={state.proposalValue ?? ''}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setState({ ...state, proposalValue: e.target.value })
+                }
+                leadingIcon={<Icon name="plus" size={16} />}
               />
-            )}
-          </div>
-        )}
+              <Input
+                label="Data prevista de retorno"
+                id="proposalReturnDate"
+                type="date"
+                value={state.proposalReturnDate ?? ''}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setState({ ...state, proposalReturnDate: e.target.value })
+                }
+                leadingIcon={<Icon name="calendar" size={16} />}
+              />
+            </>
+          )}
 
-        {activeTab === 'contato' && (
-          <div className="modal__column modal__column--contact">
-            <h3 className="modal__column-title">Contato</h3>
-
-            <Input
-              label="Nome"
-              id="contact-name"
-              type="text"
-              placeholder="Ex: Ana"
-              value={contactName}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                setContactName(e.target.value)
-                updateMessageForName(e.target.value)
-              }}
-              leadingIcon={<Icon name="user" size={16} />}
-            />
-
-            <Input
-              label="Clínica"
-              id="clinic-name"
-              type="text"
-              value={clinicName}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                setClinicName(e.target.value)
-                updateMessageForClinic(e.target.value)
-              }}
-              leadingIcon={<Icon name="home" size={16} />}
-            />
-
-            <Textarea
-              label="Mensagem"
-              id="lead-message"
-              value={message}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value)}
-              rows={8}
-              className="modal__message"
-            />
-          </div>
-        )}
-
-        {activeTab === 'dados' && (
-          <div className="modal__column modal__column--dados">
-            <h3 className="modal__column-title">Dados coletados</h3>
-
+          {state.column === 'perdido' && (
             <Select
-              label="Interesse"
-              id="interest"
-              value={state.interest ?? ''}
-              onChange={(value: string) => setState({ ...state, interest: value as KanbanState['interest'] })}
-              options={interestOptions}
+              label="Motivo"
+              id="lostReason"
+              value={state.lostReason ?? ''}
+              onChange={(value: string) => setState({ ...state, lostReason: value })}
+              options={lostReasonOptions}
             />
+          )}
 
-            <Input
-              label="Orçamento previsto"
-              id="budget"
-              type="text"
-              placeholder="Ex: R$ 2.000"
-              value={state.budget ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setState({ ...state, budget: e.target.value })
-              }
-              leadingIcon={<Icon name="plus" size={16} />}
-            />
+          <Select
+            label="Interesse"
+            id="interest"
+            value={state.interest ?? ''}
+            onChange={(value: string) => setState({ ...state, interest: value as KanbanState['interest'] })}
+            options={interestOptions}
+          />
 
-            <Input
-              label="Data de retorno"
-              id="returnDate"
-              type="date"
-              value={state.returnDate ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setState({ ...state, returnDate: e.target.value })
-              }
-              leadingIcon={<Icon name="calendar" size={16} />}
-            />
+          <Input
+            label="Orçamento previsto"
+            id="budget"
+            type="text"
+            placeholder="Ex: R$ 2.000"
+            value={state.budget ?? ''}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setState({ ...state, budget: e.target.value })
+            }
+            leadingIcon={<Icon name="plus" size={16} />}
+          />
 
-            <Textarea
-              label="Dados e observações"
-              id="collectedData"
-              value={state.collectedData ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                setState({ ...state, collectedData: e.target.value })
-              }
-              rows={6}
-              placeholder="Anotações da prospecção, decisores, dores, canais, contexto..."
-            />
-          </div>
-        )}
+          <Input
+            label="Data de retorno"
+            id="returnDate"
+            type="date"
+            value={state.returnDate ?? ''}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setState({ ...state, returnDate: e.target.value })
+            }
+            leadingIcon={<Icon name="calendar" size={16} />}
+          />
+
+          <Textarea
+            label="Dados e observações"
+            id="collectedData"
+            value={state.collectedData ?? ''}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              setState({ ...state, collectedData: e.target.value })
+            }
+            rows={4}
+            placeholder="Anotações da prospecção, decisores, dores, canais, contexto..."
+          />
+
+          <Textarea
+            label="Mensagem"
+            id="lead-message"
+            value={message}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value)}
+            rows={6}
+            className="modal__message"
+          />
+        </div>
 
         <div className="modal__actions">
           <Button type="button" variant="secondary" onClick={onClose}>
