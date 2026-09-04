@@ -54,12 +54,13 @@ import './App.css'
 
 const COLUMNS: { id: ColumnId; label: string; emoji: string; color: string; icon: IconName }[] = [
   { id: 'open', label: 'Open', emoji: '🟢', color: '#25BF44', icon: 'check-circle' },
-  { id: 'contato', label: 'Contato feito', emoji: '📞', color: '#3B82F6', icon: 'send' },
+  { id: 'em_contato', label: 'Em contato', emoji: '📞', color: '#3B82F6', icon: 'send' },
+  { id: 'contato', label: 'Contato feito', emoji: '✅', color: '#2DD4A0', icon: 'check' },
   { id: 'conversa', label: 'Em conversa', emoji: '💬', color: '#8B5CF6', icon: 'message' },
   { id: 'followup', label: 'Follow-up', emoji: '📅', color: '#F59E0B', icon: 'calendar' },
   { id: 'proposta', label: 'Proposta enviada', emoji: '📄', color: '#0EA5E9', icon: 'file' },
   { id: 'negociacao', label: 'Negociação', emoji: '🔥', color: '#EF4444', icon: 'warning' },
-  { id: 'fechado', label: 'Cliente fechado', emoji: '✅', color: '#13992F', icon: 'check' },
+  { id: 'fechado', label: 'Cliente fechado', emoji: '🤝', color: '#13992F', icon: 'check' },
   { id: 'perdido', label: 'Perdido', emoji: '❌', color: '#6D7480', icon: 'x' },
 ]
 
@@ -728,11 +729,13 @@ function App() {
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('')
+  const [kanbanGroupFilter, setKanbanGroupFilter] = useState('')
   const [selectedLead, setSelectedLead] = useState<LeadWithMeta | null>(null)
   const [activeDrag, setActiveDrag] = useState<LeadWithMeta | null>(null)
   const [user, setUser] = useState<User | null | undefined>(undefined)
   const [currentView, setCurrentView] = useState<'home' | 'table' | 'packages' | 'help'>('home')
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
+  const [navOpen, setNavOpen] = useState(false)
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     const saved = localStorage.getItem('codexa-theme')
     if (saved === 'dark' || saved === 'light') return saved
@@ -798,12 +801,31 @@ function App() {
     })
   }, [leadsWithMeta, search, categoryFilter])
 
+  const kanbanFilteredLeads = useMemo(() => {
+    if (!kanbanGroupFilter) return filteredLeads
+    return filteredLeads.filter((lead) => lead.groupId === kanbanGroupFilter)
+  }, [filteredLeads, kanbanGroupFilter])
+
+  const groups = useMemo(() => {
+    const map = new Map<string, { groupId: string; groupTitle: string; count: number }>()
+    leadsWithMeta.forEach((lead) => {
+      if (!lead.groupId) return
+      const existing = map.get(lead.groupId)
+      if (existing) {
+        existing.count += 1
+      } else {
+        map.set(lead.groupId, { groupId: lead.groupId, groupTitle: lead.groupTitle?.trim() || 'Grupo', count: 1 })
+      }
+    })
+    return Array.from(map.values()).sort((a, b) => a.groupTitle.localeCompare(b.groupTitle))
+  }, [leadsWithMeta])
+
   const leadsByColumn = useMemo(() => {
     const map: Record<ColumnId, LeadWithMeta[]> = COLUMNS.reduce(
       (acc, c) => ({ ...acc, [c.id]: [] }),
       {} as Record<ColumnId, LeadWithMeta[]>,
     )
-    filteredLeads.forEach((lead) => {
+    kanbanFilteredLeads.forEach((lead) => {
       map[lead.kanbanState.column] = map[lead.kanbanState.column] ?? []
       map[lead.kanbanState.column].push(lead)
     })
@@ -817,7 +839,7 @@ function App() {
       }
     })
     return map
-  }, [filteredLeads])
+  }, [kanbanFilteredLeads])
 
   const selectedGroupLeads = useMemo(() => {
     if (!selectedGroup) return []
@@ -997,14 +1019,25 @@ function App() {
       <aside className="prospect-sidebar">
         <div className="prospect-sidebar__brand">
           <img src={theme === 'dark' ? codexaLogoDark : codexaLogo} alt="Codexa" className="prospect-sidebar__logo" />
+          <Button
+            type="button"
+            className="prospect-sidebar__menu"
+            variant="ghost"
+            size="small"
+            iconOnly
+            leadingIcon={<Icon name={navOpen ? 'x' : 'menu'} size={22} />}
+            onClick={() => setNavOpen((prev) => !prev)}
+            aria-label="Abrir menu"
+            aria-expanded={navOpen}
+          />
         </div>
 
-        <nav className="prospect-nav" aria-label="Navegação principal">
+        <nav className={`prospect-nav ${navOpen ? 'prospect-nav--open' : ''}`} aria-label="Navegação principal">
           <Button
             type="button"
             className="prospect-nav__btn"
             variant={currentView === 'home' ? 'primary' : 'ghost'}
-            onClick={() => { setSelectedGroup(null); setCurrentView('home') }}
+            onClick={() => { setSelectedGroup(null); setCurrentView('home'); setNavOpen(false) }}
             leadingIcon={<Icon name="home" size={18} />}
           >
             Home
@@ -1013,7 +1046,7 @@ function App() {
             type="button"
             className="prospect-nav__btn"
             variant={currentView === 'table' ? 'primary' : 'ghost'}
-            onClick={() => { setSelectedGroup(null); setCurrentView('table') }}
+            onClick={() => { setSelectedGroup(null); setCurrentView('table'); setNavOpen(false) }}
             leadingIcon={<Icon name="users" size={18} />}
           >
             Leads
@@ -1022,7 +1055,7 @@ function App() {
             type="button"
             className="prospect-nav__btn"
             variant={currentView === 'packages' ? 'primary' : 'ghost'}
-            onClick={() => { setSelectedGroup(null); setCurrentView('packages') }}
+            onClick={() => { setSelectedGroup(null); setCurrentView('packages'); setNavOpen(false) }}
             leadingIcon={<Icon name="file" size={18} />}
           >
             Pacotes
@@ -1031,13 +1064,21 @@ function App() {
             type="button"
             className="prospect-nav__btn"
             variant={currentView === 'help' ? 'primary' : 'ghost'}
-            onClick={() => { setSelectedGroup(null); setCurrentView('help') }}
+            onClick={() => { setSelectedGroup(null); setCurrentView('help'); setNavOpen(false) }}
             leadingIcon={<Icon name="help" size={18} />}
           >
             Help
           </Button>
         </nav>
       </aside>
+
+      {navOpen && (
+        <div
+          className="prospect-nav-overlay"
+          onClick={() => setNavOpen(false)}
+          aria-hidden="true"
+        />
+      )}
 
       <main className="prospect-main">
         <header className="prospect-header prospect-header--logged">
@@ -1115,6 +1156,20 @@ function App() {
                   ]}
                 />
               </div>
+              {currentView === 'home' && (
+                <div className="prospect-toolbar__field prospect-toolbar__field--group">
+                  <Select
+                    label="Grupo"
+                    id="kanban-group"
+                    value={kanbanGroupFilter}
+                    onChange={(value: string) => setKanbanGroupFilter(value)}
+                    options={[
+                      { value: '', label: 'Todos os grupos' },
+                      ...groups.map((g) => ({ value: g.groupId, label: `${g.groupTitle} (${g.count})` })),
+                    ]}
+                  />
+                </div>
+              )}
             </div>
           )}
 
@@ -1130,7 +1185,7 @@ function App() {
                     {error}
                   </Alert>
                 </div>
-              ) : filteredLeads.length === 0 ? (
+              ) : kanbanFilteredLeads.length === 0 ? (
                 <div className="prospect-empty">
                   <EmptyState
                     icon="search"
