@@ -350,3 +350,20 @@ html[data-theme="dark"] .ds-table td {
 html[data-theme="dark"] .ds-table tbody tr:hover {
   background: var(--ds-line);
 }
+
+/* Dashboard */
+html[data-theme="dark"] .dashboard-metric__icon--total {
+  color: #93c5fd;
+  background: #172554;
+}
+
+html[data-theme="dark"] .dashboard-metric__icon--open,
+html[data-theme="dark"] .dashboard-metric__icon--closed {
+  color: #86efac;
+  background: #14331f;
+}
+
+html[data-theme="dark"] .dashboard-metric__icon--progress {
+  color: #c4b5fd;
+  background: #2e1065;
+}

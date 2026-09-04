@@ -21,6 +21,7 @@ import { onAuthStateChanged, signOut, type User } from 'firebase/auth'
 import { auth } from './firebase'
 import Login from './Login'
 import Help from './Help'
+import Dashboard from './Dashboard'
 import LeadGroupsTable, { type LeadGroup } from './LeadGroupsTable'
 import LeadsTable from './LeadsTable'
 import Packages from './Packages'
@@ -39,10 +40,11 @@ import {
   SearchInput,
   Select,
   Spinner,
+  Tabs,
   Tag,
   Textarea,
 } from 'codexa-ui'
-import type { IconName } from 'codexa-ui'
+import type { IconName, TabItem } from 'codexa-ui'
 
 import type { ColumnId, KanbanState, Lead, LeadWithMeta, Temperature } from './types'
 
@@ -477,6 +479,14 @@ function LeadModal({
   )
   const [contactName, setContactName] = useState('')
   const [clinicName, setClinicName] = useState(lead.title)
+  const [activeTab, setActiveTab] = useState<'cliente' | 'contato' | 'dados'>('cliente')
+
+  const tabItems: TabItem[] = [
+    { id: 'cliente', label: 'Cliente' },
+    { id: 'contato', label: 'Contato' },
+    { id: 'dados', label: 'Dados' },
+  ]
+
   const interestOptions = [
     { value: '', label: 'Selecione' },
     { value: 'alto', label: 'Alto' },
@@ -533,152 +543,172 @@ function LeadModal({
       </div>
 
       <form className="modal__form" onSubmit={handleSubmit}>
-        <div className="modal__column">
-          <h3 className="modal__column-title">Cliente</h3>
+        <Tabs
+          items={tabItems}
+          value={activeTab}
+          onChange={(value) => setActiveTab(value as 'cliente' | 'contato' | 'dados')}
+        />
 
-          <Select
-            label="Etapa do funil"
-            id="status"
-            value={state.column}
-            onChange={(value: string) => setState({ ...state, column: value as ColumnId })}
-            options={statusOptions}
-          />
+        {activeTab === 'cliente' && (
+          <div className="modal__column">
+            <h3 className="modal__column-title">Cliente</h3>
 
-          <Input
-            label="Nome"
-            id="contact-name"
-            type="text"
-            placeholder="Ex: Ana"
-            value={contactName}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              setContactName(e.target.value)
-              updateMessageForName(e.target.value)
-            }}
-            leadingIcon={<Icon name="user" size={16} />}
-          />
-
-          <Input
-            label="Clínica"
-            id="clinic-name"
-            type="text"
-            value={clinicName}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              setClinicName(e.target.value)
-              updateMessageForClinic(e.target.value)
-            }}
-            leadingIcon={<Icon name="home" size={16} />}
-          />
-
-          <Input
-            label="Próxima ação"
-            id="nextAction"
-            type="text"
-            placeholder="Ex: Enviar mensagem de apresentação"
-            value={state.nextAction ?? ''}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setState({ ...state, nextAction: e.target.value })
-            }
-            leadingIcon={<Icon name="edit" size={16} />}
-          />
-
-          <Input
-            label="Data de follow-up"
-            id="dueDate"
-            type="date"
-            value={state.dueDate ?? ''}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setState({ ...state, dueDate: e.target.value })
-            }
-            leadingIcon={<Icon name="calendar" size={16} />}
-          />
-
-          {state.column === 'proposta' && (
-            <>
-              <Input
-                label="Valor da proposta"
-                id="proposalValue"
-                type="text"
-                placeholder="R$ 0,00"
-                value={state.proposalValue ?? ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setState({ ...state, proposalValue: e.target.value })
-                }
-                leadingIcon={<Icon name="plus" size={16} />}
-              />
-              <Input
-                label="Data prevista de retorno"
-                id="proposalReturnDate"
-                type="date"
-                value={state.proposalReturnDate ?? ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setState({ ...state, proposalReturnDate: e.target.value })
-                }
-                leadingIcon={<Icon name="calendar" size={16} />}
-              />
-            </>
-          )}
-
-          {state.column === 'perdido' && (
             <Select
-              label="Motivo"
-              id="lostReason"
-              value={state.lostReason ?? ''}
-              onChange={(value: string) => setState({ ...state, lostReason: value })}
-              options={lostReasonOptions}
+              label="Etapa do funil"
+              id="status"
+              value={state.column}
+              onChange={(value: string) => setState({ ...state, column: value as ColumnId })}
+              options={statusOptions}
             />
-          )}
 
-          <Select
-            label="Interesse"
-            id="interest"
-            value={state.interest ?? ''}
-            onChange={(value: string) => setState({ ...state, interest: value as KanbanState['interest'] })}
-            options={interestOptions}
-          />
+            <Input
+              label="Próxima ação"
+              id="nextAction"
+              type="text"
+              placeholder="Ex: Enviar mensagem de apresentação"
+              value={state.nextAction ?? ''}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setState({ ...state, nextAction: e.target.value })
+              }
+              leadingIcon={<Icon name="edit" size={16} />}
+            />
 
-          <Input
-            label="Orçamento previsto"
-            id="budget"
-            type="text"
-            placeholder="Ex: R$ 2.000"
-            value={state.budget ?? ''}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setState({ ...state, budget: e.target.value })
-            }
-            leadingIcon={<Icon name="plus" size={16} />}
-          />
+            <Input
+              label="Data de follow-up"
+              id="dueDate"
+              type="date"
+              value={state.dueDate ?? ''}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setState({ ...state, dueDate: e.target.value })
+              }
+              leadingIcon={<Icon name="calendar" size={16} />}
+            />
 
-          <Input
-            label="Data de retorno"
-            id="returnDate"
-            type="date"
-            value={state.returnDate ?? ''}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setState({ ...state, returnDate: e.target.value })
-            }
-            leadingIcon={<Icon name="calendar" size={16} />}
-          />
+            {state.column === 'proposta' && (
+              <>
+                <Input
+                  label="Valor da proposta"
+                  id="proposalValue"
+                  type="text"
+                  placeholder="R$ 0,00"
+                  value={state.proposalValue ?? ''}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setState({ ...state, proposalValue: e.target.value })
+                  }
+                  leadingIcon={<Icon name="plus" size={16} />}
+                />
+                <Input
+                  label="Data prevista de retorno"
+                  id="proposalReturnDate"
+                  type="date"
+                  value={state.proposalReturnDate ?? ''}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setState({ ...state, proposalReturnDate: e.target.value })
+                  }
+                  leadingIcon={<Icon name="calendar" size={16} />}
+                />
+              </>
+            )}
 
-          <Textarea
-            label="Dados e observações"
-            id="collectedData"
-            value={state.collectedData ?? ''}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-              setState({ ...state, collectedData: e.target.value })
-            }
-            rows={4}
-            placeholder="Anotações da prospecção, decisores, dores, canais, contexto..."
-          />
+            {state.column === 'perdido' && (
+              <Select
+                label="Motivo"
+                id="lostReason"
+                value={state.lostReason ?? ''}
+                onChange={(value: string) => setState({ ...state, lostReason: value })}
+                options={lostReasonOptions}
+              />
+            )}
+          </div>
+        )}
 
-          <Textarea
-            label="Mensagem"
-            id="lead-message"
-            value={message}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value)}
-            rows={6}
-            className="modal__message"
-          />
-        </div>
+        {activeTab === 'contato' && (
+          <div className="modal__column modal__column--contact">
+            <h3 className="modal__column-title">Contato</h3>
+
+            <Input
+              label="Nome"
+              id="contact-name"
+              type="text"
+              placeholder="Ex: Ana"
+              value={contactName}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setContactName(e.target.value)
+                updateMessageForName(e.target.value)
+              }}
+              leadingIcon={<Icon name="user" size={16} />}
+            />
+
+            <Input
+              label="Clínica"
+              id="clinic-name"
+              type="text"
+              value={clinicName}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setClinicName(e.target.value)
+                updateMessageForClinic(e.target.value)
+              }}
+              leadingIcon={<Icon name="home" size={16} />}
+            />
+
+            <Textarea
+              label="Mensagem"
+              id="lead-message"
+              value={message}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value)}
+              rows={8}
+              className="modal__message"
+            />
+          </div>
+        )}
+
+        {activeTab === 'dados' && (
+          <div className="modal__column modal__column--dados">
+            <h3 className="modal__column-title">Dados coletados</h3>
+
+            <Select
+              label="Interesse"
+              id="interest"
+              value={state.interest ?? ''}
+              onChange={(value: string) => setState({ ...state, interest: value as KanbanState['interest'] })}
+              options={interestOptions}
+            />
+
+            <Input
+              label="Orçamento previsto"
+              id="budget"
+              type="text"
+              placeholder="Ex: R$ 2.000"
+              value={state.budget ?? ''}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setState({ ...state, budget: e.target.value })
+              }
+              leadingIcon={<Icon name="plus" size={16} />}
+            />
+
+            <Input
+              label="Data de retorno"
+              id="returnDate"
+              type="date"
+              value={state.returnDate ?? ''}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setState({ ...state, returnDate: e.target.value })
+              }
+              leadingIcon={<Icon name="calendar" size={16} />}
+            />
+
+            <Textarea
+              label="Dados e observações"
+              id="collectedData"
+              value={state.collectedData ?? ''}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                setState({ ...state, collectedData: e.target.value })
+              }
+              rows={6}
+              placeholder="Anotações da prospecção, decisores, dores, canais, contexto..."
+            />
+          </div>
+        )}
 
         <div className="modal__actions">
           <Button type="button" variant="secondary" onClick={onClose}>
@@ -704,7 +734,7 @@ function App() {
   const [selectedLead, setSelectedLead] = useState<LeadWithMeta | null>(null)
   const [activeDrag, setActiveDrag] = useState<LeadWithMeta | null>(null)
   const [user, setUser] = useState<User | null | undefined>(undefined)
-  const [currentView, setCurrentView] = useState<'home' | 'table' | 'packages' | 'help'>('home')
+  const [currentView, setCurrentView] = useState<'dashboard' | 'kanban' | 'table' | 'packages' | 'help'>('dashboard')
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
   const [navOpen, setNavOpen] = useState(false)
   const [filtersOpen, setFiltersOpen] = useState(false)
@@ -1145,11 +1175,20 @@ function App() {
           <Button
             type="button"
             className="prospect-nav__btn"
-            variant={currentView === 'home' ? 'primary' : 'ghost'}
-            onClick={() => { setSelectedGroup(null); setCurrentView('home'); setNavOpen(false) }}
+            variant={currentView === 'dashboard' ? 'primary' : 'ghost'}
+            onClick={() => { setSelectedGroup(null); setCurrentView('dashboard'); setNavOpen(false) }}
             leadingIcon={<Icon name="home" size={18} />}
           >
-            Home
+            Dashboard
+          </Button>
+          <Button
+            type="button"
+            className="prospect-nav__btn"
+            variant={currentView === 'kanban' ? 'primary' : 'ghost'}
+            onClick={() => { setSelectedGroup(null); setCurrentView('kanban'); setNavOpen(false) }}
+            leadingIcon={<Icon name="sort" size={18} />}
+          >
+            Kanban
           </Button>
           <Button
             type="button"
@@ -1204,8 +1243,10 @@ function App() {
             />
             <div>
               <h2>
-                {currentView === 'home'
-                  ? 'Home'
+                {currentView === 'dashboard'
+                  ? 'Dashboard'
+                  : currentView === 'kanban'
+                    ? 'Kanban'
                   : currentView === 'table'
                     ? 'Leads'
                     : currentView === 'packages'
@@ -1213,8 +1254,10 @@ function App() {
                       : 'Help'}
               </h2>
               <p>
-                {currentView === 'home'
-                  ? 'Kanban de prospecção comercial'
+                {currentView === 'dashboard'
+                  ? 'Visão geral do funil comercial'
+                  : currentView === 'kanban'
+                    ? 'Kanban de prospecção comercial'
                   : currentView === 'table'
                     ? 'Lista completa de leads'
                     : currentView === 'packages'
@@ -1237,7 +1280,7 @@ function App() {
         </header>
 
         <div className="prospect-content">
-          {(currentView === 'home' || (currentView === 'table' && selectedGroup)) && (
+          {(currentView === 'kanban' || (currentView === 'table' && selectedGroup)) && (
             <>
               <div className="prospect-toolbar">
                 <div className="prospect-toolbar__fields">
@@ -1263,7 +1306,7 @@ function App() {
                       ]}
                     />
                   </div>
-                  {currentView === 'home' && (
+                  {currentView === 'kanban' && (
                     <div className="prospect-toolbar__field prospect-toolbar__field--group">
                       <Select
                         label="Grupo"
@@ -1325,7 +1368,7 @@ function App() {
                         ]}
                       />
                     </div>
-                    {currentView === 'home' && (
+                    {currentView === 'kanban' && (
                       <div className="prospect-filters__field">
                         <Select
                           label="Grupo"
@@ -1350,7 +1393,25 @@ function App() {
             </>
           )}
 
-          {currentView === 'home' ? (
+          {currentView === 'dashboard' ? (
+            loading ? (
+              <div className="prospect-loading">
+                <Spinner size="medium" label="Carregando dashboard..." />
+              </div>
+            ) : error ? (
+              <div className="prospect-empty">
+                <Alert tone="danger" title="Erro ao carregar">
+                  {error}
+                </Alert>
+              </div>
+            ) : (
+              <Dashboard
+                leads={leadsWithMeta}
+                columns={COLUMNS}
+                onOpenKanban={() => setCurrentView('kanban')}
+              />
+            )
+          ) : currentView === 'kanban' ? (
             <>
               {loading ? (
                 <div className="prospect-loading">
