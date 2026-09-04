@@ -69,6 +69,7 @@
   padding: 0 8px;
 }
 
+.prospect-nav__header,
 .prospect-nav__user,
 .prospect-nav__close {
   display: none;
@@ -791,7 +792,7 @@ body.lead-modal-open .ds-dialog {
     flex-direction: column;
     justify-content: flex-start;
     gap: 8px;
-    padding: 90px 16px 24px;
+    padding: 160px 16px 24px;
     margin: 0;
     background: var(--ds-white);
     border: 0;
@@ -814,9 +815,48 @@ body.lead-modal-open .ds-dialog {
     z-index: 100;
   }
 
-  .prospect-nav__user {
+  .prospect-nav__header {
     position: absolute;
     top: 16px;
+    left: 16px;
+    right: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .prospect-nav__logo {
+    max-height: 32px;
+    width: auto;
+  }
+
+  .prospect-nav__theme {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    background: var(--ds-off-white);
+    border: 1px solid var(--ds-line);
+    border-radius: 999px;
+  }
+
+  .prospect-nav__theme-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    color: var(--ds-gray);
+  }
+
+  .prospect-nav__theme-btn--active {
+    color: var(--ds-green-dark);
+    background: var(--ds-green-mist);
+    border-radius: 999px;
+  }
+
+  .prospect-nav__user {
+    position: absolute;
+    top: 80px;
     left: 16px;
     right: 16px;
     display: flex;
@@ -876,10 +916,7 @@ body.lead-modal-open .ds-dialog {
   }
 
   .prospect-nav__footer {
-    display: flex;
-    margin-top: auto;
-    padding: 20px 0;
-    border-top: 1px solid var(--ds-line);
+    display: none;
   }
 
   .prospect-nav__btn svg {
