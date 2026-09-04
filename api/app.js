@@ -229,6 +229,18 @@ app.delete('/api/leads/group/:groupId', async (req, res) => {
   }
 })
 
+app.delete('/api/leads/:placeId', async (req, res) => {
+  try {
+    await connectToDatabase()
+    const lead = await Lead.findOneAndDelete({ placeId: req.params.placeId })
+    if (!lead) return res.status(404).json({ error: 'Lead não encontrado' })
+    res.status(204).end()
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Erro ao excluir lead' })
+  }
+})
+
 app.use((_req, res) => {
   res.status(404).json({ error: 'Not found' })
 })
