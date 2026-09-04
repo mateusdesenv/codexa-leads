@@ -29,6 +29,10 @@ const leadSchema = new mongoose.Schema(
       lostReason: { type: String, default: null },
       proposalValue: { type: String, default: null },
       proposalReturnDate: { type: String, default: null },
+      collectedData: { type: String, default: null },
+      interest: { type: String, default: null },
+      budget: { type: String, default: null },
+      returnDate: { type: String, default: null },
     },
   },
   {

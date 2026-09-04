@@ -9,6 +9,7 @@ import {
   Icon,
   Input,
   SearchInput,
+  Switch,
   Tag,
   Textarea,
 } from 'codexa-ui'
@@ -37,6 +38,7 @@ export default function Help() {
   const [question, setQuestion] = useState('')
   const [answer, setAnswer] = useState('')
   const [tagInput, setTagInput] = useState('')
+  const [isFavorite, setIsFavorite] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
 
@@ -61,12 +63,14 @@ export default function Help() {
 
   const filtered = useMemo(() => {
     const term = search.toLowerCase()
-    if (!term) return items
-    return items.filter((i) =>
-      [i.question, i.answer, ...(i.tags || [])]
-        .filter(Boolean)
-        .some((v) => v!.toLowerCase().includes(term)),
-    )
+    const list = term
+      ? items.filter((i) =>
+          [i.question, i.answer, ...(i.tags || [])]
+            .filter(Boolean)
+            .some((v) => v!.toLowerCase().includes(term)),
+        )
+      : [...items]
+    return list.sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite))
   }, [items, search])
 
   function openCreate() {
@@ -74,6 +78,7 @@ export default function Help() {
     setQuestion('')
     setAnswer('')
     setTagInput('')
+    setIsFavorite(false)
     setFormError(null)
     setIsFormOpen(true)
   }
@@ -83,6 +88,7 @@ export default function Help() {
     setQuestion(item.question)
     setAnswer(item.answer)
     setTagInput(formatTags(item.tags))
+    setIsFavorite(item.isFavorite ?? false)
     setFormError(null)
     setIsFormOpen(true)
   }
@@ -96,6 +102,7 @@ export default function Help() {
       question: question.trim(),
       answer: answer.trim(),
       tags: parseTags(tagInput),
+      isFavorite,
     }
     try {
       const res = await fetch(editing ? `${API}/${editing.id}` : API, {
@@ -120,6 +127,16 @@ export default function Help() {
       setError(err instanceof Error ? err.message : 'Erro ao remover')
     } finally {
       setDeleteId(null)
+    }
+  }
+
+  async function handleToggleFavorite(item: QnA) {
+    try {
+      const res = await fetch(`${API}/${item.id}/favorite`, { method: 'PATCH' })
+      if (!res.ok) throw new Error('Erro ao favoritar')
+      await fetchItems()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao favoritar')
     }
   }
 
@@ -178,6 +195,22 @@ export default function Help() {
               <div className="qna-card__header">
                 <h3 className="qna-card__question">{item.question}</h3>
                 <div className="qna-card__actions">
+                  <Button
+                    variant="ghost"
+                    size="small"
+                    onClick={() => handleToggleFavorite(item)}
+                    leadingIcon={
+                      <Icon
+                        name="star"
+                        size={14}
+                        style={{
+                          fill: item.isFavorite ? 'currentColor' : 'transparent',
+                        }}
+                      />
+                    }
+                  >
+                    {item.isFavorite ? 'Favoritada' : 'Favoritar'}
+                  </Button>
                   <Button
                     variant="ghost"
                     size="small"
@@ -244,6 +277,14 @@ export default function Help() {
             }
             leadingIcon={<Icon name="filter" size={16} />}
             helperText="Ex: preço, integração, suporte"
+          />
+          <Switch
+            id="qna-favorite"
+            label="Favoritar e exibir no início"
+            checked={isFavorite}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setIsFavorite(e.target.checked)
+            }
           />
           {formError && (
             <Alert tone="danger" title="Erro no formulário">

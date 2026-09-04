@@ -582,9 +582,12 @@
 
 .modal__form {
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 24px;
   align-items: start;
+}
+
+.modal__form > .ds-tabs {
+  width: 100%;
 }
 
 .modal__form .prospect-field input,
@@ -1039,6 +1042,8 @@ body.lead-modal-open .ds-dialog {
 
 .qna-card__actions {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 6px;
   flex-shrink: 0;
 }
@@ -1127,6 +1132,14 @@ body.lead-modal-open .ds-dialog {
 
 .leads-table {
   margin-top: 8px;
+}
+
+.leads-table__tabs {
+  margin-bottom: 16px;
+}
+
+.leads-table__tabs .ds-tabs {
+  flex-wrap: wrap;
 }
 
 .leads-table .ds-table-wrap {
@@ -1259,4 +1272,48 @@ body.lead-modal-open .ds-dialog {
   .modal__actions {
     grid-column: auto;
   }
+}
+
+.packages-page {
+  display: grid;
+  gap: 24px;
+}
+
+.packages-page__header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 650;
+  color: var(--ds-graphite);
+}
+
+.packages-page__header p {
+  margin: 4px 0 0;
+  color: var(--ds-gray);
+  font-size: 0.9rem;
+}
+
+.packages-page .ds-table-wrap {
+  background: var(--ds-white);
+}
+
+.packages__name {
+  font-weight: 650;
+  color: var(--ds-graphite);
+}
+
+.packages__includes {
+  color: var(--ds-charcoal);
+  line-height: 1.5;
+}
+
+.packages__value {
+  font-weight: 650;
+  color: var(--ds-graphite);
+  white-space: nowrap;
+}
+
+.packages-page__empty {
+  color: var(--ds-gray);
+  text-align: center;
+  padding: 24px;
 }
