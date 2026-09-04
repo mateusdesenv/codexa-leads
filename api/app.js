@@ -111,6 +111,31 @@ app.post('/api/leads/seed', async (_req, res) => {
   }
 })
 
+app.put('/api/leads/batch', async (req, res) => {
+  try {
+    await connectToDatabase()
+    const items = Array.isArray(req.body) ? req.body : []
+    if (!items.length) return res.json({ updated: 0 })
+
+    const bulkOps = items
+      .filter((item) => item && typeof item.placeId === 'string' && item.kanbanState)
+      .map((item) => ({
+        updateOne: {
+          filter: { placeId: item.placeId },
+          update: { $set: { kanbanState: item.kanbanState } },
+        },
+      }))
+
+    if (!bulkOps.length) return res.json({ updated: 0 })
+
+    const result = await Lead.bulkWrite(bulkOps)
+    res.json({ updated: result.modifiedCount })
+  } catch (err) {
+    console.error(err)
+    res.status(400).json({ error: err instanceof Error ? err.message : 'Erro ao atualizar leads' })
+  }
+})
+
 app.put('/api/leads/:placeId', async (req, res) => {
   try {
     await connectToDatabase()
