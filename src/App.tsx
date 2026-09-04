@@ -824,8 +824,8 @@ function App() {
         <nav className="prospect-nav" aria-label="Navegação principal">
           <Button
             type="button"
+            className="prospect-nav__btn"
             variant={currentView === 'home' ? 'primary' : 'ghost'}
-            fullWidth
             onClick={() => { setSelectedGroup(null); setCurrentView('home') }}
             leadingIcon={<Icon name="home" size={18} />}
           >
@@ -833,8 +833,8 @@ function App() {
           </Button>
           <Button
             type="button"
+            className="prospect-nav__btn"
             variant={currentView === 'table' ? 'primary' : 'ghost'}
-            fullWidth
             onClick={() => { setSelectedGroup(null); setCurrentView('table') }}
             leadingIcon={<Icon name="menu" size={18} />}
           >
@@ -842,8 +842,8 @@ function App() {
           </Button>
           <Button
             type="button"
+            className="prospect-nav__btn"
             variant={currentView === 'help' ? 'primary' : 'ghost'}
-            fullWidth
             onClick={() => { setSelectedGroup(null); setCurrentView('help') }}
             leadingIcon={<Icon name="help" size={18} />}
           >
