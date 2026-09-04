@@ -15,7 +15,6 @@ import { CSS } from '@dnd-kit/utilities'
 import { onAuthStateChanged, signOut, type User } from 'firebase/auth'
 import { auth } from './firebase'
 import Login from './Login'
-import ImportExport from './ImportExport'
 import Help from './Help'
 import LeadGroupsTable, { type LeadGroup } from './LeadGroupsTable'
 import LeadsTable from './LeadsTable'
@@ -632,7 +631,7 @@ function App() {
   const [selectedLead, setSelectedLead] = useState<LeadWithMeta | null>(null)
   const [activeDrag, setActiveDrag] = useState<LeadWithMeta | null>(null)
   const [user, setUser] = useState<User | null | undefined>(undefined)
-  const [currentView, setCurrentView] = useState<'home' | 'table' | 'import' | 'help'>('home')
+  const [currentView, setCurrentView] = useState<'home' | 'table' | 'help'>('home')
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     const saved = localStorage.getItem('codexa-theme')
@@ -771,36 +770,6 @@ function App() {
     })
   }
 
-  const handleImport = async (title: string, leads: Lead[]) => {
-    try {
-      const res = await fetch('/api/leads/import', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, leads }),
-      })
-      if (!res.ok) throw new Error('Erro ao importar leads')
-
-      const fresh = await fetchLeads()
-      setBaseLeads(fresh)
-    } catch (err) {
-      console.error(err)
-      setError(err instanceof Error ? err.message : 'Erro ao importar leads')
-    }
-  }
-
-  const handleExport = () => {
-    const data = JSON.stringify(leadsWithMeta, null, 2)
-    const blob = new Blob([data], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `codexa-leads-${new Date().toISOString().slice(0, 10)}.json`
-    document.body.appendChild(a)
-    a.click()
-    a.remove()
-    URL.revokeObjectURL(url)
-  }
-
   const handleCardClick = (lead: LeadWithMeta) => {
     if (didDrag.current) return
     setSelectedLead(lead)
@@ -873,15 +842,6 @@ function App() {
           </Button>
           <Button
             type="button"
-            variant={currentView === 'import' ? 'primary' : 'ghost'}
-            fullWidth
-            onClick={() => { setSelectedGroup(null); setCurrentView('import') }}
-            leadingIcon={<Icon name="upload" size={18} />}
-          >
-            Importar / Exportar
-          </Button>
-          <Button
-            type="button"
             variant={currentView === 'help' ? 'primary' : 'ghost'}
             fullWidth
             onClick={() => { setSelectedGroup(null); setCurrentView('help') }}
@@ -900,18 +860,14 @@ function App() {
                 ? 'Home'
                 : currentView === 'table'
                   ? 'Tabela'
-                  : currentView === 'import'
-                    ? 'Importar / Exportar'
-                    : 'Help'}
+                  : 'Help'}
             </h2>
             <p>
               {currentView === 'home'
                 ? 'Kanban de prospecção comercial'
                 : currentView === 'table'
                   ? 'Lista completa de leads'
-                  : currentView === 'import'
-                    ? 'Importe ou exporte seus leads'
-                    : 'Base de conhecimento para prospecções'}
+                  : 'Base de conhecimento para prospecções'}
             </p>
           </div>
 
@@ -988,16 +944,7 @@ function App() {
                   <EmptyState
                     icon="search"
                     title="Nenhum lead encontrado"
-                    description="Tente ajustar os filtros ou importar novos leads."
-                    action={
-                      <Button
-                        variant="primary"
-                        onClick={() => setCurrentView('import')}
-                        leadingIcon={<Icon name="upload" size={16} />}
-                      >
-                        Importar leads
-                      </Button>
-                    }
+                    description="Tente ajustar os filtros."
                   />
                 </div>
               ) : (
@@ -1071,16 +1018,7 @@ function App() {
                     <EmptyState
                       icon="search"
                       title="Nenhum lead encontrado"
-                      description="Tente ajustar os filtros ou importar novos leads."
-                      action={
-                        <Button
-                          variant="primary"
-                          onClick={() => setCurrentView('import')}
-                          leadingIcon={<Icon name="upload" size={16} />}
-                        >
-                          Importar leads
-                        </Button>
-                      }
+                      description="Tente ajustar os filtros."
                     />
                   </div>
                 ) : (
@@ -1117,10 +1055,8 @@ function App() {
                 />
               )}
             </>
-          ) : currentView === 'help' ? (
-            <Help />
           ) : (
-            <ImportExport leads={leadsWithMeta} onImport={handleImport} onExport={handleExport} />
+            <Help />
           )}
         </div>
       </main>
