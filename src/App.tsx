@@ -736,6 +736,7 @@ function App() {
   const [currentView, setCurrentView] = useState<'home' | 'table' | 'packages' | 'help'>('home')
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
   const [navOpen, setNavOpen] = useState(false)
+  const [filtersOpen, setFiltersOpen] = useState(false)
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     const saved = localStorage.getItem('codexa-theme')
     if (saved === 'dark' || saved === 'light') return saved
@@ -1033,6 +1034,36 @@ function App() {
         </div>
 
         <nav className={`prospect-nav ${navOpen ? 'prospect-nav--open' : ''}`} aria-label="Navegação principal">
+          <div className="prospect-nav__user">
+            <Avatar
+              name={user.displayName ?? user.email ?? 'Usuário'}
+              src={user.photoURL || undefined}
+              size="medium"
+            />
+            <div className="prospect-nav__user-info">
+              <span className="prospect-nav__user-name">{user.displayName ?? user.email ?? 'Usuário'}</span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="small"
+                onClick={() => signOut(auth)}
+                leadingIcon={<Icon name="logout" size={14} />}
+              >
+                Sair
+              </Button>
+            </div>
+            <Button
+              type="button"
+              className="prospect-nav__close"
+              variant="ghost"
+              size="small"
+              iconOnly
+              leadingIcon={<Icon name="x" size={20} />}
+              onClick={() => setNavOpen(false)}
+              aria-label="Fechar menu"
+            />
+          </div>
+
           <Button
             type="button"
             className="prospect-nav__btn"
@@ -1069,6 +1100,17 @@ function App() {
           >
             Help
           </Button>
+
+          <div className="prospect-nav__footer">
+            <Switch
+              id="theme-toggle-mobile"
+              label="Modo escuro"
+              checked={theme === 'dark'}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setTheme(e.target.checked ? 'dark' : 'light')
+              }
+            />
+          </div>
         </nav>
       </aside>
 
@@ -1133,44 +1175,106 @@ function App() {
 
         <div className="prospect-content">
           {(currentView === 'home' || (currentView === 'table' && selectedGroup)) && (
-            <div className="prospect-toolbar">
-              <div className="prospect-toolbar__field prospect-toolbar__field--search">
-                <SearchInput
-                  label="Buscar"
-                  id="search"
-                  placeholder="Nome, endereço, telefone..."
-                  value={search}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
-                  onClear={() => setSearch('')}
-                />
-              </div>
-              <div className="prospect-toolbar__field prospect-toolbar__field--category">
-                <Select
-                  label="Categoria"
-                  id="category"
-                  value={categoryFilter}
-                  onChange={(value: string) => setCategoryFilter(value)}
-                  options={[
-                    { value: '', label: 'Todas' },
-                    ...categories.map((cat) => ({ value: cat, label: cat })),
-                  ]}
-                />
-              </div>
-              {currentView === 'home' && (
-                <div className="prospect-toolbar__field prospect-toolbar__field--group">
-                  <Select
-                    label="Grupo"
-                    id="kanban-group"
-                    value={kanbanGroupFilter}
-                    onChange={(value: string) => setKanbanGroupFilter(value)}
-                    options={[
-                      { value: '', label: 'Todos os grupos' },
-                      ...groups.map((g) => ({ value: g.groupId, label: `${g.groupTitle} (${g.count})` })),
-                    ]}
-                  />
+            <>
+              <div className="prospect-toolbar">
+                <div className="prospect-toolbar__fields">
+                  <div className="prospect-toolbar__field prospect-toolbar__field--search">
+                    <SearchInput
+                      label="Buscar"
+                      id="search"
+                      placeholder="Nome, endereço, telefone..."
+                      value={search}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
+                      onClear={() => setSearch('')}
+                    />
+                  </div>
+                  <div className="prospect-toolbar__field prospect-toolbar__field--category">
+                    <Select
+                      label="Categoria"
+                      id="category"
+                      value={categoryFilter}
+                      onChange={(value: string) => setCategoryFilter(value)}
+                      options={[
+                        { value: '', label: 'Todas' },
+                        ...categories.map((cat) => ({ value: cat, label: cat })),
+                      ]}
+                    />
+                  </div>
+                  {currentView === 'home' && (
+                    <div className="prospect-toolbar__field prospect-toolbar__field--group">
+                      <Select
+                        label="Grupo"
+                        id="kanban-group"
+                        value={kanbanGroupFilter}
+                        onChange={(value: string) => setKanbanGroupFilter(value)}
+                        options={[
+                          { value: '', label: 'Todos os grupos' },
+                          ...groups.map((g) => ({ value: g.groupId, label: `${g.groupTitle} (${g.count})` })),
+                        ]}
+                      />
+                    </div>
+                  )}
                 </div>
+                <Button
+                  type="button"
+                  className="prospect-toolbar__filter-toggle"
+                  variant="secondary"
+                  size="small"
+                  onClick={() => setFiltersOpen(true)}
+                  leadingIcon={<Icon name="filter" size={18} />}
+                >
+                  Filtros
+                </Button>
+              </div>
+
+              {filtersOpen && (
+                <Dialog open onClose={() => setFiltersOpen(false)} title="Filtros">
+                  <div className="prospect-filters">
+                    <div className="prospect-filters__field">
+                      <SearchInput
+                        label="Buscar"
+                        id="search-mobile"
+                        placeholder="Nome, endereço, telefone..."
+                        value={search}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
+                        onClear={() => setSearch('')}
+                      />
+                    </div>
+                    <div className="prospect-filters__field">
+                      <Select
+                        label="Categoria"
+                        id="category-mobile"
+                        value={categoryFilter}
+                        onChange={(value: string) => setCategoryFilter(value)}
+                        options={[
+                          { value: '', label: 'Todas' },
+                          ...categories.map((cat) => ({ value: cat, label: cat })),
+                        ]}
+                      />
+                    </div>
+                    {currentView === 'home' && (
+                      <div className="prospect-filters__field">
+                        <Select
+                          label="Grupo"
+                          id="kanban-group-mobile"
+                          value={kanbanGroupFilter}
+                          onChange={(value: string) => setKanbanGroupFilter(value)}
+                          options={[
+                            { value: '', label: 'Todos os grupos' },
+                            ...groups.map((g) => ({ value: g.groupId, label: `${g.groupTitle} (${g.count})` })),
+                          ]}
+                        />
+                      </div>
+                    )}
+                    <div className="prospect-filters__actions">
+                      <Button type="button" variant="secondary" onClick={() => setFiltersOpen(false)}>
+                        Fechar
+                      </Button>
+                    </div>
+                  </div>
+                </Dialog>
               )}
-            </div>
+            </>
           )}
 
           {currentView === 'home' ? (
