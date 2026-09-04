@@ -29,10 +29,37 @@
 }
 
 .prospect-sidebar__logo {
-  max-width: 180px;
-  max-height: 56px;
-  width: auto;
-  height: auto;
+  display: none;
+}
+
+.prospect-sidebar__user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.prospect-sidebar__user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.prospect-sidebar__user-name {
+  font-size: 0.9rem;
+  font-weight: 650;
+  color: var(--ds-graphite);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.prospect-sidebar__user .ds-button {
+  width: max-content;
+  padding: 0;
+  font-size: 0.8rem;
 }
 
 .prospect-main {
@@ -80,6 +107,13 @@
 }
 
 .prospect-header__page {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.prospect-header__page > div {
   display: grid;
   gap: 4px;
   min-width: 0;
@@ -706,8 +740,13 @@ body.lead-modal-open .ds-dialog {
   }
 
   .prospect-sidebar__logo {
+    display: block;
     max-height: 40px;
     max-width: 120px;
+  }
+
+  .prospect-sidebar__user {
+    display: none;
   }
 
   .prospect-sidebar__menu {
@@ -888,12 +927,9 @@ body.lead-modal-open .ds-dialog {
   }
 }
 
-.prospect-header__user {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 0.9rem;
-  color: var(--ds-charcoal);
+.prospect-header__logo {
+  max-height: 40px;
+  width: auto;
 }
 
 .theme-toggle {
@@ -1041,9 +1077,15 @@ body.lead-modal-open .ds-dialog {
 }
 
 .prospect-nav__user,
-.prospect-nav__close,
-.prospect-nav__footer {
+.prospect-nav__close {
   display: none;
+}
+
+.prospect-nav__footer {
+  display: flex;
+  margin-top: auto;
+  padding-top: 24px;
+  border-top: 1px solid var(--ds-line);
 }
 
 .prospect-nav__btn {
@@ -1171,8 +1213,8 @@ body.lead-modal-open .ds-dialog {
     justify-content: center;
   }
 
-  .prospect-header__user {
-    justify-content: flex-end;
+  .prospect-header__logo {
+    max-height: 32px;
   }
 }
 
