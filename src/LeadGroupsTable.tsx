@@ -23,6 +23,7 @@ export default function LeadGroupsTable({
 }) {
   const [search, setSearch] = useState('')
   const [menuOpenFor, setMenuOpenFor] = useState<string | null>(null)
+  const [menuPosition, setMenuPosition] = useState<{ top: number; right: number } | null>(null)
   const [editingGroup, setEditingGroup] = useState<LeadGroup | null>(null)
   const [editTitle, setEditTitle] = useState('')
   const [deletingGroup, setDeletingGroup] = useState<LeadGroup | null>(null)
@@ -55,7 +56,10 @@ export default function LeadGroupsTable({
     return groups.filter((g) => g.groupTitle?.toLowerCase().includes(term))
   }, [groups, search])
 
-  const closeMenu = () => setMenuOpenFor(null)
+  const closeMenu = () => {
+    setMenuOpenFor(null)
+    setMenuPosition(null)
+  }
 
   useEffect(() => {
     if (!menuOpenFor) return
@@ -133,11 +137,20 @@ export default function LeadGroupsTable({
                   size="small"
                   iconOnly
                   aria-label="Mais ações"
-                  onClick={() => setMenuOpenFor((current) => (current === groupKey ? null : groupKey))}
+                  onClick={(event) => {
+                    const rect = (event.currentTarget as HTMLButtonElement).getBoundingClientRect()
+                    setMenuPosition({ top: rect.bottom + 4, right: window.innerWidth - rect.right })
+                    setMenuOpenFor((current) => (current === groupKey ? null : groupKey))
+                  }}
                   leadingIcon={<Icon name="more-horizontal" size={16} />}
                 />
-                {menuOpenFor === groupKey && (
-                  <div className="leads-table__actions-menu" role="menu" aria-label="Ações do grupo">
+                {menuOpenFor === groupKey && menuPosition && (
+                  <div
+                    className="leads-table__actions-menu"
+                    role="menu"
+                    aria-label="Ações do grupo"
+                    style={{ top: menuPosition.top, right: menuPosition.right }}
+                  >
                     <button
                       type="button"
                       className="leads-table__actions-item"
