@@ -45,6 +45,7 @@ export interface KanbanState {
   interest?: 'alto' | 'medio' | 'baixo' | ''
   budget?: string
   returnDate?: string
+  order?: number
 }
 
 export interface LeadWithMeta extends Lead {

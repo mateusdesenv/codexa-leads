@@ -5,13 +5,18 @@ import {
   PointerSensor,
   TouchSensor,
   useDroppable,
-  useDraggable,
   useSensor,
   useSensors,
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
+import {
+  SortableContext,
+  arrayMove,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
 import { onAuthStateChanged, signOut, type User } from 'firebase/auth'
 import { auth } from './firebase'
 import Login from './Login'
@@ -105,6 +110,15 @@ const updateLeadState = async (placeId: string, kanbanState: KanbanState): Promi
   })
   if (!res.ok) throw new Error('Erro ao atualizar lead')
   return res.json()
+}
+
+const updateLeadsBatch = async (leads: { placeId: string; kanbanState: KanbanState }[]): Promise<void> => {
+  const res = await fetch('/api/leads/batch', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(leads),
+  })
+  if (!res.ok) throw new Error('Erro ao atualizar leads')
 }
 
 const migrateLocalStates = async (leads: Lead[]) => {
@@ -296,9 +310,11 @@ function Actions({ lead }: { lead: Lead }) {
 
 function LeadCard({
   lead,
+  index,
   onClick,
 }: {
   lead: LeadWithMeta
+  index: number
   onClick: (lead: LeadWithMeta) => void
 }) {
   const {
@@ -306,11 +322,13 @@ function LeadCard({
     listeners,
     setNodeRef,
     transform,
+    transition,
     isDragging,
-  } = useDraggable({ id: lead.placeId, data: { lead } })
+  } = useSortable({ id: lead.placeId, data: { lead } })
 
   const style = {
     transform: CSS.Translate.toString(transform),
+    transition,
     opacity: isDragging ? 0.4 : 1,
   }
 
@@ -334,9 +352,12 @@ function LeadCard({
             </Tag>
           )}
         </div>
-        <Badge tone={getTemperatureTone(lead.temperature)} size="small">
-          {getTemperatureEmoji(lead.temperature)} {lead.score}
-        </Badge>
+        <div className="kanban-card__badges">
+          <span className="kanban-card__position">#{index + 1}</span>
+          <Badge tone={getTemperatureTone(lead.temperature)} size="small">
+            {getTemperatureEmoji(lead.temperature)} {lead.score}
+          </Badge>
+        </div>
       </div>
 
       <div className="kanban-card__body">
@@ -412,11 +433,16 @@ function KanbanColumn({
           {leads.length}
         </span>
       </header>
-      <div className="kanban-column__cards">
-        {leads.map((lead) => (
-          <LeadCard key={lead.placeId} lead={lead} onClick={onCardClick} />
-        ))}
-      </div>
+      <SortableContext
+        items={leads.map((lead) => lead.placeId)}
+        strategy={verticalListSortingStrategy}
+      >
+        <div className="kanban-column__cards">
+          {leads.map((lead, index) => (
+            <LeadCard key={lead.placeId} lead={lead} index={index} onClick={onCardClick} />
+          ))}
+        </div>
+      </SortableContext>
     </div>
   )
 }
@@ -782,7 +808,13 @@ function App() {
       map[lead.kanbanState.column].push(lead)
     })
     COLUMNS.forEach((c) => {
-      map[c.id].sort((a, b) => b.score - a.score)
+      if (c.id === 'open') {
+        map[c.id].sort((a, b) => b.score - a.score)
+      } else {
+        map[c.id].sort(
+          (a, b) => (a.kanbanState.order ?? Infinity) - (b.kanbanState.order ?? Infinity),
+        )
+      }
     })
     return map
   }, [filteredLeads])
@@ -819,19 +851,91 @@ function App() {
 
     const { active, over } = event
     if (!over) return
-    const newColumn = over.id as ColumnId
-    const placeId = active.id as string
-    if (!COLUMNS.some((c) => c.id === newColumn)) return
-    const lead = baseLeads.find((l) => l.placeId === placeId)
-    if (!lead) return
-    const newState = { ...(lead.kanbanState ?? { column: 'open' as ColumnId }), column: newColumn }
-    setBaseLeads((prev) =>
-      prev.map((l) => (l.placeId === placeId ? { ...l, kanbanState: newState } : l)),
+
+    const activeId = active.id as string
+    const overId = over.id as string
+    const activeIndex = baseLeads.findIndex((l) => l.placeId === activeId)
+    if (activeIndex === -1) return
+
+    const activeLead = baseLeads[activeIndex]
+    const activeColumn = activeLead.kanbanState?.column ?? 'open'
+
+    // Build current column map respecting the same ordering used in leadsByColumn
+    const byColumn = COLUMNS.reduce(
+      (acc, c) => ({ ...acc, [c.id]: [] as Lead[] }),
+      {} as Record<ColumnId, Lead[]>,
     )
-    updateLeadState(placeId, newState).catch((err) => {
-      console.error(err)
-      setError('Erro ao salvar mudança de coluna')
+    baseLeads.forEach((lead) => {
+      byColumn[lead.kanbanState?.column ?? 'open'].push(lead)
     })
+    COLUMNS.forEach((c) => {
+      if (c.id === 'open') {
+        byColumn[c.id].sort((a, b) => scoreLead(b) - scoreLead(a))
+      } else {
+        byColumn[c.id].sort(
+          (a, b) => (a.kanbanState?.order ?? Infinity) - (b.kanbanState?.order ?? Infinity),
+        )
+      }
+    })
+
+    const overIsColumn = COLUMNS.some((c) => c.id === overId)
+    let targetColumn: ColumnId
+    let targetIndex: number
+
+    if (overIsColumn) {
+      targetColumn = overId as ColumnId
+      targetIndex = byColumn[targetColumn].length
+    } else {
+      const overLead = baseLeads.find((l) => l.placeId === overId)
+      if (!overLead) return
+      targetColumn = overLead.kanbanState?.column ?? 'open'
+      targetIndex = byColumn[targetColumn].findIndex((l) => l.placeId === overId)
+      if (targetIndex === -1) return
+    }
+
+    const activeInColumnIndex = byColumn[activeColumn].findIndex((l) => l.placeId === activeId)
+    if (activeInColumnIndex === -1) return
+
+    if (activeColumn === targetColumn) {
+      byColumn[targetColumn] = arrayMove(
+        byColumn[targetColumn],
+        activeInColumnIndex,
+        targetIndex,
+      )
+    } else {
+      const [moved] = byColumn[activeColumn].splice(activeInColumnIndex, 1)
+      byColumn[targetColumn].splice(targetIndex, 0, moved)
+    }
+
+    // Rebuild leads with updated column and order, persisting order only for non-open columns
+    const nextLeads: Lead[] = []
+    const leadsToUpdate: { placeId: string; kanbanState: KanbanState }[] = []
+
+    COLUMNS.forEach((c) => {
+      byColumn[c.id].forEach((lead, index) => {
+        const nextKanbanState: KanbanState = {
+          ...(lead.kanbanState ?? {}),
+          column: c.id,
+          order: c.id === 'open' ? undefined : index,
+        }
+        nextLeads.push({ ...lead, kanbanState: nextKanbanState })
+        if (
+          lead.kanbanState?.column !== c.id ||
+          lead.kanbanState?.order !== nextKanbanState.order
+        ) {
+          leadsToUpdate.push({ placeId: lead.placeId, kanbanState: nextKanbanState })
+        }
+      })
+    })
+
+    setBaseLeads(nextLeads)
+
+    if (leadsToUpdate.length) {
+      updateLeadsBatch(leadsToUpdate).catch((err) => {
+        console.error(err)
+        setError('Erro ao salvar ordem dos leads')
+      })
+    }
   }
 
   const handleSaveLead = (placeId: string, state: KanbanState) => {

@@ -33,6 +33,7 @@ const leadSchema = new mongoose.Schema(
       interest: { type: String, default: null },
       budget: { type: String, default: null },
       returnDate: { type: String, default: null },
+      order: { type: Number, default: null },
     },
   },
   {
