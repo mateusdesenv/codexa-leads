@@ -1020,6 +1020,25 @@ function App() {
       <aside className="prospect-sidebar">
         <div className="prospect-sidebar__brand">
           <img src={theme === 'dark' ? codexaLogoDark : codexaLogo} alt="Codexa" className="prospect-sidebar__logo" />
+          <div className="prospect-sidebar__user">
+            <Avatar
+              name={user.displayName ?? user.email ?? 'Usuário'}
+              src={user.photoURL || undefined}
+              size="medium"
+            />
+            <div className="prospect-sidebar__user-info">
+              <span className="prospect-sidebar__user-name">{user.displayName ?? user.email ?? 'Usuário'}</span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="small"
+                onClick={() => signOut(auth)}
+                leadingIcon={<Icon name="logout" size={14} />}
+              >
+                Sair
+              </Button>
+            </div>
+          </div>
           <Button
             type="button"
             className="prospect-sidebar__menu"
@@ -1125,51 +1144,31 @@ function App() {
       <main className="prospect-main">
         <header className="prospect-header prospect-header--logged">
           <div className="prospect-header__page">
-            <h2>
-              {currentView === 'home'
-                ? 'Home'
-                : currentView === 'table'
-                  ? 'Leads'
-                  : currentView === 'packages'
-                    ? 'Pacotes'
-                    : 'Help'}
-            </h2>
-            <p>
-              {currentView === 'home'
-                ? 'Kanban de prospecção comercial'
-                : currentView === 'table'
-                  ? 'Lista completa de leads'
-                  : currentView === 'packages'
-                    ? 'Planos e valores para clínicas de estética'
-                    : 'Base de conhecimento para prospecções'}
-            </p>
-          </div>
-
-          <div className="prospect-header__user">
-            <Switch
-              id="theme-toggle"
-              label="Escuro"
-              className="theme-toggle"
-              checked={theme === 'dark'}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setTheme(e.target.checked ? 'dark' : 'light')
-              }
+            <img
+              src={theme === 'dark' ? codexaLogoDark : codexaLogo}
+              alt="Codexa"
+              className="prospect-header__logo"
             />
-            <Avatar
-              name={user.displayName ?? user.email ?? 'Usuário'}
-              src={user.photoURL || undefined}
-              size="medium"
-            />
-            <span className="user-name">{user.displayName ?? user.email ?? 'Usuário'}</span>
-            <Button
-              type="button"
-              variant="secondary"
-              size="small"
-              onClick={() => signOut(auth)}
-              leadingIcon={<Icon name="logout" size={16} />}
-            >
-              Sair
-            </Button>
+            <div>
+              <h2>
+                {currentView === 'home'
+                  ? 'Home'
+                  : currentView === 'table'
+                    ? 'Leads'
+                    : currentView === 'packages'
+                      ? 'Pacotes'
+                      : 'Help'}
+              </h2>
+              <p>
+                {currentView === 'home'
+                  ? 'Kanban de prospecção comercial'
+                  : currentView === 'table'
+                    ? 'Lista completa de leads'
+                    : currentView === 'packages'
+                      ? 'Planos e valores para clínicas de estética'
+                      : 'Base de conhecimento para prospecções'}
+              </p>
+            </div>
           </div>
         </header>
 
