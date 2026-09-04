@@ -836,9 +836,9 @@ function App() {
             className="prospect-nav__btn"
             variant={currentView === 'table' ? 'primary' : 'ghost'}
             onClick={() => { setSelectedGroup(null); setCurrentView('table') }}
-            leadingIcon={<Icon name="menu" size={18} />}
+            leadingIcon={<Icon name="users" size={18} />}
           >
-            Tabela
+            Leads
           </Button>
           <Button
             type="button"
@@ -859,7 +859,7 @@ function App() {
               {currentView === 'home'
                 ? 'Home'
                 : currentView === 'table'
-                  ? 'Tabela'
+                  ? 'Leads'
                   : 'Help'}
             </h2>
             <p>
