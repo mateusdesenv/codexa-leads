@@ -269,23 +269,39 @@ function getWhatsAppUrl(phone: string | null | undefined): string | null {
 }
 
 function Actions({ lead }: { lead: Lead }) {
+  const phoneForUrl = lead.phoneUnformatted ?? lead.phone
+  const phoneHref = phoneForUrl ? `tel:${phoneForUrl}` : null
+  const waUrl = phoneForUrl ? getWhatsAppUrl(phoneForUrl) : null
+  const hasWebsite = !!lead.website && isValidUrl(lead.website)
+
   return (
     <div className="lead-actions" onClick={(e) => e.stopPropagation()}>
-      {lead.phone && (
+      {phoneHref ? (
         <AnchorButton
           as="a"
-          href={`tel:${lead.phoneUnformatted ?? lead.phone}`}
+          href={phoneHref}
           variant="secondary"
           size="small"
           fullWidth
         >
           Ligar
         </AnchorButton>
+      ) : (
+        <Button
+          type="button"
+          variant="secondary"
+          size="small"
+          fullWidth
+          disabled
+        >
+          Ligar
+        </Button>
       )}
-      {lead.phone && (
+
+      {waUrl ? (
         <AnchorButton
           as="a"
-          href={getWhatsAppUrl(lead.phoneUnformatted ?? lead.phone)}
+          href={waUrl}
           target="_blank"
           rel="noopener noreferrer"
           variant="primary"
@@ -295,11 +311,23 @@ function Actions({ lead }: { lead: Lead }) {
         >
           WhatsApp
         </AnchorButton>
+      ) : (
+        <Button
+          type="button"
+          variant="primary"
+          size="small"
+          fullWidth
+          disabled
+          leadingIcon={<Icon name="message" size={14} />}
+        >
+          WhatsApp
+        </Button>
       )}
-      {lead.website && isValidUrl(lead.website) && (
+
+      {hasWebsite ? (
         <AnchorButton
           as="a"
-          href={lead.website}
+          href={lead.website!}
           target="_blank"
           rel="noopener noreferrer"
           variant="secondary"
@@ -309,7 +337,19 @@ function Actions({ lead }: { lead: Lead }) {
         >
           Site
         </AnchorButton>
+      ) : (
+        <Button
+          type="button"
+          variant="secondary"
+          size="small"
+          fullWidth
+          disabled
+          leadingIcon={<Icon name="external-link" size={14} />}
+        >
+          Site
+        </Button>
       )}
+
       <AnchorButton
         as="a"
         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lead.title ?? '')}&query_place_id=${lead.placeId}`}
