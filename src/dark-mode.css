@@ -31,7 +31,8 @@ html[data-theme="dark"] .kanban-card--dragging {
 }
 
 html[data-theme="dark"] .kanban-card__next-action,
-html[data-theme="dark"] .kanban-card__notes {
+html[data-theme="dark"] .kanban-card__notes,
+html[data-theme="dark"] .kanban-card__data {
   background: #1f232a;
 }
 

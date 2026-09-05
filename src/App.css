@@ -613,6 +613,37 @@
   overflow: hidden;
 }
 
+.kanban-card__data {
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+  background: #f4f6f7;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: var(--ds-graphite);
+}
+
+.kanban-card__data-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.kanban-card__data-row span {
+  color: var(--ds-gray);
+  font-weight: 650;
+  font-size: 0.68rem;
+}
+
+.kanban-card__data-row strong,
+.kanban-card__data-row time {
+  color: var(--ds-graphite);
+  font-weight: 600;
+  text-align: right;
+}
+
 .kanban-card__footer {
   display: flex;
   flex-direction: column;
