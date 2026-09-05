@@ -588,6 +588,12 @@
   gap: 8px;
 }
 
+.lead-actions .ds-button:disabled,
+.lead-actions .ds-button[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .lead-actions > a:nth-last-child(1):nth-child(odd) {
   grid-column: 1 / -1;
 }
