@@ -608,12 +608,12 @@ function LeadModal({
   )
   const [contactName, setContactName] = useState('')
   const [clinicName, setClinicName] = useState(lead.title)
-  const [activeTab, setActiveTab] = useState<'cliente' | 'contato' | 'dados'>('cliente')
+  const [activeTab, setActiveTab] = useState<'cliente' | 'contato' | 'dados'>('dados')
 
   const tabItems: TabItem[] = [
+    { id: 'dados', label: 'Dados' },
     { id: 'cliente', label: 'Cliente' },
     { id: 'contato', label: 'Contato' },
-    { id: 'dados', label: 'Dados' },
   ]
 
   const interestOptions = [
