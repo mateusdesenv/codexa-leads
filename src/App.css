@@ -576,6 +576,12 @@
   color: #a61f2b;
 }
 
+.kanban-card__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .kanban-card__footer .lead-actions {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

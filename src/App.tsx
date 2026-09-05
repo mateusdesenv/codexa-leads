@@ -407,6 +407,18 @@ function LeadCard({
 
       <div className="kanban-card__footer">
         <Actions lead={lead} />
+        <Button
+          type="button"
+          variant="secondary"
+          size="small"
+          fullWidth
+          onClick={(e: React.MouseEvent) => {
+            e.stopPropagation()
+            onClick(lead)
+          }}
+        >
+          Ver detalhes
+        </Button>
       </div>
     </article>
   )
