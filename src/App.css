@@ -540,17 +540,6 @@
   background: #eaf3fc;
 }
 
-.kanban-card__phone {
-  font-size: 0.8rem;
-  color: var(--ds-green-dark);
-  text-decoration: none;
-  font-weight: 650;
-}
-
-.kanban-card__phone:hover {
-  text-decoration: underline;
-}
-
 .kanban-card__next-action {
   display: grid;
   gap: 2px;
