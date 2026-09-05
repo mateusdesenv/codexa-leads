@@ -683,73 +683,6 @@ function LeadModal({
             <h3 className="modal__column-title">Cliente</h3>
 
             <LeadClientInfo lead={lead} />
-
-            <Select
-              label="Etapa do funil"
-              id="status"
-              value={state.column}
-              onChange={(value: string) => setState({ ...state, column: value as ColumnId })}
-              options={statusOptions}
-            />
-
-            <Input
-              label="Próxima ação"
-              id="nextAction"
-              type="text"
-              placeholder="Ex: Enviar mensagem de apresentação"
-              value={state.nextAction ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setState({ ...state, nextAction: e.target.value })
-              }
-              leadingIcon={<Icon name="edit" size={16} />}
-            />
-
-            <Input
-              label="Data de follow-up"
-              id="dueDate"
-              type="date"
-              value={state.dueDate ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setState({ ...state, dueDate: e.target.value })
-              }
-              leadingIcon={<Icon name="calendar" size={16} />}
-            />
-
-            {state.column === 'proposta' && (
-              <>
-                <Input
-                  label="Valor da proposta"
-                  id="proposalValue"
-                  type="text"
-                  placeholder="R$ 0,00"
-                  value={state.proposalValue ?? ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setState({ ...state, proposalValue: e.target.value })
-                  }
-                  leadingIcon={<Icon name="plus" size={16} />}
-                />
-                <Input
-                  label="Data prevista de retorno"
-                  id="proposalReturnDate"
-                  type="date"
-                  value={state.proposalReturnDate ?? ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setState({ ...state, proposalReturnDate: e.target.value })
-                  }
-                  leadingIcon={<Icon name="calendar" size={16} />}
-                />
-              </>
-            )}
-
-            {state.column === 'perdido' && (
-              <Select
-                label="Motivo"
-                id="lostReason"
-                value={state.lostReason ?? ''}
-                onChange={(value: string) => setState({ ...state, lostReason: value })}
-                options={lostReasonOptions}
-              />
-            )}
           </div>
         )}
 
@@ -796,6 +729,62 @@ function LeadModal({
         {activeTab === 'dados' && (
           <div className="modal__column modal__column--dados">
             <h3 className="modal__column-title">Dados coletados</h3>
+
+            <Select
+              label="Etapa do funil"
+              id="status"
+              value={state.column}
+              onChange={(value: string) => setState({ ...state, column: value as ColumnId })}
+              options={statusOptions}
+            />
+
+            <Input
+              label="Próxima ação"
+              id="nextAction"
+              type="text"
+              placeholder="Ex: Enviar mensagem de apresentação"
+              value={state.nextAction ?? ''}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setState({ ...state, nextAction: e.target.value })
+              }
+              leadingIcon={<Icon name="edit" size={16} />}
+            />
+
+            {state.column === 'proposta' && (
+              <>
+                <Input
+                  label="Valor da proposta"
+                  id="proposalValue"
+                  type="text"
+                  placeholder="R$ 0,00"
+                  value={state.proposalValue ?? ''}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setState({ ...state, proposalValue: e.target.value })
+                  }
+                  leadingIcon={<Icon name="plus" size={16} />}
+                />
+                <Input
+                  label="Data prevista de retorno"
+                  id="proposalReturnDate"
+                  type="date"
+                  value={state.proposalReturnDate ?? ''}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setState({ ...state, proposalReturnDate: e.target.value })
+                  }
+                  leadingIcon={<Icon name="calendar" size={16} />}
+                />
+              </>
+            )}
+
+            {state.column === 'perdido' && (
+              <Select
+                label="Motivo"
+                id="lostReason"
+                value={state.lostReason ?? ''}
+                onChange={(value: string) => setState({ ...state, lostReason: value })}
+                options={lostReasonOptions}
+              />
+            )}
 
             <Select
               label="Interesse"
