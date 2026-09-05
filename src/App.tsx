@@ -415,11 +415,6 @@ function LeadCard({
 
       <div className="kanban-card__body">
         <div className="kanban-card__meta">
-          {lead.totalScore !== null && lead.totalScore !== undefined && (
-            <span className="kanban-card__rating">
-              <Icon name="star" size={12} /> {lead.totalScore.toFixed(1)} ({lead.reviewsCount ?? 0})
-            </span>
-          )}
           <Badge tone={getWebsiteTone(lead.websiteKind)} size="small">
             <Icon name={getWebsiteIcon(lead.websiteKind)} size={12} /> {getWebsiteLabel(lead.websiteKind)}
           </Badge>
@@ -449,6 +444,11 @@ function LeadCard({
       </div>
 
       <div className="kanban-card__footer">
+        {lead.totalScore !== null && lead.totalScore !== undefined && (
+          <span className="kanban-card__rating">
+            <Icon name="star" size={12} /> {lead.totalScore.toFixed(1)} ({lead.reviewsCount ?? 0})
+          </span>
+        )}
         <Actions lead={lead} />
         <Button
           type="button"
