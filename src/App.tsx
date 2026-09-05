@@ -414,12 +414,6 @@ function LeadCard({
       </div>
 
       <div className="kanban-card__body">
-        <div className="kanban-card__meta">
-          <Badge tone={getWebsiteTone(lead.websiteKind)} size="small">
-            <Icon name={getWebsiteIcon(lead.websiteKind)} size={12} /> {getWebsiteLabel(lead.websiteKind)}
-          </Badge>
-        </div>
-
         {lead.kanbanState.nextAction && (
           <div
             className={`kanban-card__next-action ${isOverdue(lead.kanbanState.dueDate) ? 'kanban-card__next-action--overdue' : ''}`}
@@ -444,11 +438,18 @@ function LeadCard({
       </div>
 
       <div className="kanban-card__footer">
-        {lead.totalScore !== null && lead.totalScore !== undefined && (
+        <div className="kanban-card__footer-top">
           <span className="kanban-card__rating">
-            <Icon name="star" size={12} /> {lead.totalScore.toFixed(1)} ({lead.reviewsCount ?? 0})
+            {lead.totalScore !== null && lead.totalScore !== undefined && (
+              <>
+                <Icon name="star" size={12} /> {lead.totalScore.toFixed(1)} ({lead.reviewsCount ?? 0})
+              </>
+            )}
           </span>
-        )}
+          <Badge tone={getWebsiteTone(lead.websiteKind)} size="small">
+            <Icon name={getWebsiteIcon(lead.websiteKind)} size={12} /> {getWebsiteLabel(lead.websiteKind)}
+          </Badge>
+        </div>
         <Actions lead={lead} />
         <Button
           type="button"

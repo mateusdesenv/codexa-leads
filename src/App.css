@@ -516,10 +516,16 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  align-self: flex-start;
   font-size: 0.78rem;
   color: var(--ds-charcoal);
   font-weight: 650;
+}
+
+.kanban-card__footer-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
 }
 
 .kanban-card__website {
