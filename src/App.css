@@ -2098,6 +2098,27 @@ body.lead-modal-open .ds-dialog {
   color: var(--ds-graphite);
 }
 
+.lead-client-info__section {
+  padding-top: 18px;
+  margin-top: 18px;
+  border-top: 1px solid var(--ds-line);
+}
+
+.lead-client-info__section:first-of-type {
+  padding-top: 0;
+  margin-top: 0;
+  border-top: none;
+}
+
+.lead-client-info__section-title {
+  margin: 0 0 12px;
+  font-size: 0.76rem;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ds-graphite);
+}
+
 .lead-client-info__grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
