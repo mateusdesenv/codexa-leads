@@ -23,6 +23,7 @@ import Login from './Login'
 import Help from './Help'
 import Dashboard from './Dashboard'
 import ImportLeadsModal from './ImportLeadsModal'
+import LeadClientInfo from './LeadClientInfo'
 import LeadGroupsTable, { type LeadGroup } from './LeadGroupsTable'
 import LeadsTable from './LeadsTable'
 import Packages from './Packages'
@@ -566,6 +567,8 @@ function LeadModal({
         {activeTab === 'cliente' && (
           <div className="modal__column">
             <h3 className="modal__column-title">Cliente</h3>
+
+            <LeadClientInfo lead={lead} />
 
             <Select
               label="Etapa do funil"
