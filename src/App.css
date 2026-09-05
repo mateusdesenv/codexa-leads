@@ -1579,6 +1579,9 @@ body.lead-modal-open .ds-dialog {
 .packages-page {
   display: grid;
   gap: 24px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .packages-page__header h2 {
@@ -1594,30 +1597,73 @@ body.lead-modal-open .ds-dialog {
   font-size: 0.9rem;
 }
 
-.packages-page .ds-table-wrap {
-  background: var(--ds-white);
+.packages__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  align-items: start;
 }
 
-.packages__name {
+.packages__card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.packages__card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(17, 19, 26, 0.1);
+}
+
+.packages__badge {
+  display: flex;
+  justify-content: center;
+}
+
+.packages__card-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto;
+  background: var(--ds-green-mist);
+  color: var(--ds-green);
+  border-radius: 50%;
+}
+
+.packages__card-title {
+  margin: 0;
+  font-size: 1.2rem;
   font-weight: 650;
   color: var(--ds-graphite);
 }
 
-.packages__includes {
+.packages__card-description {
+  margin: 0;
   color: var(--ds-charcoal);
   line-height: 1.5;
+  flex: 1;
 }
 
-.packages__value {
-  font-weight: 650;
-  color: var(--ds-graphite);
-  white-space: nowrap;
+.packages__card-price {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
 }
 
-.packages-page__empty {
+.packages__card-amount {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--ds-green);
+}
+
+.packages__card-period {
+  font-size: 0.8rem;
   color: var(--ds-gray);
-  text-align: center;
-  padding: 24px;
 }
 
 .dashboard {

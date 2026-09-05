@@ -1,5 +1,4 @@
-import { DataTable } from 'codexa-ui'
-import type { DataTableColumn } from 'codexa-ui'
+import { Card, Badge, Button, Icon } from 'codexa-ui'
 
 interface Package {
   name: string
@@ -38,25 +37,6 @@ const formatCurrency = (value: number): string => {
 }
 
 export default function Packages() {
-  const columns: DataTableColumn<Package>[] = [
-    {
-      key: 'name',
-      header: 'Pacote',
-      render: (pkg) => <span className="packages__name">{pkg.name}</span>,
-    },
-    {
-      key: 'includes',
-      header: 'Inclui',
-      render: (pkg) => <span className="packages__includes">{pkg.includes}</span>,
-    },
-    {
-      key: 'value',
-      header: 'Valor',
-      align: 'end',
-      render: (pkg) => <span className="packages__value">{formatCurrency(pkg.value)}</span>,
-    },
-  ]
-
   return (
     <div className="packages-page">
       <header className="packages-page__header">
@@ -64,12 +44,45 @@ export default function Packages() {
         <p>Opções de sites e presença digital para clínicas de estética</p>
       </header>
 
-      <DataTable
-        columns={columns}
-        rows={PACKAGES}
-        rowKey={(pkg) => pkg.name}
-        emptyState={<p className="packages-page__empty">Nenhum pacote encontrado.</p>}
-      />
+      <div className="packages__grid">
+        {PACKAGES.map((pkg) => (
+          <Card
+            key={pkg.name}
+            className="packages__card"
+            padding="large"
+            as="article"
+          >
+            {pkg.name === 'Presença Digital Completa' && (
+              <div className="packages__badge">
+                <Badge tone="success" size="small">
+                  Mais popular
+                </Badge>
+              </div>
+            )}
+
+            <div className="packages__card-icon" aria-hidden="true">
+              <Icon name="file" size={32} />
+            </div>
+
+            <h3 className="packages__card-title">{pkg.name}</h3>
+            <p className="packages__card-description">{pkg.includes}</p>
+
+            <div className="packages__card-price">
+              <span className="packages__card-amount">{formatCurrency(pkg.value)}</span>
+              <span className="packages__card-period">por projeto</span>
+            </div>
+
+            <Button
+              type="button"
+              variant="primary"
+              fullWidth
+              leadingIcon={<Icon name="arrow-right" size={16} />}
+            >
+              Escolher pacote
+            </Button>
+          </Card>
+        ))}
+      </div>
     </div>
   )
 }
