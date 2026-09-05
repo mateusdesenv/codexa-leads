@@ -272,6 +272,17 @@ function Actions({ lead }: { lead: Lead }) {
       {lead.phone && (
         <AnchorButton
           as="a"
+          href={`tel:${lead.phoneUnformatted ?? lead.phone}`}
+          variant="secondary"
+          size="small"
+          fullWidth
+        >
+          Ligar
+        </AnchorButton>
+      )}
+      {lead.phone && (
+        <AnchorButton
+          as="a"
           href={getWhatsAppUrl(lead.phoneUnformatted ?? lead.phone)}
           target="_blank"
           rel="noopener noreferrer"
@@ -376,19 +387,6 @@ function LeadCard({
             <Icon name={getWebsiteIcon(lead.websiteKind)} size={12} /> {getWebsiteLabel(lead.websiteKind)}
           </Badge>
         </div>
-
-        {lead.phone && (
-          <AnchorButton
-            as="a"
-            href={`tel:${lead.phoneUnformatted ?? lead.phone}`}
-            variant="ghost"
-            size="small"
-            className="kanban-card__phone"
-            onClick={(e: React.MouseEvent) => e.stopPropagation()}
-          >
-            {lead.phone}
-          </AnchorButton>
-        )}
 
         {lead.kanbanState.nextAction && (
           <div
