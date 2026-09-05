@@ -298,7 +298,7 @@
 }
 
 .kanban-column {
-  flex: 0 0 300px;
+  flex: 0 0 360px;
   display: flex;
   flex-direction: column;
   max-height: calc(100vh - 260px);
@@ -587,9 +587,13 @@
 }
 
 .kanban-card__footer .lead-actions {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.lead-actions > a:nth-last-child(1):nth-child(odd) {
+  grid-column: 1 / -1;
 }
 
 .action-btn {
@@ -641,7 +645,7 @@
 }
 
 .kanban-card--dragging {
-  width: 280px;
+  width: 340px;
   box-shadow: 0 14px 30px rgba(17, 19, 26, 0.14);
   cursor: grabbing;
 }
@@ -982,7 +986,7 @@ body.lead-modal-open .ds-dialog {
   }
 
   .kanban-column {
-    flex: 0 0 260px;
+    flex: 0 0 300px;
     max-height: calc(100vh - 240px);
   }
 

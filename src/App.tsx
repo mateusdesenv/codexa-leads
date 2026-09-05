@@ -277,6 +277,7 @@ function Actions({ lead }: { lead: Lead }) {
           rel="noopener noreferrer"
           variant="primary"
           size="small"
+          fullWidth
           leadingIcon={<Icon name="message" size={14} />}
         >
           WhatsApp
@@ -290,6 +291,7 @@ function Actions({ lead }: { lead: Lead }) {
           rel="noopener noreferrer"
           variant="secondary"
           size="small"
+          fullWidth
           leadingIcon={<Icon name="external-link" size={14} />}
         >
           Site
@@ -302,6 +304,7 @@ function Actions({ lead }: { lead: Lead }) {
         rel="noopener noreferrer"
         variant="secondary"
         size="small"
+        fullWidth
         leadingIcon={<Icon name="link" size={14} />}
       >
         Maps
