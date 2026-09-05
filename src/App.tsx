@@ -282,7 +282,6 @@ function Actions({ lead }: { lead: Lead }) {
           href={phoneHref}
           variant="secondary"
           size="small"
-          fullWidth
           iconOnly
           aria-label="Ligar"
           leadingIcon={<Icon name="send" size={16} />}
@@ -292,7 +291,6 @@ function Actions({ lead }: { lead: Lead }) {
           type="button"
           variant="secondary"
           size="small"
-          fullWidth
           disabled
           iconOnly
           aria-label="Ligar"
@@ -308,7 +306,6 @@ function Actions({ lead }: { lead: Lead }) {
           rel="noopener noreferrer"
           variant="primary"
           size="small"
-          fullWidth
           iconOnly
           aria-label="WhatsApp"
           leadingIcon={<Icon name="message" size={16} />}
@@ -318,7 +315,6 @@ function Actions({ lead }: { lead: Lead }) {
           type="button"
           variant="primary"
           size="small"
-          fullWidth
           disabled
           iconOnly
           aria-label="WhatsApp"
@@ -334,7 +330,6 @@ function Actions({ lead }: { lead: Lead }) {
           rel="noopener noreferrer"
           variant="secondary"
           size="small"
-          fullWidth
           iconOnly
           aria-label="Site"
           leadingIcon={<Icon name="external-link" size={16} />}
@@ -344,7 +339,6 @@ function Actions({ lead }: { lead: Lead }) {
           type="button"
           variant="secondary"
           size="small"
-          fullWidth
           disabled
           iconOnly
           aria-label="Site"
@@ -359,7 +353,6 @@ function Actions({ lead }: { lead: Lead }) {
         rel="noopener noreferrer"
         variant="secondary"
         size="small"
-        fullWidth
         iconOnly
         aria-label="Maps"
         leadingIcon={<Icon name="link" size={16} />}
