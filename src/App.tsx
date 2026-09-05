@@ -439,6 +439,13 @@ function LeadCard({
             )}
           </div>
         )}
+
+        {lead.kanbanState.collectedData && (
+          <div className="kanban-card__notes">
+            <span>Dados e observações</span>
+            <div>{lead.kanbanState.collectedData}</div>
+          </div>
+        )}
       </div>
 
       <div className="kanban-card__footer">
