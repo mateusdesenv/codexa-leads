@@ -4,6 +4,7 @@ import type { DataTableColumn, TabItem } from 'codexa-ui'
 import { Badge, Button, Icon } from 'codexa-ui'
 
 import type { ColumnId, LeadWithMeta, Temperature } from './types'
+import { formatCalendarDate } from './date'
 
 type TableLead = LeadWithMeta
 
@@ -44,12 +45,7 @@ const getTemperatureEmoji = (t: Temperature): string => {
 }
 
 const formatDate = (value?: string | null): string => {
-  if (!value) return '—'
-  try {
-    return new Date(value).toLocaleDateString('pt-BR')
-  } catch {
-    return value
-  }
+  return formatCalendarDate(value, '—')
 }
 
 const INITIAL_BY_COLUMN: Record<ColumnId, LeadWithMeta[]> = {

@@ -29,9 +29,17 @@ interface LeadClientInfoProps {
   lead: LeadWithMeta
 }
 
-function InfoSection({ title, children }: { title: string; children: ReactNode }) {
+function InfoSection({
+  title,
+  children,
+  compact = false,
+}: {
+  title: string
+  children: ReactNode
+  compact?: boolean
+}) {
   return (
-    <div className="lead-client-info__section">
+    <div className={`lead-client-info__section ${compact ? 'lead-client-info__section--compact' : ''}`}>
       <div className="lead-client-info__section-heading">
         <h5 className="lead-client-info__section-title">{title}</h5>
       </div>
@@ -74,7 +82,7 @@ export default function LeadClientInfo({ lead }: LeadClientInfoProps) {
       </InfoSection>
 
       {hasContact && (
-        <InfoSection title="Contato">
+        <InfoSection title="Contato" compact>
           {lead.phone && (
             <div className="lead-client-info__item">
               <span className="lead-client-info__label">Telefone</span>
@@ -85,7 +93,7 @@ export default function LeadClientInfo({ lead }: LeadClientInfoProps) {
           )}
 
           {lead.website && websiteHref && (
-            <div className="lead-client-info__item lead-client-info__item--wide">
+            <div className="lead-client-info__item">
               <span className="lead-client-info__label">Site</span>
               <div className="lead-client-info__website">
                 <Link href={websiteHref ?? undefined} variant="subtle" external>
@@ -181,7 +189,7 @@ export default function LeadClientInfo({ lead }: LeadClientInfoProps) {
       </InfoSection>
 
       {hasOrganization && (
-        <InfoSection title="Organização">
+        <InfoSection title="Organização" compact>
           {lead.groupTitle && (
             <div className="lead-client-info__item">
               <span className="lead-client-info__label">Lista</span>
@@ -190,7 +198,7 @@ export default function LeadClientInfo({ lead }: LeadClientInfoProps) {
           )}
 
           {lead.categories.length > 0 && (
-            <div className="lead-client-info__item lead-client-info__item--wide">
+            <div className="lead-client-info__item">
               <span className="lead-client-info__label">Categorias</span>
               <div className="lead-client-info__tags">
                 {lead.categories.map((category) => (

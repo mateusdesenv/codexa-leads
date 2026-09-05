@@ -2441,3 +2441,623 @@ body.lead-modal-open .ds-dialog {
     grid-template-columns: 1fr;
   }
 }
+
+/*
+ * Operational workspace refresh
+ *
+ * This layer deliberately favours stable borders, compact spacing and clear
+ * action hierarchy over decorative elevation. It applies the same interaction
+ * language to the dashboard, pipeline, data views and supporting screens.
+ */
+.prospect-app {
+  background: var(--ds-off-white);
+}
+
+.prospect-sidebar {
+  width: 248px;
+  flex-basis: 248px;
+  gap: 24px;
+  padding: 20px 14px;
+  background: var(--ds-white);
+  border-right: 1px solid var(--ds-line);
+}
+
+.prospect-sidebar__brand {
+  padding: 6px 10px;
+}
+
+.prospect-sidebar__user .ds-avatar {
+  box-shadow: none;
+}
+
+.prospect-nav {
+  gap: 3px;
+  padding: 0 2px;
+}
+
+.prospect-nav__btn {
+  min-height: 42px;
+  border-radius: 9px;
+  font-size: .84rem;
+  font-weight: 700;
+}
+
+.prospect-nav__btn.ds-button--primary {
+  color: var(--ds-green-dark);
+  background: var(--ds-green-mist);
+  box-shadow: inset 3px 0 0 var(--ds-green);
+}
+
+.prospect-nav__footer {
+  margin: auto 2px 0;
+  padding-top: 16px;
+}
+
+.prospect-main {
+  max-width: calc(100% - 248px);
+}
+
+.prospect-header--logged {
+  min-height: 76px;
+  padding: 16px 32px;
+  background: var(--ds-white);
+  border-bottom: 1px solid var(--ds-line);
+  backdrop-filter: none;
+}
+
+.prospect-header__page {
+  gap: 12px;
+}
+
+.prospect-header__page h2 {
+  font-size: 1.125rem;
+  font-weight: 780;
+  letter-spacing: -.025em;
+}
+
+.prospect-header__page p {
+  margin-top: 2px;
+  font-size: .78rem;
+}
+
+.prospect-content {
+  padding: 28px 32px 40px;
+}
+
+.prospect-toolbar {
+  gap: 14px;
+  padding: 12px;
+  border: 1px solid var(--ds-line);
+  border-radius: 12px;
+  background: var(--ds-white);
+  box-shadow: none;
+}
+
+.prospect-toolbar .ds-button,
+.help-page__header > .ds-button {
+  min-height: 38px;
+}
+
+.prospect-field label {
+  font-size: .7rem;
+  font-weight: 750;
+  letter-spacing: .04em;
+}
+
+.prospect-field input,
+.prospect-field select {
+  min-height: 40px;
+  border-radius: 8px;
+}
+
+.kanban-board {
+  gap: 14px;
+  padding: 0 0 16px;
+  min-height: calc(100vh - 226px);
+}
+
+.kanban-column {
+  flex-basis: 320px;
+  max-height: calc(100vh - 226px);
+  border: 1px solid var(--ds-line);
+  border-radius: 12px;
+  box-shadow: none;
+  background: var(--ds-off-white);
+}
+
+.kanban-column__header {
+  padding: 13px 14px;
+  border-top-width: 3px;
+  border-radius: 11px 11px 0 0;
+  background: var(--ds-white);
+}
+
+.kanban-column__title h2 {
+  font-size: .8rem;
+  font-weight: 800;
+  letter-spacing: .015em;
+  text-transform: uppercase;
+}
+
+.kanban-column__count {
+  min-width: 26px;
+  height: 24px;
+  color: var(--ds-charcoal);
+  background: var(--ds-off-white);
+  border: 1px solid var(--ds-line);
+}
+
+.kanban-column__header-actions {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.kanban-column__sort-trigger {
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0;
+  color: var(--ds-gray);
+  border-radius: 7px;
+}
+
+.kanban-column__sort-trigger:hover:not(:disabled),
+.kanban-column__sort-trigger:focus-visible:not(:disabled) {
+  color: var(--ds-green-dark);
+  background: var(--ds-green-mist);
+}
+
+.kanban-column__sort-menu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 7px);
+  right: 0;
+  display: grid;
+  width: 180px;
+  padding: 5px;
+  border: 1px solid var(--ds-line);
+  border-radius: 9px;
+  background: var(--ds-white);
+  box-shadow: 0 12px 24px color-mix(in srgb, var(--ds-graphite) 14%, transparent);
+}
+
+.kanban-column__sort-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 34px;
+  padding: 7px 8px;
+  color: var(--ds-charcoal);
+  font: inherit;
+  font-size: .78rem;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+}
+
+.kanban-column__sort-option:hover,
+.kanban-column__sort-option:focus-visible,
+.kanban-column__sort-option--active {
+  color: var(--ds-green-dark);
+  outline: 0;
+  background: var(--ds-green-mist);
+}
+
+.kanban-column__cards {
+  gap: 8px;
+  padding: 8px;
+  background: var(--ds-off-white);
+}
+
+.kanban-card {
+  gap: 10px;
+  padding: 13px;
+  border: 1px solid var(--ds-line);
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.kanban-card:hover {
+  border-color: var(--ds-green);
+  box-shadow: none;
+  transform: none;
+}
+
+.kanban-card:focus-visible,
+.qna-card:focus-within,
+.packages__card:focus-within {
+  outline: 3px solid color-mix(in srgb, var(--ds-green) 28%, transparent);
+  outline-offset: 2px;
+}
+
+.kanban-card__title {
+  font-size: .9rem;
+  font-weight: 760;
+  line-height: 1.3;
+}
+
+.kanban-card__next-action,
+.kanban-card__notes,
+.kanban-card__data {
+  border-color: var(--ds-line);
+  background: var(--ds-off-white);
+}
+
+.kanban-card__footer {
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--ds-line);
+}
+
+.dashboard {
+  gap: 16px;
+  max-width: none;
+}
+
+.dashboard__hero {
+  min-height: 150px;
+  padding: 26px !important;
+  border: 1px solid var(--ds-line);
+  border-left: 4px solid var(--ds-green);
+  border-radius: 12px;
+  box-shadow: none;
+  background: var(--ds-white);
+}
+
+.dashboard__hero > div {
+  gap: 7px;
+}
+
+.dashboard__hero h2 {
+  max-width: 620px;
+  font-size: clamp(1.55rem, 2.8vw, 2.2rem);
+  font-weight: 800;
+  line-height: 1.12;
+}
+
+.dashboard__hero p {
+  max-width: 500px;
+  font-size: .88rem;
+}
+
+.dashboard__metrics {
+  gap: 12px;
+}
+
+.dashboard-metric {
+  min-height: 126px;
+  border: 1px solid var(--ds-line);
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.dashboard-metric__icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+}
+
+.dashboard-metric strong {
+  font-size: 1.85rem;
+  font-weight: 800;
+}
+
+.dashboard-chart {
+  border: 1px solid var(--ds-line);
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.dashboard-chart__summary {
+  border: 1px solid var(--ds-line);
+  border-radius: 8px;
+  background: var(--ds-off-white);
+}
+
+.dashboard-funnel {
+  gap: 16px;
+}
+
+.dashboard-funnel__track {
+  height: 8px;
+  background: var(--ds-off-white);
+}
+
+.leads-table__tabs {
+  padding: 4px;
+  margin-bottom: 12px;
+  border-color: var(--ds-line);
+  border-radius: 10px;
+}
+
+.leads-table .ds-table-wrap {
+  border-color: var(--ds-line);
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.leads-table__score {
+  border-radius: 7px;
+}
+
+.packages-page {
+  gap: 24px;
+  max-width: none;
+}
+
+.packages-page__header {
+  max-width: 680px;
+}
+
+.packages-page__eyebrow {
+  margin-bottom: 8px;
+  border-radius: 6px;
+}
+
+.packages-page__header h2 {
+  font-size: clamp(1.65rem, 2.8vw, 2.3rem);
+}
+
+.packages__grid {
+  gap: 12px;
+}
+
+.packages__card {
+  gap: 16px;
+  padding: 22px !important;
+  border: 1px solid var(--ds-line);
+  border-radius: 12px;
+  box-shadow: none;
+  background: var(--ds-white);
+}
+
+.packages__card--featured {
+  border: 2px solid var(--ds-green);
+  background: var(--ds-white);
+  box-shadow: none;
+}
+
+.packages__card-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 9px;
+}
+
+.packages__card-price {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top-color: var(--ds-line);
+}
+
+.packages__card-amount {
+  font-size: 1.6rem;
+}
+
+.help-page {
+  max-width: none;
+  width: 100%;
+}
+
+.help-page__header {
+  align-items: flex-end;
+  padding: 0;
+}
+
+.help-page__header h2,
+.import-export__header h2 {
+  font-size: clamp(1.5rem, 2.5vw, 2.05rem);
+}
+
+.help-page__toolbar {
+  padding: 12px;
+  border-color: var(--ds-line);
+  border-radius: 12px;
+  background: var(--ds-white);
+}
+
+.help-page__grid {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.qna-card {
+  min-height: 270px;
+  border: 1px solid var(--ds-line);
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.qna-card__question {
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.qna-card__answer {
+  font-size: .88rem;
+  line-height: 1.55;
+}
+
+.qna-card__actions {
+  gap: 2px;
+  padding-top: 10px;
+  border-top-color: var(--ds-line);
+}
+
+.qna-card__actions .ds-button {
+  min-height: 34px;
+  padding-inline: 8px;
+  font-size: .76rem;
+}
+
+.import-export-page {
+  max-width: 1040px;
+}
+
+.import-export__grid {
+  gap: 12px;
+}
+
+.import-card,
+.export-card {
+  min-height: 280px;
+  gap: 14px;
+  border: 1px solid var(--ds-line);
+  border-radius: 12px;
+  box-shadow: none;
+  background: var(--ds-white);
+}
+
+.export-card {
+  border-left: 4px solid var(--ds-green);
+}
+
+.login-page {
+  background: var(--ds-off-white);
+}
+
+.login-card {
+  padding: 32px !important;
+  border: 1px solid var(--ds-line);
+  border-radius: 14px;
+  box-shadow: 0 16px 36px color-mix(in srgb, var(--ds-graphite) 9%, transparent);
+}
+
+.login-card__brand {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+}
+
+.lead-client-info {
+  padding: 6px !important;
+  background: var(--ds-white);
+}
+
+.lead-client-info__title {
+  padding: 12px;
+}
+
+.lead-client-info__title::before,
+.lead-client-info__section-heading::before {
+  box-shadow: none;
+}
+
+.lead-client-info__section {
+  padding: 14px;
+  margin-top: 8px;
+  border-color: var(--ds-line);
+  border-radius: 10px;
+  background: var(--ds-white);
+  transition: border-color var(--ds-motion-fast);
+}
+
+.lead-client-info__section:hover {
+  border-color: var(--ds-line);
+  box-shadow: none;
+  transform: none;
+}
+
+.lead-client-info__item {
+  min-height: 62px;
+  padding: 10px;
+  border-color: var(--ds-line);
+  border-radius: 8px;
+  background: var(--ds-off-white);
+}
+
+.lead-client-info__section--compact .lead-client-info__grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 1120px) {
+  .prospect-sidebar {
+    width: 216px;
+    flex-basis: 216px;
+  }
+
+  .prospect-main {
+    max-width: calc(100% - 216px);
+  }
+
+  .prospect-header--logged,
+  .prospect-content {
+    padding-inline: 24px;
+  }
+}
+
+@media (max-width: 760px) {
+  .prospect-sidebar,
+  .prospect-main {
+    width: 100%;
+    max-width: none;
+  }
+
+  .prospect-header--logged {
+    min-height: 66px;
+    padding: 12px 16px;
+  }
+
+  .prospect-content {
+    padding: 20px 16px 32px;
+  }
+
+  .prospect-header__page p {
+    display: none;
+  }
+
+  .dashboard__hero {
+    min-height: 0;
+    padding: 20px !important;
+  }
+
+  .dashboard__metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-metric {
+    min-height: 118px;
+  }
+
+  .kanban-board {
+    min-height: calc(100vh - 204px);
+  }
+
+  .kanban-column {
+    flex-basis: min(84vw, 320px);
+    max-height: calc(100vh - 204px);
+  }
+
+  .help-page__header {
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .help-page__header > .ds-button {
+    width: 100%;
+  }
+
+  .qna-card {
+    min-height: 0;
+  }
+
+  .qna-card__actions .ds-button {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .lead-client-info__section--compact .lead-client-info__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .login-card {
+    padding: 26px 20px !important;
+    border-radius: 12px;
+  }
+}

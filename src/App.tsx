@@ -54,6 +54,7 @@ import type { ColumnId, KanbanState, Lead, LeadWithMeta, Temperature } from './t
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const AnchorButton = Button as any
 import { loadKanbanStates } from './storage'
+import { formatCalendarDate, parseCalendarDate } from './date'
 import './App.css'
 
 const COLUMNS: { id: ColumnId; label: string; emoji: string; color: string; icon: IconName }[] = [
@@ -67,6 +68,29 @@ const COLUMNS: { id: ColumnId; label: string; emoji: string; color: string; icon
   { id: 'fechado', label: 'Cliente fechado', emoji: '🤝', color: '#13992F', icon: 'check' },
   { id: 'perdido', label: 'Perdido', emoji: '❌', color: '#6D7480', icon: 'x' },
 ]
+
+type KanbanSort = 'manual' | 'score-desc' | 'score-asc' | 'rating-desc' | 'name-asc' | 'name-desc'
+
+const KANBAN_SORT_OPTIONS: { value: KanbanSort; label: string }[] = [
+  { value: 'manual', label: 'Ordem manual' },
+  { value: 'score-desc', label: 'Maior score' },
+  { value: 'score-asc', label: 'Menor score' },
+  { value: 'rating-desc', label: 'Melhor avaliação' },
+  { value: 'name-asc', label: 'Nome: A–Z' },
+  { value: 'name-desc', label: 'Nome: Z–A' },
+]
+
+const DEFAULT_KANBAN_SORT: Record<ColumnId, KanbanSort> = {
+  open: 'score-desc',
+  em_contato: 'manual',
+  contato: 'manual',
+  conversa: 'manual',
+  followup: 'manual',
+  proposta: 'manual',
+  negociacao: 'manual',
+  fechado: 'manual',
+  perdido: 'manual',
+}
 
 const LOST_REASONS = [
   'Sem interesse',
@@ -256,12 +280,11 @@ function getInterestTone(interest: KanbanState['interest']): 'success' | 'warnin
 
 function isOverdue(dueDate?: string): boolean {
   if (!dueDate) return false
-  return new Date(dueDate).getTime() < new Date().setHours(0, 0, 0, 0)
+  return parseCalendarDate(dueDate).getTime() < new Date().setHours(0, 0, 0, 0)
 }
 
 function formatDate(dateStr?: string): string {
-  if (!dateStr) return ''
-  return new Date(dateStr).toLocaleDateString('pt-BR')
+  return formatCalendarDate(dateStr)
 }
 
 function isValidUrl(url: string): boolean {
@@ -543,12 +566,34 @@ function KanbanColumn({
   column,
   leads,
   onCardClick,
+  sort,
+  onSortChange,
 }: {
   column: (typeof COLUMNS)[number]
   leads: LeadWithMeta[]
   onCardClick: (lead: LeadWithMeta) => void
+  sort: KanbanSort
+  onSortChange: (sort: KanbanSort) => void
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: column.id, data: { column } })
+  const [isSortMenuOpen, setIsSortMenuOpen] = useState(false)
+  const sortMenuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!isSortMenuOpen) return
+    const closeOnOutsideClick = (event: PointerEvent) => {
+      if (!sortMenuRef.current?.contains(event.target as Node)) setIsSortMenuOpen(false)
+    }
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsSortMenuOpen(false)
+    }
+    document.addEventListener('pointerdown', closeOnOutsideClick)
+    document.addEventListener('keydown', closeOnEscape)
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsideClick)
+      document.removeEventListener('keydown', closeOnEscape)
+    }
+  }, [isSortMenuOpen])
 
   return (
     <div
@@ -560,9 +605,43 @@ function KanbanColumn({
           <Icon name={column.icon} size={18} style={{ color: column.color }} label={column.label} />
           <h2>{column.label}</h2>
         </div>
-        <span className="kanban-column__count" style={{ color: column.color }}>
-          {leads.length}
-        </span>
+        <div className="kanban-column__header-actions" ref={sortMenuRef}>
+          <span className="kanban-column__count" style={{ color: column.color }}>
+            {leads.length}
+          </span>
+          <Button
+            type="button"
+            variant="ghost"
+            size="small"
+            iconOnly
+            className="kanban-column__sort-trigger"
+            aria-label={`Ordenar ${column.label}`}
+            aria-haspopup="menu"
+            aria-expanded={isSortMenuOpen}
+            onClick={() => setIsSortMenuOpen((isOpen) => !isOpen)}
+            leadingIcon={<Icon name="sort" size={16} />}
+          />
+          {isSortMenuOpen && (
+            <div className="kanban-column__sort-menu" role="menu" aria-label={`Ordenar coluna ${column.label}`}>
+              {KANBAN_SORT_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={`kanban-column__sort-option ${sort === option.value ? 'kanban-column__sort-option--active' : ''}`}
+                  role="menuitemradio"
+                  aria-checked={sort === option.value}
+                  onClick={() => {
+                    onSortChange(option.value)
+                    setIsSortMenuOpen(false)
+                  }}
+                >
+                  <span>{option.label}</span>
+                  {sort === option.value && <Icon name="check" size={15} />}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </header>
       <SortableContext
         items={leads.map((lead) => lead.placeId)}
@@ -851,6 +930,7 @@ function App() {
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('')
   const [kanbanGroupFilter, setKanbanGroupFilter] = useState('')
+  const [kanbanSorts, setKanbanSorts] = useState<Record<ColumnId, KanbanSort>>(DEFAULT_KANBAN_SORT)
   const [selectedLead, setSelectedLead] = useState<LeadWithMeta | null>(null)
   const [activeDrag, setActiveDrag] = useState<LeadWithMeta | null>(null)
   const [user, setUser] = useState<User | null | undefined>(undefined)
@@ -937,11 +1017,6 @@ function App() {
     })
   }, [leadsWithMeta, search, categoryFilter])
 
-  const kanbanFilteredLeads = useMemo(() => {
-    if (!kanbanGroupFilter) return filteredLeads
-    return filteredLeads.filter((lead) => lead.groupId === kanbanGroupFilter)
-  }, [filteredLeads, kanbanGroupFilter])
-
   const groups = useMemo(() => {
     const map = new Map<string, { groupId: string; groupTitle: string; count: number }>()
     leadsWithMeta.forEach((lead) => {
@@ -956,6 +1031,15 @@ function App() {
     return Array.from(map.values()).sort((a, b) => a.groupTitle.localeCompare(b.groupTitle))
   }, [leadsWithMeta])
 
+  const activeKanbanGroup = groups.some((group) => group.groupId === kanbanGroupFilter)
+    ? kanbanGroupFilter
+    : (groups[0]?.groupId ?? '')
+
+  const kanbanFilteredLeads = useMemo(() => {
+    if (!activeKanbanGroup) return []
+    return filteredLeads.filter((lead) => lead.groupId === activeKanbanGroup)
+  }, [filteredLeads, activeKanbanGroup])
+
   const leadsByColumn = useMemo(() => {
     const map: Record<ColumnId, LeadWithMeta[]> = COLUMNS.reduce(
       (acc, c) => ({ ...acc, [c.id]: [] }),
@@ -965,17 +1049,19 @@ function App() {
       map[lead.kanbanState.column] = map[lead.kanbanState.column] ?? []
       map[lead.kanbanState.column].push(lead)
     })
-    COLUMNS.forEach((c) => {
-      if (c.id === 'open') {
-        map[c.id].sort((a, b) => b.score - a.score)
-      } else {
-        map[c.id].sort(
-          (a, b) => (a.kanbanState.order ?? Infinity) - (b.kanbanState.order ?? Infinity),
-        )
-      }
+    COLUMNS.forEach((column) => {
+      const sort = kanbanSorts[column.id]
+      map[column.id].sort((a, b) => {
+        if (sort === 'score-desc') return b.score - a.score
+        if (sort === 'score-asc') return a.score - b.score
+        if (sort === 'rating-desc') return (b.totalScore ?? -1) - (a.totalScore ?? -1)
+        if (sort === 'name-asc') return a.title.localeCompare(b.title, 'pt-BR')
+        if (sort === 'name-desc') return b.title.localeCompare(a.title, 'pt-BR')
+        return (a.kanbanState.order ?? Infinity) - (b.kanbanState.order ?? Infinity)
+      })
     })
     return map
-  }, [kanbanFilteredLeads])
+  }, [kanbanFilteredLeads, kanbanSorts])
 
   const selectedGroupLeads = useMemo(() => {
     if (!selectedGroup) return []
@@ -1451,12 +1537,9 @@ function App() {
                       <Select
                         label="Grupo"
                         id="kanban-group"
-                        value={kanbanGroupFilter}
+                        value={activeKanbanGroup}
                         onChange={(value: string) => setKanbanGroupFilter(value)}
-                        options={[
-                          { value: '', label: 'Todos os grupos' },
-                          ...groups.map((g) => ({ value: g.groupId, label: `${g.groupTitle} (${g.count})` })),
-                        ]}
+                        options={groups.map((g) => ({ value: g.groupId, label: `${g.groupTitle} (${g.count})` }))}
                       />
                     </div>
                   )}
@@ -1513,12 +1596,9 @@ function App() {
                         <Select
                           label="Grupo"
                           id="kanban-group-mobile"
-                          value={kanbanGroupFilter}
+                          value={activeKanbanGroup}
                           onChange={(value: string) => setKanbanGroupFilter(value)}
-                          options={[
-                            { value: '', label: 'Todos os grupos' },
-                            ...groups.map((g) => ({ value: g.groupId, label: `${g.groupTitle} (${g.count})` })),
-                          ]}
+                          options={groups.map((g) => ({ value: g.groupId, label: `${g.groupTitle} (${g.count})` }))}
                         />
                       </div>
                     )}
@@ -1584,6 +1664,8 @@ function App() {
                         column={column}
                         leads={leadsByColumn[column.id]}
                         onCardClick={handleCardClick}
+                        sort={kanbanSorts[column.id]}
+                        onSortChange={(sort) => setKanbanSorts((current) => ({ ...current, [column.id]: sort }))}
                       />
                     ))}
                   </div>
