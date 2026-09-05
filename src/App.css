@@ -2000,6 +2000,74 @@ body.lead-modal-open .ds-dialog {
   line-height: 1.5;
 }
 
+.lead-client-info {
+  width: 100%;
+}
+
+.lead-client-info__title {
+  margin: 0 0 16px;
+  font-size: 0.95rem;
+  font-weight: 650;
+  color: var(--ds-graphite);
+}
+
+.lead-client-info__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px 24px;
+}
+
+.lead-client-info__item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.lead-client-info__item--wide {
+  grid-column: 1 / -1;
+}
+
+.lead-client-info__label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--ds-gray);
+}
+
+.lead-client-info__value {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.88rem;
+  color: var(--ds-charcoal);
+  word-break: break-word;
+}
+
+.lead-client-info__website {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.lead-client-info__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.lead-client-info .ds-link {
+  font-size: 0.88rem;
+}
+
+@media (max-width: 760px) {
+  .lead-client-info__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 1120px) {
   .dashboard__metrics,
   .dashboard__charts {
