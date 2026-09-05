@@ -30,7 +30,8 @@ html[data-theme="dark"] .kanban-card--dragging {
   box-shadow: 0 14px 30px rgba(0, 0, 0, 0.4);
 }
 
-html[data-theme="dark"] .kanban-card__next-action {
+html[data-theme="dark"] .kanban-card__next-action,
+html[data-theme="dark"] .kanban-card__notes {
   background: #1f232a;
 }
 

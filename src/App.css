@@ -576,6 +576,33 @@
   color: #a61f2b;
 }
 
+.kanban-card__notes {
+  display: grid;
+  gap: 4px;
+  padding: 8px;
+  background: #f4f6f7;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: var(--ds-graphite);
+}
+
+.kanban-card__notes span {
+  color: var(--ds-gray);
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.68rem;
+}
+
+.kanban-card__notes div {
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .kanban-card__footer {
   display: flex;
   flex-direction: column;
