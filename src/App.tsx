@@ -240,6 +240,20 @@ function getWebsiteIcon(kind: LeadWithMeta['websiteKind']): IconName {
   return 'x'
 }
 
+function formatInterest(interest: KanbanState['interest']) {
+  if (interest === 'alto') return 'Alto'
+  if (interest === 'medio') return 'Médio'
+  if (interest === 'baixo') return 'Baixo'
+  return interest
+}
+
+function getInterestTone(interest: KanbanState['interest']): 'success' | 'warning' | 'danger' | 'neutral' {
+  if (interest === 'alto') return 'success'
+  if (interest === 'medio') return 'warning'
+  if (interest === 'baixo') return 'danger'
+  return 'neutral'
+}
+
 function isOverdue(dueDate?: string): boolean {
   if (!dueDate) return false
   return new Date(dueDate).getTime() < new Date().setHours(0, 0, 0, 0)
@@ -434,6 +448,54 @@ function LeadCard({
                 {isOverdue(lead.kanbanState.dueDate) ? 'Atrasado: ' : 'Até: '}
                 {formatDate(lead.kanbanState.dueDate)}
               </time>
+            )}
+          </div>
+        )}
+
+        {(lead.kanbanState.interest ||
+          lead.kanbanState.budget ||
+          lead.kanbanState.returnDate ||
+          lead.kanbanState.proposalValue ||
+          lead.kanbanState.proposalReturnDate ||
+          lead.kanbanState.lostReason) && (
+          <div className="kanban-card__data">
+            {lead.kanbanState.interest && (
+              <div className="kanban-card__data-row">
+                <span>Interesse</span>
+                <Badge tone={getInterestTone(lead.kanbanState.interest)} size="small">
+                  {formatInterest(lead.kanbanState.interest)}
+                </Badge>
+              </div>
+            )}
+            {lead.kanbanState.budget && (
+              <div className="kanban-card__data-row">
+                <span>Orçamento</span>
+                <strong>{lead.kanbanState.budget}</strong>
+              </div>
+            )}
+            {lead.kanbanState.returnDate && (
+              <div className="kanban-card__data-row">
+                <span>Retorno</span>
+                <time dateTime={lead.kanbanState.returnDate}>{formatDate(lead.kanbanState.returnDate)}</time>
+              </div>
+            )}
+            {lead.kanbanState.proposalValue && (
+              <div className="kanban-card__data-row">
+                <span>Proposta</span>
+                <strong>{lead.kanbanState.proposalValue}</strong>
+              </div>
+            )}
+            {lead.kanbanState.proposalReturnDate && (
+              <div className="kanban-card__data-row">
+                <span>Retorno proposta</span>
+                <time dateTime={lead.kanbanState.proposalReturnDate}>{formatDate(lead.kanbanState.proposalReturnDate)}</time>
+              </div>
+            )}
+            {lead.kanbanState.lostReason && (
+              <div className="kanban-card__data-row">
+                <span>Motivo perda</span>
+                <Badge tone="danger" size="small">{lead.kanbanState.lostReason}</Badge>
+              </div>
             )}
           </div>
         )}
