@@ -22,6 +22,7 @@ import { auth } from './firebase'
 import Login from './Login'
 import Help from './Help'
 import Dashboard from './Dashboard'
+import ImportLeadsModal from './ImportLeadsModal'
 import LeadGroupsTable, { type LeadGroup } from './LeadGroupsTable'
 import LeadsTable from './LeadsTable'
 import Packages from './Packages'
@@ -739,6 +740,7 @@ function App() {
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
   const [navOpen, setNavOpen] = useState(false)
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>(() => {
     const saved = localStorage.getItem('codexa-theme')
     if (saved === 'dark' || saved === 'light' || saved === 'system') return saved
@@ -999,6 +1001,25 @@ function App() {
     } catch (err) {
       console.error(err)
       setError(err instanceof Error ? err.message : 'Erro ao atualizar')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleImportLeads = async (title: string, leads: Lead[]) => {
+    try {
+      setLoading(true)
+      const res = await fetch('/api/leads/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, leads }),
+      })
+      if (!res.ok) throw new Error('Erro ao importar leads')
+      const fresh = await fetchLeads()
+      setBaseLeads(fresh)
+    } catch (err) {
+      console.error(err)
+      throw err instanceof Error ? err : new Error('Erro ao importar leads')
     } finally {
       setLoading(false)
     }
@@ -1539,6 +1560,23 @@ function App() {
                   onSave={handleSaveLead}
                 />
               )}
+
+              <Button
+                type="button"
+                className="leads-import-fab"
+                variant="primary"
+                size="large"
+                iconOnly
+                aria-label="Importar nova lista"
+                onClick={() => setImportOpen(true)}
+                leadingIcon={<Icon name="plus" size={24} />}
+              />
+
+              <ImportLeadsModal
+                open={importOpen}
+                onClose={() => setImportOpen(false)}
+                onImport={handleImportLeads}
+              />
             </>
           ) : currentView === 'packages' ? (
             <Packages />

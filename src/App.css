@@ -1196,7 +1196,8 @@ body.lead-modal-open .ds-dialog {
   gap: 10px;
 }
 
-.import-card input[type='file'] {
+.import-card input[type='file'],
+.import-modal__file {
   padding: 10px;
   border: 1px dashed #cfd4db;
   border-radius: 10px;
@@ -1206,7 +1207,8 @@ body.lead-modal-open .ds-dialog {
   cursor: pointer;
 }
 
-.import-card input[type='file']:hover {
+.import-card input[type='file']:hover,
+.import-modal__file:hover {
   border-color: var(--ds-green-dark);
   background: var(--ds-green-ice);
 }
@@ -1227,6 +1229,37 @@ body.lead-modal-open .ds-dialog {
 .import-export__message--error {
   color: #991b1b;
   background: #fee2e2;
+}
+
+.leads-import-fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 40;
+  border-radius: 50%;
+  box-shadow: 0 6px 18px rgba(37, 191, 68, 0.3);
+}
+
+.import-modal__form {
+  display: grid;
+  gap: 16px;
+  min-width: 320px;
+}
+
+.import-modal__file-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ds-charcoal);
+}
+
+.import-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
 }
 
 @media (max-width: 760px) {
