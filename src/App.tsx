@@ -45,6 +45,7 @@ import {
   Tabs,
   Tag,
   Textarea,
+  Tooltip,
 } from 'codexa-ui'
 import type { IconName, TabItem } from 'codexa-ui'
 
@@ -276,87 +277,95 @@ function Actions({ lead }: { lead: Lead }) {
 
   return (
     <div className="lead-actions" onClick={(e) => e.stopPropagation()}>
-      {phoneHref ? (
-        <AnchorButton
-          as="a"
-          href={phoneHref}
-          variant="secondary"
-          size="small"
-          iconOnly
-          aria-label="Ligar"
-          leadingIcon={<Icon name="user" size={16} />}
-        />
-      ) : (
-        <Button
-          type="button"
-          variant="secondary"
-          size="small"
-          disabled
-          iconOnly
-          aria-label="Ligar"
-          leadingIcon={<Icon name="user" size={16} />}
-        />
-      )}
+      <Tooltip label="Ligar">
+        {phoneHref ? (
+          <AnchorButton
+            as="a"
+            href={phoneHref}
+            variant="secondary"
+            size="small"
+            iconOnly
+            aria-label="Ligar"
+            leadingIcon={<Icon name="user" size={16} />}
+          />
+        ) : (
+          <Button
+            type="button"
+            variant="secondary"
+            size="small"
+            disabled
+            iconOnly
+            aria-label="Ligar"
+            leadingIcon={<Icon name="user" size={16} />}
+          />
+        )}
+      </Tooltip>
 
-      {waUrl ? (
+      <Tooltip label="WhatsApp">
+        {waUrl ? (
+          <AnchorButton
+            as="a"
+            href={waUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            variant="primary"
+            size="small"
+            iconOnly
+            aria-label="WhatsApp"
+            leadingIcon={<Icon name="message" size={16} />}
+          />
+        ) : (
+          <Button
+            type="button"
+            variant="primary"
+            size="small"
+            disabled
+            iconOnly
+            aria-label="WhatsApp"
+            leadingIcon={<Icon name="message" size={16} />}
+          />
+        )}
+      </Tooltip>
+
+      <Tooltip label="Site">
+        {hasWebsite ? (
+          <AnchorButton
+            as="a"
+            href={lead.website!}
+            target="_blank"
+            rel="noopener noreferrer"
+            variant="secondary"
+            size="small"
+            iconOnly
+            aria-label="Site"
+            leadingIcon={<Icon name="external-link" size={16} />}
+          />
+        ) : (
+          <Button
+            type="button"
+            variant="secondary"
+            size="small"
+            disabled
+            iconOnly
+            aria-label="Site"
+            leadingIcon={<Icon name="external-link" size={16} />}
+          />
+        )}
+      </Tooltip>
+
+      <Tooltip label="Maps">
         <AnchorButton
           as="a"
-          href={waUrl}
+          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lead.title ?? '')}&query_place_id=${lead.placeId}`}
           target="_blank"
           rel="noopener noreferrer"
-          variant="primary"
-          size="small"
-          iconOnly
-          aria-label="WhatsApp"
-          leadingIcon={<Icon name="message" size={16} />}
-        />
-      ) : (
-        <Button
-          type="button"
-          variant="primary"
-          size="small"
-          disabled
-          iconOnly
-          aria-label="WhatsApp"
-          leadingIcon={<Icon name="message" size={16} />}
-        />
-      )}
-
-      {hasWebsite ? (
-        <AnchorButton
-          as="a"
-          href={lead.website!}
-          target="_blank"
-          rel="noopener noreferrer"
           variant="secondary"
           size="small"
           iconOnly
-          aria-label="Site"
-          leadingIcon={<Icon name="external-link" size={16} />}
+          aria-label="Maps"
+          leadingIcon={<Icon name="search" size={16} />}
         />
-      ) : (
-        <Button
-          type="button"
-          variant="secondary"
-          size="small"
-          disabled
-          iconOnly
-          aria-label="Site"
-          leadingIcon={<Icon name="external-link" size={16} />}
-        />
-      )}
-
-      <AnchorButton
-        as="a"
-        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lead.title ?? '')}&query_place_id=${lead.placeId}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        variant="secondary"
-        size="small"
-        iconOnly
-        aria-label="Maps"
-        leadingIcon={<Icon name="search" size={16} />}
-      />
+      </Tooltip>
     </div>
   )
 }

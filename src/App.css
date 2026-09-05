@@ -626,6 +626,12 @@
   gap: 8px;
 }
 
+.kanban-card__footer .lead-actions .ds-tooltip,
+.kanban-card__footer .lead-actions .ds-tooltip__trigger {
+  display: flex;
+  width: 100%;
+}
+
 .kanban-card__footer .lead-actions .ds-button {
   display: inline-flex;
   align-items: center;
