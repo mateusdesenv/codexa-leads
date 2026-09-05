@@ -585,18 +585,23 @@
 
 .kanban-card__footer .lead-actions {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 8px;
+}
+
+.lead-actions .ds-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .lead-actions .ds-button:disabled,
 .lead-actions .ds-button[aria-disabled='true'] {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.lead-actions > a:nth-last-child(1):nth-child(odd) {
-  grid-column: 1 / -1;
 }
 
 .action-btn {

@@ -283,9 +283,10 @@ function Actions({ lead }: { lead: Lead }) {
           variant="secondary"
           size="small"
           fullWidth
-        >
-          Ligar
-        </AnchorButton>
+          iconOnly
+          aria-label="Ligar"
+          leadingIcon={<Icon name="send" size={16} />}
+        />
       ) : (
         <Button
           type="button"
@@ -293,9 +294,10 @@ function Actions({ lead }: { lead: Lead }) {
           size="small"
           fullWidth
           disabled
-        >
-          Ligar
-        </Button>
+          iconOnly
+          aria-label="Ligar"
+          leadingIcon={<Icon name="send" size={16} />}
+        />
       )}
 
       {waUrl ? (
@@ -307,10 +309,10 @@ function Actions({ lead }: { lead: Lead }) {
           variant="primary"
           size="small"
           fullWidth
-          leadingIcon={<Icon name="message" size={14} />}
-        >
-          WhatsApp
-        </AnchorButton>
+          iconOnly
+          aria-label="WhatsApp"
+          leadingIcon={<Icon name="message" size={16} />}
+        />
       ) : (
         <Button
           type="button"
@@ -318,10 +320,10 @@ function Actions({ lead }: { lead: Lead }) {
           size="small"
           fullWidth
           disabled
-          leadingIcon={<Icon name="message" size={14} />}
-        >
-          WhatsApp
-        </Button>
+          iconOnly
+          aria-label="WhatsApp"
+          leadingIcon={<Icon name="message" size={16} />}
+        />
       )}
 
       {hasWebsite ? (
@@ -333,10 +335,10 @@ function Actions({ lead }: { lead: Lead }) {
           variant="secondary"
           size="small"
           fullWidth
-          leadingIcon={<Icon name="external-link" size={14} />}
-        >
-          Site
-        </AnchorButton>
+          iconOnly
+          aria-label="Site"
+          leadingIcon={<Icon name="external-link" size={16} />}
+        />
       ) : (
         <Button
           type="button"
@@ -344,10 +346,10 @@ function Actions({ lead }: { lead: Lead }) {
           size="small"
           fullWidth
           disabled
-          leadingIcon={<Icon name="external-link" size={14} />}
-        >
-          Site
-        </Button>
+          iconOnly
+          aria-label="Site"
+          leadingIcon={<Icon name="external-link" size={16} />}
+        />
       )}
 
       <AnchorButton
@@ -358,10 +360,10 @@ function Actions({ lead }: { lead: Lead }) {
         variant="secondary"
         size="small"
         fullWidth
-        leadingIcon={<Icon name="link" size={14} />}
-      >
-        Maps
-      </AnchorButton>
+        iconOnly
+        aria-label="Maps"
+        leadingIcon={<Icon name="link" size={16} />}
+      />
     </div>
   )
 }
