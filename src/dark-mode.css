@@ -297,13 +297,15 @@ html[data-theme="dark"] .modal {
   box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
 }
 
-html[data-theme="dark"] .import-card input[type='file'] {
+html[data-theme="dark"] .import-card input[type='file'],
+html[data-theme="dark"] .import-modal__file {
   border-color: var(--ds-line);
   background: var(--ds-white);
   color: var(--ds-charcoal);
 }
 
-html[data-theme="dark"] .import-card input[type='file']:hover {
+html[data-theme="dark"] .import-card input[type='file']:hover,
+html[data-theme="dark"] .import-modal__file:hover {
   border-color: var(--ds-green);
   background: var(--ds-green-ice);
 }
