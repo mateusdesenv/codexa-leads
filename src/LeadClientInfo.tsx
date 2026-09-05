@@ -32,7 +32,9 @@ interface LeadClientInfoProps {
 function InfoSection({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="lead-client-info__section">
-      <h5 className="lead-client-info__section-title">{title}</h5>
+      <div className="lead-client-info__section-heading">
+        <h5 className="lead-client-info__section-title">{title}</h5>
+      </div>
       <div className="lead-client-info__grid">{children}</div>
     </div>
   )

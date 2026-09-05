@@ -62,7 +62,7 @@ export default function ImportExport({ leads, onImport, onExport }: ImportExport
       </header>
 
       <div className="import-export__grid">
-        <Card padding="medium">
+        <Card padding="medium" className="import-card">
           <h3>Importar leads</h3>
           <p>
             Selecione um arquivo JSON com os leads. Cada lead precisa ter pelo
@@ -97,7 +97,7 @@ export default function ImportExport({ leads, onImport, onExport }: ImportExport
           )}
         </Card>
 
-        <Card padding="medium">
+        <Card padding="medium" className="export-card">
           <h3>Exportar leads</h3>
           <p>
             Baixe todos os <strong>{leads.length}</strong> leads atuais em

@@ -194,40 +194,6 @@ export default function Help() {
             <Card key={item.id} padding="medium" className="qna-card">
               <div className="qna-card__header">
                 <h3 className="qna-card__question">{item.question}</h3>
-                <div className="qna-card__actions">
-                  <Button
-                    variant="ghost"
-                    size="small"
-                    onClick={() => handleToggleFavorite(item)}
-                    leadingIcon={
-                      <Icon
-                        name="star"
-                        size={14}
-                        style={{
-                          fill: item.isFavorite ? 'currentColor' : 'transparent',
-                        }}
-                      />
-                    }
-                  >
-                    {item.isFavorite ? 'Favoritada' : 'Favoritar'}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="small"
-                    onClick={() => openEdit(item)}
-                    leadingIcon={<Icon name="edit" size={14} />}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="small"
-                    onClick={() => setDeleteId(item.id!)}
-                    leadingIcon={<Icon name="trash" size={14} />}
-                  >
-                    Excluir
-                  </Button>
-                </div>
               </div>
               <p className="qna-card__answer">{item.answer}</p>
               {item.tags.length > 0 && (
@@ -239,6 +205,40 @@ export default function Help() {
                   ))}
                 </div>
               )}
+              <div className="qna-card__actions">
+                <Button
+                  variant="ghost"
+                  size="small"
+                  onClick={() => handleToggleFavorite(item)}
+                  leadingIcon={
+                    <Icon
+                      name="star"
+                      size={14}
+                      style={{
+                        fill: item.isFavorite ? 'currentColor' : 'transparent',
+                      }}
+                    />
+                  }
+                >
+                  {item.isFavorite ? 'Favoritada' : 'Favoritar'}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="small"
+                  onClick={() => openEdit(item)}
+                  leadingIcon={<Icon name="edit" size={14} />}
+                >
+                  Editar
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="small"
+                  onClick={() => setDeleteId(item.id!)}
+                  leadingIcon={<Icon name="trash" size={14} />}
+                >
+                  Excluir
+                </Button>
+              </div>
             </Card>
           ))}
         </div>

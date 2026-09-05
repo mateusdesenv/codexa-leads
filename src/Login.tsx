@@ -5,6 +5,7 @@ import {
   signInWithPopup,
 } from 'firebase/auth'
 import { Button, Card, Input, Alert } from 'codexa-ui'
+import codexaIcon from 'codexa-ui/logos/logos-fundo-transparente/icon-only.png'
 import { auth, googleProvider } from './firebase'
 
 export default function Login() {
@@ -47,6 +48,8 @@ export default function Login() {
     <div className="login-page">
       <Card padding="large" className="login-card" style={{ width: '100%', maxWidth: '420px' }}>
         <header className="login-card__header">
+          <img src={codexaIcon} alt="Codexa" className="login-card__brand" />
+          <span>Codexa Leads</span>
           <h1>Prospecção Codexa</h1>
           <p>Faça login para acessar o painel de leads.</p>
         </header>

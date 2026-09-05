@@ -40,15 +40,16 @@ export default function Packages() {
   return (
     <div className="packages-page">
       <header className="packages-page__header">
-        <h2>Pacotes Codexa</h2>
-        <p>Opções de sites e presença digital para clínicas de estética</p>
+        <span className="packages-page__eyebrow">Soluções Codexa</span>
+        <h2>Presença digital que transforma interesse em agenda.</h2>
+        <p>Escolha o formato ideal para cada etapa de crescimento da clínica.</p>
       </header>
 
       <div className="packages__grid">
         {PACKAGES.map((pkg) => (
           <Card
             key={pkg.name}
-            className="packages__card"
+            className={`packages__card ${pkg.name === 'Presença Digital Completa' ? 'packages__card--featured' : ''}`}
             padding="large"
             as="article"
           >
