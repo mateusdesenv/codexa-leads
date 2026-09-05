@@ -284,7 +284,7 @@ function Actions({ lead }: { lead: Lead }) {
           size="small"
           iconOnly
           aria-label="Ligar"
-          leadingIcon={<Icon name="send" size={16} />}
+          leadingIcon={<Icon name="user" size={16} />}
         />
       ) : (
         <Button
@@ -294,7 +294,7 @@ function Actions({ lead }: { lead: Lead }) {
           disabled
           iconOnly
           aria-label="Ligar"
-          leadingIcon={<Icon name="send" size={16} />}
+          leadingIcon={<Icon name="user" size={16} />}
         />
       )}
 
@@ -355,7 +355,7 @@ function Actions({ lead }: { lead: Lead }) {
         size="small"
         iconOnly
         aria-label="Maps"
-        leadingIcon={<Icon name="link" size={16} />}
+        leadingIcon={<Icon name="search" size={16} />}
       />
     </div>
   )
