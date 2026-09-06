@@ -1509,6 +1509,15 @@ function App() {
           {(currentView === 'kanban' || (currentView === 'table' && selectedGroup)) && (
             <>
               <div className="prospect-toolbar">
+                <div className="prospect-toolbar__heading">
+                  <span className="prospect-toolbar__heading-icon" aria-hidden="true">
+                    <Icon name="filter" size={18} />
+                  </span>
+                  <div>
+                    <span>Filtros</span>
+                    <p>Encontre os leads certos com mais rapidez</p>
+                  </div>
+                </div>
                 <div className="prospect-toolbar__fields">
                   <div className="prospect-toolbar__field prospect-toolbar__field--search">
                     <SearchInput

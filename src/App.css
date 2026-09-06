@@ -2976,6 +2976,136 @@ body.lead-modal-open .ds-dialog {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+/* Desktop filter workspace: make the controls read as one deliberate action area. */
+@media (min-width: 761px) {
+  .prospect-toolbar {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(156px, 0.58fr) minmax(0, 2.6fr) auto;
+    gap: 18px;
+    align-items: end;
+    padding: 16px;
+    overflow: hidden;
+    border-color: color-mix(in srgb, var(--ds-green) 20%, var(--ds-line));
+    background:
+      linear-gradient(108deg, color-mix(in srgb, var(--ds-green-mist) 78%, var(--ds-white)), var(--ds-white) 42%),
+      var(--ds-white);
+  }
+
+  .prospect-toolbar::after {
+    position: absolute;
+    top: -52px;
+    right: 18%;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--ds-green) 7%, transparent);
+    content: '';
+    pointer-events: none;
+  }
+
+  .prospect-toolbar__heading,
+  .prospect-toolbar__fields,
+  .prospect-toolbar__refresh {
+    position: relative;
+    z-index: 1;
+  }
+
+  .prospect-toolbar__heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding-right: 18px;
+    border-right: 1px solid color-mix(in srgb, var(--ds-green) 19%, var(--ds-line));
+  }
+
+  .prospect-toolbar__heading-icon {
+    display: grid;
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    color: var(--ds-green-dark);
+    background: var(--ds-white);
+    border: 1px solid color-mix(in srgb, var(--ds-green) 26%, var(--ds-line));
+    border-radius: 10px;
+    box-shadow: 0 4px 10px color-mix(in srgb, var(--ds-green) 10%, transparent);
+  }
+
+  .prospect-toolbar__heading > div {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .prospect-toolbar__heading span:not(.prospect-toolbar__heading-icon) {
+    color: var(--ds-graphite);
+    font-size: .83rem;
+    font-weight: 800;
+    letter-spacing: .02em;
+  }
+
+  .prospect-toolbar__heading p {
+    margin: 0;
+    color: var(--ds-gray);
+    font-size: .7rem;
+    line-height: 1.35;
+  }
+
+  .prospect-toolbar__fields {
+    display: grid;
+    grid-template-columns: minmax(320px, 1.9fr) repeat(2, minmax(180px, 1fr));
+    gap: 12px;
+    align-items: end;
+  }
+
+  .prospect-toolbar__field,
+  .prospect-toolbar__field--search,
+  .prospect-toolbar__field--group {
+    min-width: 0;
+  }
+
+  .prospect-toolbar__field--search {
+    min-inline-size: 320px;
+  }
+
+  .prospect-toolbar__field--search .ds-search {
+    width: 100%;
+    max-width: none;
+  }
+
+  .prospect-toolbar__refresh {
+    display: inline-flex;
+    min-width: 116px;
+    min-height: 42px !important;
+    justify-content: center;
+    border-color: color-mix(in srgb, var(--ds-green) 24%, var(--ds-line));
+    background: var(--ds-white);
+  }
+
+  .prospect-toolbar__refresh:hover:not(:disabled),
+  .prospect-toolbar__refresh:focus-visible:not(:disabled) {
+    color: var(--ds-green-dark);
+    border-color: var(--ds-green);
+    background: var(--ds-green-mist);
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1120px) {
+  .prospect-toolbar {
+    grid-template-columns: 1fr auto;
+  }
+
+  .prospect-toolbar__heading {
+    display: none;
+  }
+
+  .prospect-toolbar__fields {
+    grid-template-columns: minmax(260px, 1.7fr) repeat(2, minmax(145px, 1fr));
+  }
+}
+
 @media (max-width: 1120px) {
   .prospect-sidebar {
     width: 216px;
