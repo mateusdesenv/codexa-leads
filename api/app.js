@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import dotenv from 'dotenv'
 import express from 'express'
 import cors from 'cors'
 import fs from 'fs'
@@ -7,6 +8,9 @@ import { fileURLToPath } from 'url'
 import { connectToDatabase } from './lib/db.js'
 import { Lead } from './lib/lead.js'
 import { QnA } from './lib/qna.js'
+import { User } from './lib/user.js'
+
+dotenv.config({ path: '.env.local' })
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -15,6 +19,114 @@ const app = express()
 
 app.use(cors())
 app.use(express.json({ limit: '10mb' }))
+
+const ADMIN_EMAIL = 'mateus.desenv@gmail.com'
+
+const toDate = (timestamp) => {
+  const value = Number(timestamp)
+  if (!Number.isFinite(value)) return undefined
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? undefined : date
+}
+
+const getBearerToken = (request) => {
+  const authorization = request.get('authorization') ?? ''
+  return authorization.startsWith('Bearer ') ? authorization.slice(7) : null
+}
+
+const resolveFirebaseUser = async (idToken) => {
+  const apiKey = process.env.FIREBASE_WEB_API_KEY || process.env.VITE_FIREBASE_API_KEY
+  if (!apiKey) {
+    const error = new Error('Firebase não configurado no servidor')
+    error.statusCode = 500
+    throw error
+  }
+
+  const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encodeURIComponent(apiKey)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ idToken }),
+  })
+  const payload = await response.json().catch(() => ({}))
+  const firebaseUser = payload.users?.[0]
+
+  if (!response.ok || !firebaseUser?.localId || !firebaseUser?.email) {
+    const error = new Error('Sessão inválida')
+    error.statusCode = 401
+    throw error
+  }
+
+  return firebaseUser
+}
+
+const requireAuthenticatedUser = async (request, response, next) => {
+  try {
+    const token = getBearerToken(request)
+    if (!token) {
+      return response.status(401).json({ error: 'Sessão não informada' })
+    }
+    request.firebaseUser = await resolveFirebaseUser(token)
+    return next()
+  } catch (error) {
+    const status = error?.statusCode ?? 401
+    return response.status(status).json({ error: status === 401 ? 'Sessão inválida' : 'Não foi possível validar a sessão' })
+  }
+}
+
+const requireAdmin = (request, response, next) => {
+  const email = request.firebaseUser?.email?.trim().toLowerCase()
+  if (email !== ADMIN_EMAIL) {
+    return response.status(403).json({ error: 'Acesso restrito ao administrador' })
+  }
+  return next()
+}
+
+const serializeUser = (user) => ({
+  uid: user.firebaseUid,
+  email: user.email,
+  displayName: user.displayName,
+  photoURL: user.photoURL,
+  providerId: user.providerId,
+  registeredAt: user.registeredAt,
+  lastSignInAt: user.lastSignInAt,
+  createdAt: user.createdAt,
+})
+
+app.put('/api/users/me', requireAuthenticatedUser, async (request, response) => {
+  try {
+    await connectToDatabase()
+    const firebaseUser = request.firebaseUser
+    const providerId = firebaseUser.providerUserInfo?.[0]?.providerId ?? 'password'
+    const data = {
+      email: firebaseUser.email,
+      displayName: firebaseUser.displayName ?? '',
+      photoURL: firebaseUser.photoUrl ?? '',
+      providerId,
+      registeredAt: toDate(firebaseUser.createdAt),
+      lastSignInAt: toDate(firebaseUser.lastLoginAt),
+    }
+    const user = await User.findOneAndUpdate(
+      { firebaseUid: firebaseUser.localId },
+      { $set: data, $setOnInsert: { firebaseUid: firebaseUser.localId } },
+      { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true },
+    )
+    return response.json(serializeUser(user))
+  } catch (error) {
+    console.error(error)
+    return response.status(500).json({ error: 'Não foi possível sincronizar o usuário' })
+  }
+})
+
+app.get('/api/users', requireAuthenticatedUser, requireAdmin, async (_request, response) => {
+  try {
+    await connectToDatabase()
+    const users = await User.find({}).sort({ displayName: 1, email: 1 })
+    return response.json(users.map(serializeUser))
+  } catch (error) {
+    console.error(error)
+    return response.status(500).json({ error: 'Não foi possível buscar os usuários' })
+  }
+})
 
 app.get('/api/leads', async (_req, res) => {
   try {

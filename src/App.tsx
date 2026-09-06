@@ -27,12 +27,14 @@ import LeadClientInfo from './LeadClientInfo'
 import LeadGroupsTable, { type LeadGroup } from './LeadGroupsTable'
 import LeadsTable from './LeadsTable'
 import Packages from './Packages'
+import Portfolio from './Portfolio'
+import Preloader from './Preloader'
+import UserManagement from './UserManagement'
 import codexaLogo from 'codexa-ui/logos/logos-fundo-transparente/primary-logo.png'
 import codexaLogoDark from 'codexa-ui/logos/logos-fundo-transparente/primary-logo-reversed.png'
 import codexaIcon from 'codexa-ui/logos/logos-fundo-transparente/icon-only.png'
 import {
   Alert,
-  Avatar,
   Badge,
   Button,
   Dialog,
@@ -70,6 +72,7 @@ const COLUMNS: { id: ColumnId; label: string; emoji: string; color: string; icon
 ]
 
 type KanbanSort = 'manual' | 'score-desc' | 'score-asc' | 'rating-desc' | 'name-asc' | 'name-desc'
+type Theme = 'light' | 'dark' | 'system'
 
 const KANBAN_SORT_OPTIONS: { value: KanbanSort; label: string }[] = [
   { value: 'manual', label: 'Ordem manual' },
@@ -129,6 +132,15 @@ const fetchLeads = async (): Promise<Lead[]> => {
   const res = await fetch('/api/leads')
   if (!res.ok) throw new Error('Não foi possível carregar os dados')
   return res.json()
+}
+
+const syncAuthenticatedUser = async (user: User) => {
+  const token = await user.getIdToken()
+  const response = await fetch('/api/users/me', {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!response.ok) throw new Error('Não foi possível sincronizar o usuário')
 }
 
 const updateLeadState = async (placeId: string, kanbanState: KanbanState): Promise<Lead> => {
@@ -923,6 +935,33 @@ function LeadModal({
   )
 }
 
+function ThemeControls({ theme, onChange }: { theme: Theme; onChange: (theme: Theme) => void }) {
+  return (
+    <div className="prospect-nav__theme" role="group" aria-label="Preferência de tema">
+      <Button type="button" className={`prospect-nav__theme-btn ${theme === 'system' ? 'prospect-nav__theme-btn--active' : ''}`} variant="ghost" size="small" iconOnly onClick={() => onChange('system')} aria-label="Usar tema do sistema" leadingIcon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" /></svg>} />
+      <Button type="button" className={`prospect-nav__theme-btn ${theme === 'light' ? 'prospect-nav__theme-btn--active' : ''}`} variant="ghost" size="small" iconOnly onClick={() => onChange('light')} aria-label="Usar tema claro" leadingIcon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>} />
+      <Button type="button" className={`prospect-nav__theme-btn ${theme === 'dark' ? 'prospect-nav__theme-btn--active' : ''}`} variant="ghost" size="small" iconOnly onClick={() => onChange('dark')} aria-label="Usar tema escuro" leadingIcon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>} />
+    </div>
+  )
+}
+
+function ProfileAvatar({ user, size = 'medium' }: { user: User; size?: 'medium' | 'small' }) {
+  const [imageFailed, setImageFailed] = useState(false)
+  const label = user.displayName ?? user.email ?? 'Usuário'
+  const initials = label.split(' ').map((part) => part[0]).slice(0, 2).join('').toUpperCase()
+  const photoURL = imageFailed ? null : user.photoURL
+
+  return (
+    <span className={`profile-avatar profile-avatar--${size}`} aria-label={label}>
+      {photoURL ? (
+        <img src={photoURL} alt="" onError={() => setImageFailed(true)} />
+      ) : (
+        <span aria-hidden="true">{initials}</span>
+      )}
+    </span>
+  )
+}
+
 function App() {
   const [baseLeads, setBaseLeads] = useState<Lead[]>([])
   const [loading, setLoading] = useState(true)
@@ -934,12 +973,12 @@ function App() {
   const [selectedLead, setSelectedLead] = useState<LeadWithMeta | null>(null)
   const [activeDrag, setActiveDrag] = useState<LeadWithMeta | null>(null)
   const [user, setUser] = useState<User | null | undefined>(undefined)
-  const [currentView, setCurrentView] = useState<'dashboard' | 'kanban' | 'table' | 'packages' | 'help'>('dashboard')
+  const [currentView, setCurrentView] = useState<'dashboard' | 'kanban' | 'table' | 'packages' | 'portfolio' | 'users' | 'help'>('dashboard')
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
   const [navOpen, setNavOpen] = useState(false)
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [importOpen, setImportOpen] = useState(false)
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>(() => {
+  const [theme, setTheme] = useState<Theme>(() => {
     const saved = localStorage.getItem('codexa-theme')
     if (saved === 'dark' || saved === 'light' || saved === 'system') return saved
     return 'system'
@@ -966,7 +1005,10 @@ function App() {
   }, [theme])
 
   useEffect(() => {
-    return onAuthStateChanged(auth, (u) => setUser(u))
+    return onAuthStateChanged(auth, (u) => {
+      setUser(u)
+      if (u) void syncAuthenticatedUser(u).catch(() => undefined)
+    })
   }, [])
 
   useEffect(() => {
@@ -1260,8 +1302,8 @@ function App() {
     }
   }
 
-  if (user === undefined) {
-    return <div className="prospect-loading">Inicializando…</div>
+  if (user === undefined || loading) {
+    return <Preloader />
   }
 
   if (user === null) {
@@ -1271,14 +1313,10 @@ function App() {
   return (
     <div className="prospect-app">
       <aside className="prospect-sidebar">
+        <img src={theme === 'dark' ? codexaLogoDark : codexaLogo} alt="Codexa" className="prospect-sidebar__logo" />
         <div className="prospect-sidebar__brand">
-          <img src={theme === 'dark' ? codexaLogoDark : codexaLogo} alt="Codexa" className="prospect-sidebar__logo" />
           <div className="prospect-sidebar__user">
-            <Avatar
-              name={user.displayName ?? user.email ?? 'Usuário'}
-              src={user.photoURL || undefined}
-              size="medium"
-            />
+            <ProfileAvatar user={user} />
             <div className="prospect-sidebar__user-info">
               <span className="prospect-sidebar__user-name">{user.displayName ?? user.email ?? 'Usuário'}</span>
               <Button
@@ -1312,68 +1350,11 @@ function App() {
               alt="Codexa"
               className="prospect-nav__logo"
             />
-            <div className="prospect-nav__theme" role="group" aria-label="Tema">
-              <Button
-                type="button"
-                className={`prospect-nav__theme-btn ${theme === 'system' ? 'prospect-nav__theme-btn--active' : ''}`}
-                variant="ghost"
-                size="small"
-                iconOnly
-                onClick={() => setTheme('system')}
-                aria-label="Sistema"
-                leadingIcon={(
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="2" y="3" width="20" height="14" rx="2" />
-                    <line x1="8" y1="21" x2="16" y2="21" />
-                    <line x1="12" y1="17" x2="12" y2="21" />
-                  </svg>
-                )}
-              />
-              <Button
-                type="button"
-                className={`prospect-nav__theme-btn ${theme === 'light' ? 'prospect-nav__theme-btn--active' : ''}`}
-                variant="ghost"
-                size="small"
-                iconOnly
-                onClick={() => setTheme('light')}
-                aria-label="Claro"
-                leadingIcon={(
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="5" />
-                    <line x1="12" y1="1" x2="12" y2="3" />
-                    <line x1="12" y1="21" x2="12" y2="23" />
-                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                    <line x1="1" y1="12" x2="3" y2="12" />
-                    <line x1="21" y1="12" x2="23" y2="12" />
-                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-                  </svg>
-                )}
-              />
-              <Button
-                type="button"
-                className={`prospect-nav__theme-btn ${theme === 'dark' ? 'prospect-nav__theme-btn--active' : ''}`}
-                variant="ghost"
-                size="small"
-                iconOnly
-                onClick={() => setTheme('dark')}
-                aria-label="Escuro"
-                leadingIcon={(
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                  </svg>
-                )}
-              />
-            </div>
+            <ThemeControls theme={theme} onChange={setTheme} />
           </div>
 
           <div className="prospect-nav__user">
-            <Avatar
-              name={user.displayName ?? user.email ?? 'Usuário'}
-              src={user.photoURL || undefined}
-              size="medium"
-            />
+            <ProfileAvatar user={user} />
             <div className="prospect-nav__user-info">
               <span className="prospect-nav__user-name">{user.displayName ?? user.email ?? 'Usuário'}</span>
               <Button
@@ -1437,12 +1418,34 @@ function App() {
           <Button
             type="button"
             className="prospect-nav__btn"
+            variant={currentView === 'portfolio' ? 'primary' : 'ghost'}
+            onClick={() => { setSelectedGroup(null); setCurrentView('portfolio'); setNavOpen(false) }}
+            leadingIcon={<Icon name="file" size={18} />}
+          >
+            Portfólio
+          </Button>
+          <Button
+            type="button"
+            className="prospect-nav__btn"
+            variant={currentView === 'users' ? 'primary' : 'ghost'}
+            onClick={() => { setSelectedGroup(null); setCurrentView('users'); setNavOpen(false) }}
+            leadingIcon={<Icon name="user" size={18} />}
+          >
+            Usuários
+          </Button>
+          <Button
+            type="button"
+            className="prospect-nav__btn"
             variant={currentView === 'help' ? 'primary' : 'ghost'}
             onClick={() => { setSelectedGroup(null); setCurrentView('help'); setNavOpen(false) }}
             leadingIcon={<Icon name="help" size={18} />}
           >
             Help
           </Button>
+          <div className="prospect-nav__footer">
+            <span className="prospect-nav__footer-label">Aparência</span>
+            <ThemeControls theme={theme} onChange={setTheme} />
+          </div>
         </nav>
       </aside>
 
@@ -1458,11 +1461,6 @@ function App() {
         <header className="prospect-header prospect-header--logged">
           <div className="prospect-header__page">
             <img
-              src={theme === 'dark' ? codexaLogoDark : codexaLogo}
-              alt="Codexa"
-              className="prospect-header__logo"
-            />
-            <img
               src={codexaIcon}
               alt="Codexa"
               className="prospect-header__logo-mobile"
@@ -1477,7 +1475,11 @@ function App() {
                     ? 'Leads'
                     : currentView === 'packages'
                       ? 'Pacotes'
-                      : 'Help'}
+                      : currentView === 'portfolio'
+                        ? 'Portfólio'
+                        : currentView === 'users'
+                          ? 'Usuários'
+                        : 'Help'}
               </h2>
               <p>
                 {currentView === 'dashboard'
@@ -1488,7 +1490,11 @@ function App() {
                     ? 'Lista completa de leads'
                     : currentView === 'packages'
                       ? 'Planos e valores para clínicas de estética'
-                      : 'Base de conhecimento para prospecções'}
+                      : currentView === 'portfolio'
+                        ? 'Projetos e soluções desenvolvidos pela Codexa'
+                        : currentView === 'users'
+                          ? 'Conta, perfil e permissões'
+                        : 'Base de conhecimento para prospecções'}
               </p>
             </div>
           </div>
@@ -1789,6 +1795,10 @@ function App() {
             </>
           ) : currentView === 'packages' ? (
             <Packages />
+          ) : currentView === 'portfolio' ? (
+            <Portfolio />
+          ) : currentView === 'users' ? (
+            <UserManagement user={user} />
           ) : (
             <Help />
           )}

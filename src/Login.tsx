@@ -46,79 +46,94 @@ export default function Login() {
 
   return (
     <div className="login-page">
-      <Card padding="large" className="login-card" style={{ width: '100%', maxWidth: '420px' }}>
-        <header className="login-card__header">
-          <img src={codexaIcon} alt="Codexa" className="login-card__brand" />
-          <span>Codexa Leads</span>
-          <h1>Prospecção Codexa</h1>
-          <p>Faça login para acessar o painel de leads.</p>
-        </header>
-
-        {error && (
-          <Alert tone="danger" title="Erro de autenticação">
-            {error}
-          </Alert>
-        )}
-
-        <form className="login-card__form" onSubmit={handleSubmit}>
-          <Input
-            label="E-mail"
-            id="email"
-            type="email"
-            autoComplete="email"
-            placeholder="seu@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={loading}
-            required
-          />
-
-          <Input
-            label="Senha"
-            id="password"
-            type="password"
-            autoComplete={isSignUp ? 'new-password' : 'current-password'}
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={loading}
-            required
-          />
-
-          <Button
-            type="submit"
-            variant="primary"
-            fullWidth
-            loading={loading}
-          >
-            {isSignUp ? 'Criar conta' : 'Entrar'}
-          </Button>
-        </form>
-
-        <Button
-          type="button"
-          variant="ghost"
-          fullWidth
-          onClick={() => setIsSignUp((v) => !v)}
-          disabled={loading}
-        >
-          {isSignUp ? 'Já tem conta? Entrar' : 'Criar nova conta'}
-        </Button>
-
-        <div className="login-card__divider">
-          <span>ou</span>
+      <section className="login-hero" aria-labelledby="login-hero-title">
+        <div className="login-hero__brand">
+          <span className="login-hero__mark"><img src={codexaIcon} alt="" /></span>
+          <span>Codexa</span>
         </div>
 
-        <Button
-          type="button"
-          variant="secondary"
-          fullWidth
-          onClick={handleGoogle}
-          disabled={loading}
-        >
-          Entrar com Google
-        </Button>
-      </Card>
+        <div className="login-hero__copy">
+          <span className="login-hero__eyebrow">CRM de prospecção</span>
+          <h1 id="login-hero-title">Mais contexto.<br />Mais conversões.</h1>
+          <p>Centralize seus leads, organize oportunidades e conduza cada conversa ao próximo passo.</p>
+        </div>
+
+        <div className="login-hero__preview" aria-hidden="true">
+          <div className="login-preview__header">
+            <span className="login-preview__title"><i /> Pipeline comercial</span>
+            <span className="login-preview__period">Este mês</span>
+          </div>
+          <div className="login-preview__metrics">
+            <div><small>Novos leads</small><strong>48</strong><span>+18,5%</span></div>
+            <div><small>Em negociação</small><strong>12</strong><span>+8,2%</span></div>
+          </div>
+          <div className="login-preview__chart">
+            <span style={{ height: '30%' }} /><span style={{ height: '47%' }} /><span style={{ height: '42%' }} />
+            <span style={{ height: '64%' }} /><span style={{ height: '56%' }} /><span className="is-highlight" style={{ height: '86%' }} />
+            <span style={{ height: '74%' }} /><span style={{ height: '100%' }} />
+          </div>
+          <div className="login-preview__footer"><span><i /> Funil atualizado</span><strong>Ver dashboard →</strong></div>
+        </div>
+
+        <div className="login-hero__trust"><span>●</span> Dados organizados para decisões melhores</div>
+      </section>
+
+      <main className="login-panel">
+        <Card padding="large" className="login-card">
+          <header className="login-card__header">
+            <img src={codexaIcon} alt="Codexa" className="login-card__brand" />
+            <span>Codexa Leads</span>
+            <h2>Boas-vindas</h2>
+            <p>{isSignUp ? 'Crie sua conta para começar a prospectar.' : 'Entre para continuar seu trabalho.'}</p>
+          </header>
+
+          {error && (
+            <Alert tone="danger" title="Erro de autenticação">
+              {error}
+            </Alert>
+          )}
+
+          <form className="login-card__form" onSubmit={handleSubmit}>
+            <Input
+              label="E-mail"
+              id="email"
+              type="email"
+              autoComplete="email"
+              placeholder="seu@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
+              required
+            />
+
+            <Input
+              label="Senha"
+              id="password"
+              type="password"
+              autoComplete={isSignUp ? 'new-password' : 'current-password'}
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
+              required
+            />
+
+            <Button type="submit" variant="primary" fullWidth loading={loading}>
+              {isSignUp ? 'Criar conta' : 'Entrar no CRM'}
+            </Button>
+          </form>
+
+          <Button type="button" variant="ghost" fullWidth onClick={() => setIsSignUp((v) => !v)} disabled={loading}>
+            {isSignUp ? 'Já tem conta? Entrar' : 'Ainda não tem conta? Criar agora'}
+          </Button>
+
+          <div className="login-card__divider"><span>ou continue com</span></div>
+
+          <Button type="button" variant="secondary" fullWidth onClick={handleGoogle} disabled={loading}>
+            Entrar com Google
+          </Button>
+        </Card>
+      </main>
     </div>
   )
 }
