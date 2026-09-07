@@ -2,30 +2,69 @@ import { Card, Badge, Button, Icon } from 'codexa-ui'
 
 interface Package {
   name: string
-  includes: string
+  label: string
+  description: string
+  included: string[]
+  excluded: string[]
   value: number
+  featured?: boolean
 }
 
 const PACKAGES: Package[] = [
   {
     name: 'Codexa Start',
-    includes: 'Landing page de 1 página',
+    label: 'Para começar',
+    description: 'Uma presença objetiva para apresentar sua oferta e captar novos contatos.',
+    included: [
+      'Landing page de 1 página',
+      'Estrutura em página única',
+    ],
+    excluded: [
+      'Site institucional multipágina',
+      'Árvore de links personalizada',
+    ],
     value: 797,
   },
   {
     name: 'Site Institucional Essencial',
-    includes: 'Site institucional com até 3 telas/páginas',
+    label: 'Estrutura essencial',
+    description: 'O formato ideal para organizar as informações centrais da clínica.',
+    included: [
+      'Site institucional multipágina',
+      'Até 3 telas/páginas',
+    ],
+    excluded: [
+      'Estrutura expandida de até 7 páginas',
+      'Árvore de links personalizada',
+    ],
     value: 1500,
   },
   {
     name: 'Site Institucional Completo',
-    includes: 'Site institucional com até 7 telas/páginas',
+    label: 'Mais conteúdo',
+    description: 'Mais espaço para apresentar serviços, diferenciais e gerar confiança.',
+    included: [
+      'Site institucional multipágina',
+      'Até 7 telas/páginas',
+    ],
+    excluded: [
+      'Árvore de links personalizada',
+    ],
     value: 2000,
   },
   {
     name: 'Presença Digital Completa',
-    includes: 'Site institucional com até 7 telas/páginas + árvore de links personalizada com a identidade visual da clínica',
+    label: 'Ecossistema completo',
+    description: 'Site e canais digitais conectados em uma experiência visual consistente.',
+    included: [
+      'Site institucional multipágina',
+      'Até 7 telas/páginas',
+      'Árvore de links personalizada',
+      'Identidade visual da clínica na árvore de links',
+    ],
+    excluded: [],
     value: 2500,
+    featured: true,
   },
 ]
 
@@ -49,35 +88,84 @@ export default function Packages() {
         {PACKAGES.map((pkg) => (
           <Card
             key={pkg.name}
-            className={`packages__card ${pkg.name === 'Presença Digital Completa' ? 'packages__card--featured' : ''}`}
+            className={`packages__card ${pkg.featured ? 'packages__card--featured' : ''}`}
             padding="large"
             as="article"
           >
-            {pkg.name === 'Presença Digital Completa' && (
-              <div className="packages__badge">
-                <Badge tone="success" size="small">
-                  Mais popular
-                </Badge>
+            <header className="packages__card-header">
+              <div className="packages__card-topline">
+                <div className="packages__card-icon" aria-hidden="true">
+                  <Icon name={pkg.featured ? 'star' : 'file'} size={24} />
+                </div>
+
+                {pkg.featured && (
+                  <div className="packages__badge">
+                    <Badge tone="success" size="small">
+                      Mais popular
+                    </Badge>
+                  </div>
+                )}
               </div>
-            )}
 
-            <div className="packages__card-icon" aria-hidden="true">
-              <Icon name="file" size={32} />
-            </div>
-
-            <h3 className="packages__card-title">{pkg.name}</h3>
-            <p className="packages__card-description">{pkg.includes}</p>
+              <span className="packages__card-label">{pkg.label}</span>
+              <h3 className="packages__card-title">{pkg.name}</h3>
+              <p className="packages__card-description">{pkg.description}</p>
+            </header>
 
             <div className="packages__card-price">
               <span className="packages__card-amount">{formatCurrency(pkg.value)}</span>
               <span className="packages__card-period">por projeto</span>
             </div>
 
+            <div className="packages__card-features">
+              <section className="packages__feature-group" aria-label={`Itens incluídos no pacote ${pkg.name}`}>
+                <div className="packages__feature-heading">
+                  <h4>O que está incluído</h4>
+                  <span>{pkg.included.length}</span>
+                </div>
+                <ul className="packages__feature-list">
+                  {pkg.included.map((feature) => (
+                    <li key={feature}>
+                      <span className="packages__feature-icon packages__feature-icon--included" aria-hidden="true">
+                        <Icon name="check" size={13} />
+                      </span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              <section className={`packages__feature-group ${pkg.excluded.length === 0 ? 'packages__feature-group--complete' : ''}`} aria-label={`Itens não incluídos no pacote ${pkg.name}`}>
+                <div className="packages__feature-heading">
+                  <h4>O que não está incluído</h4>
+                  <span>{pkg.excluded.length}</span>
+                </div>
+                {pkg.excluded.length > 0 ? (
+                  <ul className="packages__feature-list packages__feature-list--excluded">
+                    {pkg.excluded.map((feature) => (
+                      <li key={feature}>
+                        <span className="packages__feature-icon packages__feature-icon--excluded" aria-hidden="true">
+                          <Icon name="x" size={12} />
+                        </span>
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="packages__feature-complete">
+                    <Icon name="check-circle" size={17} />
+                    Nenhum item deste comparativo fica de fora.
+                  </p>
+                )}
+              </section>
+            </div>
+
             <Button
               type="button"
+              className="packages__card-cta"
               variant="primary"
               fullWidth
-              leadingIcon={<Icon name="arrow-right" size={16} />}
+              trailingIcon={<Icon name="arrow-right" size={16} />}
             >
               Escolher pacote
             </Button>

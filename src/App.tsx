@@ -22,6 +22,7 @@ import { auth } from './firebase'
 import Login from './Login'
 import Help from './Help'
 import Dashboard from './Dashboard'
+import AddLeadModal, { type NewLeadInput } from './AddLeadModal'
 import ImportLeadsModal from './ImportLeadsModal'
 import LeadClientInfo from './LeadClientInfo'
 import LeadGroupsTable, { type LeadGroup } from './LeadGroupsTable'
@@ -31,7 +32,6 @@ import Portfolio from './Portfolio'
 import Preloader from './Preloader'
 import UserManagement from './UserManagement'
 import codexaLogo from 'codexa-ui/logos/logos-fundo-transparente/primary-logo.png'
-import codexaLogoDark from 'codexa-ui/logos/logos-fundo-transparente/primary-logo-reversed.png'
 import codexaIcon from 'codexa-ui/logos/logos-fundo-transparente/icon-only.png'
 import {
   Alert,
@@ -72,8 +72,6 @@ const COLUMNS: { id: ColumnId; label: string; emoji: string; color: string; icon
 ]
 
 type KanbanSort = 'manual' | 'score-desc' | 'score-asc' | 'rating-desc' | 'name-asc' | 'name-desc'
-type Theme = 'light' | 'dark' | 'system'
-
 const KANBAN_SORT_OPTIONS: { value: KanbanSort; label: string }[] = [
   { value: 'manual', label: 'Ordem manual' },
   { value: 'score-desc', label: 'Maior score' },
@@ -935,16 +933,6 @@ function LeadModal({
   )
 }
 
-function ThemeControls({ theme, onChange }: { theme: Theme; onChange: (theme: Theme) => void }) {
-  return (
-    <div className="prospect-nav__theme" role="group" aria-label="Preferência de tema">
-      <Button type="button" className={`prospect-nav__theme-btn ${theme === 'system' ? 'prospect-nav__theme-btn--active' : ''}`} variant="ghost" size="small" iconOnly onClick={() => onChange('system')} aria-label="Usar tema do sistema" leadingIcon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" /></svg>} />
-      <Button type="button" className={`prospect-nav__theme-btn ${theme === 'light' ? 'prospect-nav__theme-btn--active' : ''}`} variant="ghost" size="small" iconOnly onClick={() => onChange('light')} aria-label="Usar tema claro" leadingIcon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>} />
-      <Button type="button" className={`prospect-nav__theme-btn ${theme === 'dark' ? 'prospect-nav__theme-btn--active' : ''}`} variant="ghost" size="small" iconOnly onClick={() => onChange('dark')} aria-label="Usar tema escuro" leadingIcon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>} />
-    </div>
-  )
-}
-
 function ProfileAvatar({ user, size = 'medium' }: { user: User; size?: 'medium' | 'small' }) {
   const [imageFailed, setImageFailed] = useState(false)
   const label = user.displayName ?? user.email ?? 'Usuário'
@@ -978,31 +966,9 @@ function App() {
   const [navOpen, setNavOpen] = useState(false)
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [importOpen, setImportOpen] = useState(false)
-  const [theme, setTheme] = useState<Theme>(() => {
-    const saved = localStorage.getItem('codexa-theme')
-    if (saved === 'dark' || saved === 'light' || saved === 'system') return saved
-    return 'system'
-  })
+  const [addLeadOpen, setAddLeadOpen] = useState(false)
 
   const didDrag = useRef(false)
-
-  useEffect(() => {
-    const resolved = theme === 'system'
-      ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-      : theme
-    document.documentElement.setAttribute('data-theme', resolved)
-    localStorage.setItem('codexa-theme', theme)
-  }, [theme])
-
-  useEffect(() => {
-    if (theme !== 'system') return
-    const media = window.matchMedia('(prefers-color-scheme: dark)')
-    const handler = () => {
-      document.documentElement.setAttribute('data-theme', media.matches ? 'dark' : 'light')
-    }
-    media.addEventListener('change', handler)
-    return () => media.removeEventListener('change', handler)
-  }, [theme])
 
   useEffect(() => {
     return onAuthStateChanged(auth, (u) => {
@@ -1076,6 +1042,7 @@ function App() {
   const activeKanbanGroup = groups.some((group) => group.groupId === kanbanGroupFilter)
     ? kanbanGroupFilter
     : (groups[0]?.groupId ?? '')
+  const activeKanbanGroupInfo = groups.find((group) => group.groupId === activeKanbanGroup)
 
   const kanbanFilteredLeads = useMemo(() => {
     if (!activeKanbanGroup) return []
@@ -1271,6 +1238,57 @@ function App() {
     }
   }
 
+  const handleCreateLead = async (input: NewLeadInput) => {
+    if (!activeKanbanGroupInfo) throw new Error('Selecione um grupo antes de adicionar o lead')
+
+    const phone = input.phone || null
+    const website = input.website
+      ? (/^https?:\/\//i.test(input.website) ? input.website : `https://${input.website}`)
+      : null
+    const categoryName = input.categoryName || null
+    const newLead: Lead = {
+      title: input.title,
+      subTitle: null,
+      categoryName,
+      address: input.address || null,
+      neighborhood: null,
+      street: null,
+      city: null,
+      state: null,
+      postalCode: null,
+      website,
+      phone,
+      phoneUnformatted: phone ? phone.replace(/\D/g, '') || phone : null,
+      totalScore: null,
+      reviewsCount: null,
+      permanentlyClosed: false,
+      temporarilyClosed: false,
+      categories: categoryName ? [categoryName] : [],
+      placeId: `manual-${crypto.randomUUID()}`,
+      groupId: activeKanbanGroupInfo.groupId,
+      groupTitle: activeKanbanGroupInfo.groupTitle,
+      kanbanState: {
+        column: input.column,
+        collectedData: input.collectedData || undefined,
+      },
+    }
+
+    const response = await fetch('/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newLead),
+    })
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}))
+      throw new Error(payload.error || 'Não foi possível adicionar o lead')
+    }
+
+    const createdLead = await response.json() as Lead
+    setBaseLeads((current) => [...current, createdLead])
+    setAddLeadOpen(false)
+  }
+
   const handleEditGroup = async (group: LeadGroup, title: string) => {
     if (!group.groupId) return
     try {
@@ -1313,7 +1331,7 @@ function App() {
   return (
     <div className="prospect-app">
       <aside className="prospect-sidebar">
-        <img src={theme === 'dark' ? codexaLogoDark : codexaLogo} alt="Codexa" className="prospect-sidebar__logo" />
+        <img src={codexaLogo} alt="Codexa" className="prospect-sidebar__logo" />
         <div className="prospect-sidebar__brand">
           <div className="prospect-sidebar__user">
             <ProfileAvatar user={user} />
@@ -1346,11 +1364,10 @@ function App() {
         <nav className={`prospect-nav ${navOpen ? 'prospect-nav--open' : ''}`} aria-label="Navegação principal">
           <div className="prospect-nav__header">
             <img
-              src={theme === 'dark' ? codexaLogoDark : codexaLogo}
+              src={codexaLogo}
               alt="Codexa"
               className="prospect-nav__logo"
             />
-            <ThemeControls theme={theme} onChange={setTheme} />
           </div>
 
           <div className="prospect-nav__user">
@@ -1442,10 +1459,6 @@ function App() {
           >
             Help
           </Button>
-          <div className="prospect-nav__footer">
-            <span className="prospect-nav__footer-label">Aparência</span>
-            <ThemeControls theme={theme} onChange={setTheme} />
-          </div>
         </nav>
       </aside>
 
@@ -1648,6 +1661,29 @@ function App() {
             )
           ) : currentView === 'kanban' ? (
             <>
+              {!loading && !error && activeKanbanGroupInfo && (
+                <div className="kanban-group-context">
+                  <div className="kanban-group-context__info">
+                    <span className="kanban-group-context__icon" aria-hidden="true">
+                      <Icon name="users" size={18} />
+                    </span>
+                    <div>
+                      <span>Grupo em exibição</span>
+                      <strong>{activeKanbanGroupInfo.groupTitle}</strong>
+                      <small>{kanbanFilteredLeads.length} {kanbanFilteredLeads.length === 1 ? 'lead neste grupo' : 'leads neste grupo'}</small>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="primary"
+                    onClick={() => setAddLeadOpen(true)}
+                    leadingIcon={<Icon name="plus" size={17} />}
+                  >
+                    Novo lead
+                  </Button>
+                </div>
+              )}
+
               {loading ? (
                 <div className="prospect-loading">
                   <Spinner size="medium" label="Carregando leads..." />
@@ -1718,6 +1754,14 @@ function App() {
                   lead={selectedLead}
                   onClose={() => setSelectedLead(null)}
                   onSave={handleSaveLead}
+                />
+              )}
+
+              {addLeadOpen && activeKanbanGroupInfo && (
+                <AddLeadModal
+                  groupTitle={activeKanbanGroupInfo.groupTitle}
+                  onClose={() => setAddLeadOpen(false)}
+                  onCreate={handleCreateLead}
                 />
               )}
             </>

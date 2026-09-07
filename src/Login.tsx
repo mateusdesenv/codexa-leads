@@ -81,7 +81,9 @@ export default function Login() {
       <main className="login-panel">
         <Card padding="large" className="login-card">
           <header className="login-card__header">
-            <img src={codexaIcon} alt="Codexa" className="login-card__brand" />
+            <span className="login-card__brand" role="img" aria-label="Codexa">
+              <img src={codexaIcon} alt="" />
+            </span>
             <span>Codexa Leads</span>
             <h2>Boas-vindas</h2>
             <p>{isSignUp ? 'Crie sua conta para começar a prospectar.' : 'Entre para continuar seu trabalho.'}</p>
