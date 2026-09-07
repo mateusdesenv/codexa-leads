@@ -25,6 +25,7 @@ export interface Lead {
 export type ColumnId =
   | 'open'
   | 'em_contato'
+  | 'mensagem_enviada'
   | 'contato'
   | 'conversa'
   | 'followup'
