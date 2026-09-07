@@ -1,7 +1,9 @@
 import { Badge, Button, Card, Icon } from 'codexa-ui'
 import type { IconName } from 'codexa-ui'
+import type { CSSProperties } from 'react'
 
 import type { ColumnId, LeadWithMeta } from './types'
+import { formatCalendarDate } from './date'
 
 type DashboardColumn = {
   id: ColumnId
@@ -14,15 +16,42 @@ type DashboardProps = {
   leads: LeadWithMeta[]
   columns: DashboardColumn[]
   onOpenKanban: () => void
+  onOpenLead: (lead: LeadWithMeta) => void
 }
 
 const formatNumber = new Intl.NumberFormat('pt-BR')
+const longDateFormatter = new Intl.DateTimeFormat('pt-BR', {
+  weekday: 'long',
+  day: '2-digit',
+  month: 'long',
+})
+
+function toLocalDateKey(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function addDays(date: Date, amount: number): Date {
+  const result = new Date(date)
+  result.setDate(result.getDate() + amount)
+  return result
+}
+
+function getDateKey(value?: string): string {
+  return value?.slice(0, 10) ?? ''
+}
+
+function capitalize(value: string): string {
+  return value.charAt(0).toUpperCase() + value.slice(1)
+}
 
 function percentage(value: number, total: number) {
   return total === 0 ? 0 : Math.round((value / total) * 100)
 }
 
-export default function Dashboard({ leads, columns, onOpenKanban }: DashboardProps) {
+export default function Dashboard({ leads, columns, onOpenKanban, onOpenLead }: DashboardProps) {
   const total = leads.length
   const counts = columns.reduce(
     (acc, column) => ({
@@ -39,6 +68,29 @@ export default function Dashboard({ leads, columns, onOpenKanban }: DashboardPro
   const contacted = total - counts.open
   const conversations = counts.contato + counts.conversa + counts.followup + counts.proposta + counts.negociacao + counts.fechado
   const opportunities = counts.proposta + counts.negociacao + counts.fechado
+  const today = new Date()
+  const todayKey = toLocalDateKey(today)
+  const nextSevenDaysKey = toLocalDateKey(addDays(today, 7))
+  const activeLeads = leads.filter(
+    (lead) => lead.kanbanState.column !== 'fechado' && lead.kanbanState.column !== 'perdido',
+  )
+  const scheduledReturns = activeLeads
+    .filter((lead) => getDateKey(lead.kanbanState.returnDate))
+    .sort((a, b) => getDateKey(a.kanbanState.returnDate).localeCompare(getDateKey(b.kanbanState.returnDate)))
+  const returnsToday = scheduledReturns.filter(
+    (lead) => getDateKey(lead.kanbanState.returnDate) === todayKey,
+  )
+  const overdueReturns = scheduledReturns.filter(
+    (lead) => getDateKey(lead.kanbanState.returnDate) < todayKey,
+  )
+  const upcomingReturns = scheduledReturns.filter(
+    (lead) => getDateKey(lead.kanbanState.returnDate) > todayKey,
+  )
+  const returnsNextSevenDays = upcomingReturns.filter(
+    (lead) => getDateKey(lead.kanbanState.returnDate) <= nextSevenDaysKey,
+  )
+  const nextReturns = upcomingReturns.slice(0, 5)
+  const columnById = new Map(columns.map((column) => [column.id, column]))
 
   let cursor = 0
   const donutStops = columns.map((column) => {
@@ -61,9 +113,9 @@ export default function Dashboard({ leads, columns, onOpenKanban }: DashboardPro
     <section className="dashboard" aria-labelledby="dashboard-title">
       <Card className="dashboard__hero" padding="large">
         <div>
-          <Badge tone="success" size="small">Visão geral</Badge>
-          <h2 id="dashboard-title">Acompanhe seu funil comercial</h2>
-          <p>Métricas atualizadas com os status atuais dos leads.</p>
+          <Badge tone="success" size="small">{capitalize(longDateFormatter.format(today))}</Badge>
+          <h2 id="dashboard-title">Seu dia comercial começa aqui</h2>
+          <p>Priorize os retornos de hoje e mantenha as próximas oportunidades em movimento.</p>
         </div>
         <Button
           type="button"
@@ -74,6 +126,132 @@ export default function Dashboard({ leads, columns, onOpenKanban }: DashboardPro
           Abrir Kanban
         </Button>
       </Card>
+
+      <div className="dashboard__agenda-summary" aria-label="Resumo das próximas tarefas">
+        <Card className="dashboard-agenda-metric dashboard-agenda-metric--today" padding="medium">
+          <span className="dashboard-agenda-metric__icon" aria-hidden="true">
+            <Icon name="calendar" size={20} />
+          </span>
+          <div>
+            <span>Retornos hoje</span>
+            <strong>{formatNumber.format(returnsToday.length)}</strong>
+          </div>
+          <small>{returnsToday.length === 1 ? 'conversa para retomar' : 'conversas para retomar'}</small>
+        </Card>
+        <Card className="dashboard-agenda-metric dashboard-agenda-metric--overdue" padding="medium">
+          <span className="dashboard-agenda-metric__icon" aria-hidden="true">
+            <Icon name="warning" size={20} />
+          </span>
+          <div>
+            <span>Retornos atrasados</span>
+            <strong>{formatNumber.format(overdueReturns.length)}</strong>
+          </div>
+          <small>{overdueReturns.length > 0 ? 'pedem atenção prioritária' : 'nenhuma pendência vencida'}</small>
+        </Card>
+        <Card className="dashboard-agenda-metric dashboard-agenda-metric--upcoming" padding="medium">
+          <span className="dashboard-agenda-metric__icon" aria-hidden="true">
+            <Icon name="arrow-right" size={20} />
+          </span>
+          <div>
+            <span>Próximos 7 dias</span>
+            <strong>{formatNumber.format(returnsNextSevenDays.length)}</strong>
+          </div>
+          <small>{returnsNextSevenDays.length === 1 ? 'retorno já programado' : 'retornos já programados'}</small>
+        </Card>
+      </div>
+
+      <div className="dashboard__agenda">
+        <Card className="dashboard-agenda" padding="large" as="article">
+          <div className="dashboard-agenda__header">
+            <div>
+              <span className="dashboard-agenda__eyebrow">Prioridade do dia</span>
+              <h3>Retornos de hoje</h3>
+              <p>Leads com data de retorno marcada para {formatCalendarDate(todayKey)}.</p>
+            </div>
+            <Badge tone={returnsToday.length > 0 ? 'warning' : 'success'} size="small">
+              {returnsToday.length > 0 ? `${returnsToday.length} pendente${returnsToday.length === 1 ? '' : 's'}` : 'Tudo em dia'}
+            </Badge>
+          </div>
+
+          {returnsToday.length > 0 ? (
+            <ul className="dashboard-task-list" aria-label="Leads com retorno para hoje">
+              {returnsToday.map((lead) => {
+                const column = columnById.get(lead.kanbanState.column)
+                return (
+                  <li key={lead.placeId}>
+                    <button type="button" className="dashboard-task" onClick={() => onOpenLead(lead)}>
+                      <span className="dashboard-task__icon" aria-hidden="true">
+                        <Icon name="message" size={18} />
+                      </span>
+                      <span className="dashboard-task__content">
+                        <strong>{lead.title}</strong>
+                        <small>{lead.kanbanState.nextAction || 'Retomar o contato comercial'}</small>
+                        <span className="dashboard-task__meta">
+                          {lead.groupTitle && <span>{lead.groupTitle}</span>}
+                          {lead.categoryName && <span>{lead.categoryName}</span>}
+                        </span>
+                      </span>
+                      <span className="dashboard-task__status">
+                        <span style={{ '--task-color': column?.color ?? 'var(--ds-green)' } as CSSProperties}>
+                          {column?.label ?? 'Em andamento'}
+                        </span>
+                        <small>Ver lead <Icon name="arrow-right" size={14} /></small>
+                      </span>
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          ) : (
+            <div className="dashboard-agenda__empty">
+              <span aria-hidden="true"><Icon name="check-circle" size={24} /></span>
+              <div>
+                <strong>Nenhum retorno marcado para hoje</strong>
+                <p>Sua agenda está livre. Aproveite para avançar os próximos leads do funil.</p>
+              </div>
+            </div>
+          )}
+        </Card>
+
+        <Card className="dashboard-upcoming" padding="large" as="article">
+          <div className="dashboard-agenda__header">
+            <div>
+              <span className="dashboard-agenda__eyebrow">Na sequência</span>
+              <h3>Próximos retornos</h3>
+              <p>Sua agenda comercial depois de hoje.</p>
+            </div>
+          </div>
+
+          {nextReturns.length > 0 ? (
+            <ol className="dashboard-upcoming__list">
+              {nextReturns.map((lead) => (
+                <li key={lead.placeId}>
+                  <button type="button" onClick={() => onOpenLead(lead)}>
+                    <time dateTime={lead.kanbanState.returnDate}>
+                      <strong>{formatCalendarDate(lead.kanbanState.returnDate).slice(0, 5)}</strong>
+                      <span>{getDateKey(lead.kanbanState.returnDate) <= nextSevenDaysKey ? 'em breve' : 'agendado'}</span>
+                    </time>
+                    <span>
+                      <strong>{lead.title}</strong>
+                      <small>{lead.kanbanState.nextAction || lead.groupTitle || 'Retorno comercial'}</small>
+                    </span>
+                    <Icon name="arrow-right" size={15} aria-hidden="true" />
+                  </button>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <div className="dashboard-upcoming__empty">
+              <Icon name="calendar" size={20} />
+              <p>Nenhum próximo retorno agendado.</p>
+            </div>
+          )}
+
+          <Button type="button" variant="secondary" fullWidth onClick={onOpenKanban}>
+            Organizar no Kanban
+          </Button>
+        </Card>
+      </div>
 
       <div className="dashboard__metrics" aria-label="Principais métricas">
         <Card className="dashboard-metric" padding="medium">

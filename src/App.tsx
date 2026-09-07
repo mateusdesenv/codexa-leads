@@ -1403,7 +1403,7 @@ function App() {
             onClick={() => { setSelectedGroup(null); setCurrentView('dashboard'); setNavOpen(false) }}
             leadingIcon={<Icon name="home" size={18} />}
           >
-            Dashboard
+            Início
           </Button>
           <Button
             type="button"
@@ -1471,7 +1471,7 @@ function App() {
       )}
 
       <main className="prospect-main">
-        <header className="prospect-header prospect-header--logged">
+        <header className={`prospect-header prospect-header--logged ${currentView === 'dashboard' ? 'prospect-header--home' : ''}`}>
           <div className="prospect-header__page">
             <img
               src={codexaIcon}
@@ -1481,7 +1481,7 @@ function App() {
             <div>
               <h2>
                 {currentView === 'dashboard'
-                  ? 'Dashboard'
+                  ? 'Início'
                   : currentView === 'kanban'
                     ? 'Kanban'
                   : currentView === 'table'
@@ -1496,7 +1496,7 @@ function App() {
               </h2>
               <p>
                 {currentView === 'dashboard'
-                  ? 'Visão geral do funil comercial'
+                  ? 'Resumo das tarefas e retornos do dia'
                   : currentView === 'kanban'
                     ? 'Kanban de prospecção comercial'
                   : currentView === 'table'
@@ -1653,11 +1653,21 @@ function App() {
                 </Alert>
               </div>
             ) : (
-              <Dashboard
-                leads={leadsWithMeta}
-                columns={COLUMNS}
-                onOpenKanban={() => setCurrentView('kanban')}
-              />
+              <>
+                <Dashboard
+                  leads={leadsWithMeta}
+                  columns={COLUMNS}
+                  onOpenKanban={() => setCurrentView('kanban')}
+                  onOpenLead={handleCardClick}
+                />
+                {selectedLead && (
+                  <LeadModal
+                    lead={selectedLead}
+                    onClose={() => setSelectedLead(null)}
+                    onSave={handleSaveLead}
+                  />
+                )}
+              </>
             )
           ) : currentView === 'kanban' ? (
             <>
