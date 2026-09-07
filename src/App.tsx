@@ -62,6 +62,7 @@ import './App.css'
 const COLUMNS: { id: ColumnId; label: string; emoji: string; color: string; icon: IconName }[] = [
   { id: 'open', label: 'Open', emoji: '🟢', color: '#25BF44', icon: 'check-circle' },
   { id: 'em_contato', label: 'Tentativa de ligação', emoji: '📞', color: '#3B82F6', icon: 'send' },
+  { id: 'mensagem_enviada', label: 'Mensagem enviada', emoji: '✉️', color: '#6366F1', icon: 'message' },
   { id: 'contato', label: 'Contato feito', emoji: '✅', color: '#2DD4A0', icon: 'check' },
   { id: 'followup', label: 'Follow-up', emoji: '📅', color: '#F59E0B', icon: 'calendar' },
   { id: 'conversa', label: 'Em conversa', emoji: '💬', color: '#8B5CF6', icon: 'message' },
@@ -84,6 +85,7 @@ const KANBAN_SORT_OPTIONS: { value: KanbanSort; label: string }[] = [
 const DEFAULT_KANBAN_SORT: Record<ColumnId, KanbanSort> = {
   open: 'score-desc',
   em_contato: 'manual',
+  mensagem_enviada: 'manual',
   contato: 'manual',
   conversa: 'manual',
   followup: 'manual',
