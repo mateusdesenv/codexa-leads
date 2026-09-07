@@ -11,6 +11,7 @@ type TableLead = LeadWithMeta
 const COLUMN_ORDER: ColumnId[] = [
   'open',
   'em_contato',
+  'mensagem_enviada',
   'contato',
   'conversa',
   'followup',
@@ -23,6 +24,7 @@ const COLUMN_ORDER: ColumnId[] = [
 const COLUMN_LABELS: Record<ColumnId, string> = {
   open: 'Open',
   em_contato: 'Tentativa de ligação',
+  mensagem_enviada: 'Mensagem enviada',
   contato: 'Contato feito',
   conversa: 'Em conversa',
   followup: 'Follow-up',
@@ -51,6 +53,7 @@ const formatDate = (value?: string | null): string => {
 const INITIAL_BY_COLUMN: Record<ColumnId, LeadWithMeta[]> = {
   open: [],
   em_contato: [],
+  mensagem_enviada: [],
   contato: [],
   conversa: [],
   followup: [],
