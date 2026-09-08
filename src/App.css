@@ -3515,6 +3515,13 @@ body.lead-modal-open .ds-dialog {
     max-width: none;
   }
 
+  .prospect-sidebar {
+    flex-basis: auto;
+    padding: 0;
+    border-right: 0;
+    background: transparent;
+  }
+
   .prospect-header--logged {
     min-height: 66px;
     padding: 12px 16px;
