@@ -13,6 +13,10 @@ html[data-theme="dark"] {
   --ds-line: #2a2d35;
   --ds-white: #1a1d24;
   --ds-off-white: #11131a;
+  --ds-surface-light: #20252c;
+  --ds-red: #fca5a5;
+  --ds-red-ice: #3d1f23;
+  --color-bg: var(--ds-off-white);
 
   --ds-shadow-subtle: 0 2px 7px rgba(0, 0, 0, 0.28);
 }
@@ -21,6 +25,14 @@ html[data-theme="dark"] body {
   color: var(--ds-graphite);
   background: var(--ds-off-white);
 }
+
+html[data-theme="dark"] .prospect-sidebar__logo,
+html[data-theme="dark"] .prospect-nav__logo,
+html[data-theme="dark"] .access-waiting__card > img {
+  content: url('codexa-ui/logos/logos-fundo-transparente/primary-logo-reversed.png');
+}
+
+html[data-theme="dark"] .portfolio-action-error { color: #fca5a5; }
 
 html[data-theme="dark"] .kanban-card:hover {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
@@ -130,10 +142,14 @@ html[data-theme="dark"] .ds-alert--neutral {
 }
 
 /* Legacy classes still used in drag overlay / custom cards */
-html[data-theme="dark"] .temperature-badge--quente,
 html[data-theme="dark"] .kanban-card__website--proprio {
   color: #4ade80;
   background: #14331f;
+}
+
+html[data-theme="dark"] .temperature-badge--quente {
+  color: #fca5a5;
+  background: #3d1f23;
 }
 
 html[data-theme="dark"] .temperature-badge--medio,
@@ -370,4 +386,64 @@ html[data-theme="dark"] .dashboard-metric__icon--closed {
 html[data-theme="dark"] .dashboard-metric__icon--progress {
   color: #c4b5fd;
   background: #2e1065;
+}
+
+/* Components introduced by the workspace refresh. */
+html[data-theme="dark"] .prospect-nav__btn.ds-button--primary,
+html[data-theme="dark"] .prospect-nav__btn.ds-button--primary:hover:not(:disabled) {
+  color: var(--ds-green-dark);
+  background: var(--ds-green-mist);
+  border-color: transparent;
+}
+
+html[data-theme="dark"] .ds-choice__content strong,
+html[data-theme="dark"] .ds-dialog__panel {
+  color: var(--ds-graphite);
+}
+
+html[data-theme="dark"] .ds-choice__content small,
+html[data-theme="dark"] .ds-popover__content > div {
+  color: var(--ds-charcoal);
+}
+
+html[data-theme="dark"] .ds-tabs,
+html[data-theme="dark"] .ds-popover__content,
+html[data-theme="dark"] .ds-pagination > button:first-child,
+html[data-theme="dark"] .ds-pagination > button:last-child {
+  color: var(--ds-charcoal);
+  background: var(--ds-white);
+  border-color: var(--ds-line);
+}
+
+html[data-theme="dark"] .ds-pagination button { color: var(--ds-charcoal); }
+html[data-theme="dark"] .ds-pagination button:hover:not(:disabled),
+html[data-theme="dark"] .ds-pagination button.is-active {
+  color: var(--ds-green-dark);
+  background: var(--ds-green-mist);
+  border-color: var(--ds-green-dark);
+}
+
+html[data-theme="dark"] .ds-choice__indicator {
+  background: var(--ds-white);
+  border-color: var(--ds-gray);
+}
+html[data-theme="dark"] .ds-choice > input:checked + .ds-choice__indicator {
+  color: #11131a;
+  background: var(--ds-green);
+  border-color: var(--ds-green);
+}
+
+html[data-theme="dark"] .dashboard-agenda-metric--overdue .dashboard-agenda-metric__icon {
+  color: #fca5a5;
+  background: #3d1f23;
+}
+html[data-theme="dark"] .dashboard-agenda-metric--upcoming .dashboard-agenda-metric__icon {
+  color: #93c5fd;
+  background: #172554;
+}
+html[data-theme="dark"] .ds-tab { color: var(--ds-charcoal); }
+html[data-theme="dark"] .ds-tab:hover,
+html[data-theme="dark"] .ds-tab.is-active {
+  color: var(--ds-green-dark);
+  background: var(--ds-green-mist);
 }

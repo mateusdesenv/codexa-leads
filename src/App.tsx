@@ -59,6 +59,7 @@ const AnchorButton = Button as any
 import { loadKanbanStates } from './storage'
 import { formatCalendarDate, parseCalendarDate } from './date'
 import './App.css'
+import { useTheme, type ThemePreference } from './useTheme'
 
 const COLUMNS: { id: ColumnId; label: string; emoji: string; color: string; icon: IconName }[] = [
   { id: 'open', label: 'Open', emoji: '🟢', color: '#25BF44', icon: 'check-circle' },
@@ -981,7 +982,7 @@ function ProfileAvatar({ user, size = 'medium' }: { user: User; size?: 'medium' 
   )
 }
 
-function App({ user }: { user: User }) {
+function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreference; onThemeChange: (theme: ThemePreference) => void }) {
   const [baseLeads, setBaseLeads] = useState<Lead[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -1499,6 +1500,27 @@ function App({ user }: { user: User }) {
           >
             Help
           </Button>
+          <fieldset className="nav-appearance">
+            <legend>Tema</legend>
+            <div className="nav-appearance__options">
+              {([
+                ['dark', 'Escuro'],
+                ['light', 'Claro'],
+                ['system', 'Sistema'],
+              ] as const).map(([value, label]) => (
+                <label className="nav-appearance__option" key={value}>
+                  <input
+                    type="radio"
+                    name="appearance"
+                    value={value}
+                    checked={theme === value}
+                    onChange={() => onThemeChange(value)}
+                  />
+                  <span>{label}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
         </nav>
       </aside>
 
@@ -1904,5 +1926,6 @@ function App({ user }: { user: User }) {
 }
 
 export default function ProtectedApp() {
-  return <AccessGate>{(user) => <App key={user.uid} user={user} />}</AccessGate>
+  const [theme, selectTheme] = useTheme()
+  return <AccessGate>{(user) => <App key={user.uid} user={user} theme={theme} onThemeChange={selectTheme} />}</AccessGate>
 }

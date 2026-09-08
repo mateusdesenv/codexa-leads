@@ -2,6 +2,7 @@
 @import './tokens/tokens.css';
 
 :root {
+  color-scheme: light;
   font-family: 'Inter', Arial, sans-serif;
   color: var(--ds-graphite);
   background: var(--ds-off-white);
