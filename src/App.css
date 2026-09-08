@@ -4629,3 +4629,4 @@ body.lead-modal-open .ds-dialog {
 .access-waiting__card h1 { margin: 0; font-size: clamp(24px, 4vw, 32px); line-height: 1.2; }
 .access-waiting__card p { margin: 0; line-height: 1.6; overflow-wrap: anywhere; }
 .access-waiting__actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.user-actions-menu .leads-table__actions-item:disabled { opacity: .45; cursor: not-allowed; }

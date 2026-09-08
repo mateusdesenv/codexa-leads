@@ -23,6 +23,7 @@ test('access requests require administrator approval before CRM access', async (
     return originalFetch(url, options)
   }
   User.findOne = async ({ firebaseUid }) => users.get(firebaseUid)
+  User.deleteOne = async ({ firebaseUid }) => ({ deletedCount: Number(users.delete(firebaseUid)) })
   User.findOneAndUpdate = async ({ firebaseUid }, update, options) => {
     let user = users.get(firebaseUid)
     if (!user && !options.upsert) return null
@@ -62,7 +63,12 @@ test('access requests require administrator approval before CRM access', async (
     assert.equal((await request('/api/leads', 'pending')).status, 200)
     const relogin = await request('/api/users/me', 'pending', 'PUT')
     assert.equal((await relogin.json()).accessStatus, 'approved')
-    users.delete('new-user')
+    assert.equal((await request('/api/users/new-user', 'pending', 'DELETE')).status, 403)
+    assert.equal((await request('/api/users/new-user', 'unverified', 'DELETE')).status, 403)
+    assert.equal((await request('/api/users/owner', 'admin', 'DELETE')).status, 403)
+    assert.equal((await request('/api/users/missing', 'admin', 'DELETE')).status, 404)
+    assert.equal((await request('/api/users/new-user', 'admin', 'DELETE')).status, 204)
+    assert.ok(users.has('owner'))
     assert.equal((await request('/api/leads', 'pending')).status, 403)
     assert.equal((await (await request('/api/users/me', 'pending', 'PUT')).json()).accessStatus, 'pending')
     assert.equal((await request('/api/leads', 'pending')).status, 403)

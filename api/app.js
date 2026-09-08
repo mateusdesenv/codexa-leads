@@ -147,6 +147,21 @@ app.patch('/api/users/:uid/approve', requireAuthenticatedUser, requireAdmin, asy
   }
 })
 
+app.delete('/api/users/:uid', requireAuthenticatedUser, requireAdmin, async (request, response) => {
+  try {
+    await connectToDatabase()
+    const user = await User.findOne({ firebaseUid: request.params.uid })
+    if (!user) return response.status(404).json({ error: 'Usuário não encontrado' })
+    if (user.firebaseUid === request.firebaseUser.localId || user.email?.trim().toLowerCase() === ADMIN_EMAIL) {
+      return response.status(403).json({ error: 'A conta do administrador não pode ser excluída' })
+    }
+    await User.deleteOne({ firebaseUid: user.firebaseUid, email: { $ne: ADMIN_EMAIL } })
+    return response.status(204).end()
+  } catch {
+    return response.status(500).json({ error: 'Não foi possível excluir o usuário' })
+  }
+})
+
 app.get('/api/health', (_request, response) => response.json({ ok: true }))
 
 app.use('/api', requireAuthenticatedUser, async (request, response, next) => {

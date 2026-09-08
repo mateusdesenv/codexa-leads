@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { updateProfile, type User } from 'firebase/auth'
-import { Alert, Avatar, Button, Card, Icon, Input, Tag } from 'codexa-ui'
+import { Alert, Avatar, Button, Card, ConfirmDialog, Icon, Input, Tag } from 'codexa-ui'
 
 const ADMIN_EMAIL = 'mateus.desenv@gmail.com'
 
@@ -40,6 +41,8 @@ export default function UserManagement({ user }: UserManagementProps) {
   const [feedback, setFeedback] = useState<string | null>(null)
   const [systemUsers, setSystemUsers] = useState<SystemUser[]>([])
   const [approving, setApproving] = useState<string | null>(null)
+  const [deletingUser, setDeletingUser] = useState<SystemUser | null>(null)
+  const [deleting, setDeleting] = useState(false)
   const [refresh, setRefresh] = useState(0)
   const [usersLoading, setUsersLoading] = useState(false)
   const [usersError, setUsersError] = useState<string | null>(null)
@@ -98,6 +101,22 @@ export default function UserManagement({ user }: UserManagementProps) {
     } finally {
       setSaving(false)
     }
+  }
+
+  const deleteUser = async () => {
+    if (!deletingUser || deleting) return
+    setDeleting(true)
+    setUsersError(null)
+    try {
+      const token = await user.getIdToken()
+      const response = await fetch(`/api/users/${encodeURIComponent(deletingUser.uid)}`, {
+        method: 'DELETE', headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!response.ok) throw new Error('Não foi possível excluir o usuário')
+      setSystemUsers((current) => current.filter((entry) => entry.uid !== deletingUser.uid))
+    } catch {
+      setUsersError('Não foi possível excluir o usuário. Tente novamente.')
+    } finally { setDeleting(false); setDeletingUser(null) }
   }
 
   return (
@@ -182,7 +201,7 @@ export default function UserManagement({ user }: UserManagementProps) {
                     <td>{getSystemProviderLabel(systemUser.providerId)}</td>
                     <td>{formatAccountDate(systemUser.registeredAt ?? systemUser.createdAt)}</td>
                     <td><Tag tone={systemUser.accessStatus === 'approved' ? 'success' : 'warning'}>{systemUser.accessStatus === 'approved' ? 'Liberado' : 'Aguardando liberação'}</Tag></td>
-                    <td>{systemUser.accessStatus !== 'approved' && systemUser.email.toLowerCase() !== ADMIN_EMAIL && <Button size="small" disabled={approving !== null} onClick={() => approveUser(systemUser.uid)}>{approving === systemUser.uid ? 'Liberando...' : 'Liberar acesso'}</Button>}</td>
+                    <td><UserActionsMenu user={systemUser} busy={approving !== null || deleting} onApprove={() => approveUser(systemUser.uid)} onDelete={() => setDeletingUser(systemUser)} /></td>
                   </tr>
                 ))}
                 {!usersLoading && systemUsers.length === 0 && (
@@ -194,6 +213,74 @@ export default function UserManagement({ user }: UserManagementProps) {
           {usersError ? <Alert tone="danger">{usersError}</Alert> : <p className="user-management__table-note">Novas solicitações aparecem após a autenticação e permanecem bloqueadas até sua aprovação.</p>}
         </Card>
       )}
+      <ConfirmDialog
+        open={deletingUser !== null}
+        onClose={() => { if (!deleting) setDeletingUser(null) }}
+        onConfirm={deleteUser}
+        title="Excluir usuário"
+        description={`Excluir ${deletingUser?.email ?? 'este usuário'} do CRM? O acesso será removido. Se entrar novamente, precisará solicitar uma nova liberação.`}
+        confirmLabel={deleting ? 'Excluindo...' : 'Excluir usuário'}
+        tone="danger"
+      />
     </section>
   )
+}
+
+function UserActionsMenu({ user, busy, onApprove, onDelete }: {
+  user: SystemUser
+  busy: boolean
+  onApprove: () => void
+  onDelete: () => void
+}) {
+  const [position, setPosition] = useState<{ top: number; right: number } | null>(null)
+  const trigger = useRef<HTMLSpanElement>(null)
+  const menu = useRef<HTMLDivElement>(null)
+  const owner = user.email.trim().toLowerCase() === ADMIN_EMAIL
+  const close = () => {
+    setPosition(null)
+    trigger.current?.querySelector('button')?.focus()
+  }
+
+  useEffect(() => {
+    if (!position) return
+    (menu.current?.querySelector<HTMLButtonElement>('button:not(:disabled)') ?? menu.current)?.focus()
+    const outside = (event: PointerEvent) => {
+      if (!menu.current?.contains(event.target as Node) && !trigger.current?.contains(event.target as Node)) setPosition(null)
+    }
+    const dismiss = () => setPosition(null)
+    document.addEventListener('pointerdown', outside)
+    window.addEventListener('resize', dismiss)
+    window.addEventListener('scroll', dismiss, true)
+    return () => {
+      document.removeEventListener('pointerdown', outside)
+      window.removeEventListener('resize', dismiss)
+      window.removeEventListener('scroll', dismiss, true)
+    }
+  }, [position])
+
+  return <>
+    <span ref={trigger}>
+      <Button variant="ghost" size="small" iconOnly aria-label={`Mais ações para ${user.email}`} aria-haspopup="menu" aria-expanded={position !== null} disabled={busy}
+        leadingIcon={<Icon name="more-horizontal" size={18} />}
+        onClick={(event) => {
+          const rect = event.currentTarget.getBoundingClientRect()
+          setPosition(position ? null : { top: Math.max(8, Math.min(rect.bottom + 4, window.innerHeight - 110)), right: Math.max(8, window.innerWidth - rect.right) })
+        }} />
+    </span>
+    {position && createPortal(<div ref={menu} className="leads-table__actions-menu user-actions-menu" role="menu" tabIndex={-1} aria-label={`Ações para ${user.email}`} style={position}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') { event.preventDefault(); close() }
+        if (event.key === 'Tab') { event.preventDefault(); close() }
+        if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+          event.preventDefault()
+          const items = Array.from(menu.current?.querySelectorAll<HTMLButtonElement>('button:not(:disabled)') ?? [])
+          const current = items.indexOf(document.activeElement as HTMLButtonElement)
+          const next = event.key === 'Home' ? 0 : event.key === 'End' ? items.length - 1 : (current + (event.key === 'ArrowUp' ? -1 : 1) + items.length) % items.length
+          items[next]?.focus()
+        }
+      }}>
+      <button type="button" role="menuitem" className="leads-table__actions-item" disabled={busy || owner || user.accessStatus === 'approved'} onClick={() => { close(); onApprove() }}><Icon name="check-circle" size={16} />Liberar acesso</button>
+      <button type="button" role="menuitem" className="leads-table__actions-item leads-table__actions-item--danger" disabled={busy || owner} onClick={() => { close(); onDelete() }}><Icon name="trash" size={16} />Excluir usuário</button>
+    </div>, document.body)}
+  </>
 }
