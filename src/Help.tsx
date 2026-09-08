@@ -1,3 +1,4 @@
+import { apiFetch } from './api'
 import { useEffect, useMemo, useState } from 'react'
 import {
   Alert,
@@ -50,7 +51,7 @@ export default function Help() {
     try {
       setLoading(true)
       setError(null)
-      const res = await fetch(API)
+      const res = await apiFetch(API)
       if (!res.ok) throw new Error('Erro ao carregar perguntas')
       const data: QnA[] = await res.json()
       setItems(data)
@@ -105,7 +106,7 @@ export default function Help() {
       isFavorite,
     }
     try {
-      const res = await fetch(editing ? `${API}/${editing.id}` : API, {
+      const res = await apiFetch(editing ? `${API}/${editing.id}` : API, {
         method: editing ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -120,7 +121,7 @@ export default function Help() {
 
   async function handleDelete(id: string) {
     try {
-      const res = await fetch(`${API}/${id}`, { method: 'DELETE' })
+      const res = await apiFetch(`${API}/${id}`, { method: 'DELETE' })
       if (!res.ok) throw new Error('Erro ao remover')
       await fetchItems()
     } catch (err) {
@@ -132,7 +133,7 @@ export default function Help() {
 
   async function handleToggleFavorite(item: QnA) {
     try {
-      const res = await fetch(`${API}/${item.id}/favorite`, { method: 'PATCH' })
+      const res = await apiFetch(`${API}/${item.id}/favorite`, { method: 'PATCH' })
       if (!res.ok) throw new Error('Erro ao favoritar')
       await fetchItems()
     } catch (err) {

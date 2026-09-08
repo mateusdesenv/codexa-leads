@@ -86,7 +86,7 @@ export default function Login() {
             </span>
             <span>Codexa Leads</span>
             <h2>Boas-vindas</h2>
-            <p>{isSignUp ? 'Crie sua conta para começar a prospectar.' : 'Entre para continuar seu trabalho.'}</p>
+            <p>{isSignUp ? 'Crie sua conta para solicitar acesso ao CRM.' : 'Entre para continuar seu trabalho.'}</p>
           </header>
 
           {error && (

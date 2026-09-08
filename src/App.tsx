@@ -1,3 +1,4 @@
+import { apiFetch } from './api'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   DndContext,
@@ -17,9 +18,9 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { onAuthStateChanged, signOut, type User } from 'firebase/auth'
+import { signOut, type User } from 'firebase/auth'
 import { auth } from './firebase'
-import Login from './Login'
+import AccessGate from './AccessGate'
 import Help from './Help'
 import Dashboard from './Dashboard'
 import AddLeadModal, { type NewLeadInput } from './AddLeadModal'
@@ -127,22 +128,13 @@ const SOCIAL_HOSTS = [
 ]
 
 const fetchLeads = async (): Promise<Lead[]> => {
-  const res = await fetch('/api/leads')
+  const res = await apiFetch('/api/leads')
   if (!res.ok) throw new Error('Não foi possível carregar os dados')
   return res.json()
 }
 
-const syncAuthenticatedUser = async (user: User) => {
-  const token = await user.getIdToken()
-  const response = await fetch('/api/users/me', {
-    method: 'PUT',
-    headers: { Authorization: `Bearer ${token}` },
-  })
-  if (!response.ok) throw new Error('Não foi possível sincronizar o usuário')
-}
-
 const updateLeadState = async (placeId: string, kanbanState: KanbanState): Promise<Lead> => {
-  const res = await fetch(`/api/leads/${placeId}`, {
+  const res = await apiFetch(`/api/leads/${placeId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ kanbanState }),
@@ -152,7 +144,7 @@ const updateLeadState = async (placeId: string, kanbanState: KanbanState): Promi
 }
 
 const updateLeadsBatch = async (leads: { placeId: string; kanbanState: KanbanState }[]): Promise<void> => {
-  const res = await fetch('/api/leads/batch', {
+  const res = await apiFetch('/api/leads/batch', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(leads),
@@ -950,7 +942,7 @@ function ProfileAvatar({ user, size = 'medium' }: { user: User; size?: 'medium' 
   )
 }
 
-function App() {
+function App({ user }: { user: User }) {
   const [baseLeads, setBaseLeads] = useState<Lead[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -960,7 +952,6 @@ function App() {
   const [kanbanSorts, setKanbanSorts] = useState<Record<ColumnId, KanbanSort>>(DEFAULT_KANBAN_SORT)
   const [selectedLead, setSelectedLead] = useState<LeadWithMeta | null>(null)
   const [activeDrag, setActiveDrag] = useState<LeadWithMeta | null>(null)
-  const [user, setUser] = useState<User | null | undefined>(undefined)
   const [currentView, setCurrentView] = useState<'dashboard' | 'kanban' | 'table' | 'packages' | 'portfolio' | 'users' | 'help'>('dashboard')
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
   const [navOpen, setNavOpen] = useState(false)
@@ -969,13 +960,6 @@ function App() {
   const [addLeadOpen, setAddLeadOpen] = useState(false)
 
   const didDrag = useRef(false)
-
-  useEffect(() => {
-    return onAuthStateChanged(auth, (u) => {
-      setUser(u)
-      if (u) void syncAuthenticatedUser(u).catch(() => undefined)
-    })
-  }, [])
 
   useEffect(() => {
     fetchLeads()
@@ -1222,7 +1206,7 @@ function App() {
   const handleImportLeads = async (title: string, leads: Lead[]) => {
     try {
       setLoading(true)
-      const res = await fetch('/api/leads/import', {
+      const res = await apiFetch('/api/leads/import', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, leads }),
@@ -1273,7 +1257,7 @@ function App() {
       },
     }
 
-    const response = await fetch('/api/leads', {
+    const response = await apiFetch('/api/leads', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newLead),
@@ -1292,7 +1276,7 @@ function App() {
   const handleEditGroup = async (group: LeadGroup, title: string) => {
     if (!group.groupId) return
     try {
-      const res = await fetch(`/api/leads/group/${group.groupId}`, {
+      const res = await apiFetch(`/api/leads/group/${group.groupId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ groupTitle: title }),
@@ -1309,7 +1293,7 @@ function App() {
   const handleDeleteGroup = async (group: LeadGroup) => {
     if (!group.groupId) return
     try {
-      const res = await fetch(`/api/leads/group/${group.groupId}`, { method: 'DELETE' })
+      const res = await apiFetch(`/api/leads/group/${group.groupId}`, { method: 'DELETE' })
       if (!res.ok) throw new Error('Erro ao excluir grupo')
       const fresh = await fetchLeads()
       setBaseLeads(fresh)
@@ -1320,12 +1304,8 @@ function App() {
     }
   }
 
-  if (user === undefined || loading) {
+  if (loading) {
     return <Preloader />
-  }
-
-  if (user === null) {
-    return <Login />
   }
 
   return (
@@ -1862,4 +1842,6 @@ function App() {
   )
 }
 
-export default App
+export default function ProtectedApp() {
+  return <AccessGate>{(user) => <App key={user.uid} user={user} />}</AccessGate>
+}

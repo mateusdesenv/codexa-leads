@@ -4623,3 +4623,9 @@ body.lead-modal-open .ds-dialog {
     width: 100%;
   }
 }
+
+.access-waiting { min-height: 100dvh; display: grid; place-items: center; padding: 24px; background: var(--color-bg, #f7faf8); }
+.access-waiting__card { width: 100%; max-width: 540px; display: flex; flex-direction: column; gap: 20px; }
+.access-waiting__card h1 { margin: 0; font-size: clamp(24px, 4vw, 32px); line-height: 1.2; }
+.access-waiting__card p { margin: 0; line-height: 1.6; overflow-wrap: anywhere; }
+.access-waiting__actions { display: flex; flex-wrap: wrap; gap: 12px; }

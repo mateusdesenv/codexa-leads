@@ -73,9 +73,10 @@ const requireAuthenticatedUser = async (request, response, next) => {
   }
 }
 
+const isAdmin = (user) => user?.email?.trim().toLowerCase() === ADMIN_EMAIL && user.emailVerified === true
+
 const requireAdmin = (request, response, next) => {
-  const email = request.firebaseUser?.email?.trim().toLowerCase()
-  if (email !== ADMIN_EMAIL) {
+  if (!isAdmin(request.firebaseUser)) {
     return response.status(403).json({ error: 'Acesso restrito ao administrador' })
   }
   return next()
@@ -90,6 +91,8 @@ const serializeUser = (user) => ({
   registeredAt: user.registeredAt,
   lastSignInAt: user.lastSignInAt,
   createdAt: user.createdAt,
+  accessStatus: user.accessStatus ?? 'pending',
+  approvedAt: user.approvedAt,
 })
 
 app.put('/api/users/me', requireAuthenticatedUser, async (request, response) => {
@@ -105,6 +108,7 @@ app.put('/api/users/me', requireAuthenticatedUser, async (request, response) => 
       registeredAt: toDate(firebaseUser.createdAt),
       lastSignInAt: toDate(firebaseUser.lastLoginAt),
     }
+    if (isAdmin(firebaseUser)) data.accessStatus = 'approved'
     const user = await User.findOneAndUpdate(
       { firebaseUid: firebaseUser.localId },
       { $set: data, $setOnInsert: { firebaseUid: firebaseUser.localId } },
@@ -125,6 +129,37 @@ app.get('/api/users', requireAuthenticatedUser, requireAdmin, async (_request, r
   } catch (error) {
     console.error(error)
     return response.status(500).json({ error: 'Não foi possível buscar os usuários' })
+  }
+})
+
+app.patch('/api/users/:uid/approve', requireAuthenticatedUser, requireAdmin, async (request, response) => {
+  try {
+    await connectToDatabase()
+    const user = await User.findOneAndUpdate(
+      { firebaseUid: request.params.uid },
+      { $set: { accessStatus: 'approved', approvedAt: new Date(), approvedBy: request.firebaseUser.localId } },
+      { returnDocument: 'after' },
+    )
+    if (!user) return response.status(404).json({ error: 'Usuário não encontrado' })
+    return response.json(serializeUser(user))
+  } catch {
+    return response.status(500).json({ error: 'Não foi possível liberar o acesso' })
+  }
+})
+
+app.get('/api/health', (_request, response) => response.json({ ok: true }))
+
+app.use('/api', requireAuthenticatedUser, async (request, response, next) => {
+  try {
+    if (isAdmin(request.firebaseUser)) return next()
+    await connectToDatabase()
+    const user = await User.findOne({ firebaseUid: request.firebaseUser.localId })
+    if (user?.accessStatus !== 'approved') {
+      return response.status(403).json({ code: 'ACCESS_PENDING', error: 'Aguardando liberação do administrador' })
+    }
+    return next()
+  } catch {
+    return response.status(503).json({ error: 'Não foi possível verificar a liberação' })
   }
 })
 
@@ -195,10 +230,10 @@ app.get('/api/leads/export', async (_req, res) => {
   }
 })
 
-app.post('/api/leads/seed', async (_req, res) => {
+app.post('/api/leads/seed', requireAdmin, async (_req, res) => {
   try {
     await connectToDatabase()
-    const seedPath = path.join(process.cwd(), 'public', 'data', 'leads.json')
+    const seedPath = path.join(process.cwd(), 'scripts', 'data', 'leads.json')
     const seedData = JSON.parse(fs.readFileSync(seedPath, 'utf8'))
 
     const result = []
@@ -347,10 +382,6 @@ app.delete('/api/qna/:id', async (req, res) => {
     console.error(err)
     res.status(500).json({ error: 'Erro ao remover pergunta' })
   }
-})
-
-app.get('/api/health', (_req, res) => {
-  res.json({ ok: true })
 })
 
 app.put('/api/leads/group/:groupId', async (req, res) => {

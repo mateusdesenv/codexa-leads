@@ -12,7 +12,7 @@ async function main() {
   try {
     await connectToDatabase()
 
-    const seedPath = path.join(process.cwd(), 'public', 'data', 'leads.json')
+    const seedPath = path.join(process.cwd(), 'scripts', 'data', 'leads.json')
     const seedData = JSON.parse(fs.readFileSync(seedPath, 'utf8'))
 
     let count = 0

@@ -14,6 +14,7 @@ type SystemUser = {
   displayName: string
   photoURL: string
   providerId: string
+  accessStatus: 'pending' | 'approved'
   registeredAt?: string
   createdAt?: string
 }
@@ -38,6 +39,8 @@ export default function UserManagement({ user }: UserManagementProps) {
   const [saving, setSaving] = useState(false)
   const [feedback, setFeedback] = useState<string | null>(null)
   const [systemUsers, setSystemUsers] = useState<SystemUser[]>([])
+  const [approving, setApproving] = useState<string | null>(null)
+  const [refresh, setRefresh] = useState(0)
   const [usersLoading, setUsersLoading] = useState(false)
   const [usersError, setUsersError] = useState<string | null>(null)
   const isAdmin = user.email?.trim().toLowerCase() === ADMIN_EMAIL
@@ -65,7 +68,23 @@ export default function UserManagement({ user }: UserManagementProps) {
 
     void loadUsers()
     return () => { cancelled = true }
-  }, [isAdmin, user])
+  }, [isAdmin, user, refresh])
+
+  const approveUser = async (uid: string) => {
+    setApproving(uid)
+    setUsersError(null)
+    try {
+      const token = await user.getIdToken()
+      const response = await fetch(`/api/users/${encodeURIComponent(uid)}/approve`, {
+        method: 'PATCH', headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!response.ok) throw new Error('Não foi possível liberar o acesso')
+      const updated: SystemUser = await response.json()
+      setSystemUsers((current) => current.map((entry) => entry.uid === uid ? updated : entry))
+    } catch {
+      setUsersError('Não foi possível liberar o acesso. Tente novamente.')
+    } finally { setApproving(null) }
+  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -128,9 +147,10 @@ export default function UserManagement({ user }: UserManagementProps) {
               <Icon name="users" size={20} />
               <div>
                 <h2>Usuários do sistema</h2>
-                <p>Visão administrativa das contas cadastradas no CRM.</p>
+                <p>Aprove as solicitações para liberar o acesso ao CRM.</p>
               </div>
             </div>
+            <Button variant="secondary" size="small" disabled={usersLoading} onClick={() => setRefresh((value) => value + 1)}>Atualizar solicitações</Button>
             <Tag tone="info">{usersLoading ? 'Carregando...' : `${systemUsers.length} ${systemUsers.length === 1 ? 'usuário' : 'usuários'}`}</Tag>
           </div>
 
@@ -142,6 +162,8 @@ export default function UserManagement({ user }: UserManagementProps) {
                   <th scope="col">Perfil</th>
                   <th scope="col">Provedor</th>
                   <th scope="col">Desde</th>
+                  <th scope="col">Acesso</th>
+                  <th scope="col">Ação</th>
                 </tr>
               </thead>
               <tbody>
@@ -159,15 +181,17 @@ export default function UserManagement({ user }: UserManagementProps) {
                     <td><Tag tone={systemUser.email.toLowerCase() === ADMIN_EMAIL ? 'info' : 'neutral'}>{systemUser.email.toLowerCase() === ADMIN_EMAIL ? 'Administrador' : 'Usuário'}</Tag></td>
                     <td>{getSystemProviderLabel(systemUser.providerId)}</td>
                     <td>{formatAccountDate(systemUser.registeredAt ?? systemUser.createdAt)}</td>
+                    <td><Tag tone={systemUser.accessStatus === 'approved' ? 'success' : 'warning'}>{systemUser.accessStatus === 'approved' ? 'Liberado' : 'Aguardando liberação'}</Tag></td>
+                    <td>{systemUser.accessStatus !== 'approved' && systemUser.email.toLowerCase() !== ADMIN_EMAIL && <Button size="small" disabled={approving !== null} onClick={() => approveUser(systemUser.uid)}>{approving === systemUser.uid ? 'Liberando...' : 'Liberar acesso'}</Button>}</td>
                   </tr>
                 ))}
                 {!usersLoading && systemUsers.length === 0 && (
-                  <tr><td className="user-management__table-empty" colSpan={4}>Nenhum usuário sincronizado ainda.</td></tr>
+                  <tr><td className="user-management__table-empty" colSpan={6}>Nenhum usuário sincronizado ainda.</td></tr>
                 )}
               </tbody>
             </table>
           </div>
-          {usersError ? <Alert tone="danger">{usersError}</Alert> : <p className="user-management__table-note">As contas aparecem aqui automaticamente após o primeiro login.</p>}
+          {usersError ? <Alert tone="danger">{usersError}</Alert> : <p className="user-management__table-note">Novas solicitações aparecem após a autenticação e permanecem bloqueadas até sua aprovação.</p>}
         </Card>
       )}
     </section>
