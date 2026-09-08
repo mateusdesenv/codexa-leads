@@ -300,6 +300,13 @@ function isValidUrl(url: string): boolean {
   }
 }
 
+const WHATSAPP_MESSAGE = `Oi! Tudo bem?
+Tentei falar com vocês por ligação hoje, mas não consegui contato.
+
+Sou da Codexa e estive olhando um pouquinho o trabalho de vocês. Percebi algumas oportunidades que podem ajudar a clínica a atrair mais clientes e transformar melhor a presença digital em agendamentos.
+
+Queria te mostrar uma ideia bem simples que pensamos para negócios como o de vocês. Posso te explicar por aqui?`
+
 function getWhatsAppUrl(phone: string | null | undefined): string | null {
   if (!phone) return null
   let digits = phone.replace(/\D/g, '')
@@ -307,7 +314,7 @@ function getWhatsAppUrl(phone: string | null | undefined): string | null {
   if (digits.length === 11 && !digits.startsWith('55')) {
     digits = `55${digits}`
   }
-  return `https://wa.me/${digits}`
+  return `https://wa.me/${digits}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`
 }
 
 function Actions({ lead }: { lead: Lead }) {
