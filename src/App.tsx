@@ -415,11 +415,15 @@ function LeadCard({
   lead,
   index,
   onClick,
+  onAdvance,
 }: {
   lead: LeadWithMeta
   index: number
   onClick: (lead: LeadWithMeta) => void
+  onAdvance: (lead: LeadWithMeta) => Promise<void>
 }) {
+  const [isAdvancing, setIsAdvancing] = useState(false)
+  const nextColumn = COLUMNS[COLUMNS.findIndex((column) => column.id === lead.kanbanState.column) + 1]
   const {
     attributes,
     listeners,
@@ -561,6 +565,30 @@ function LeadCard({
         >
           Ver detalhes
         </Button>
+        {nextColumn && (
+          <Button
+            type="button"
+            size="small"
+            fullWidth
+            disabled={isAdvancing}
+            aria-label={`Mover para ${nextColumn.label}`}
+            title={`Mover para ${nextColumn.label}`}
+            onPointerDown={(event: React.PointerEvent) => event.stopPropagation()}
+            onTouchStart={(event: React.TouchEvent) => event.stopPropagation()}
+            onClick={async (event: React.MouseEvent) => {
+              event.stopPropagation()
+              if (isAdvancing) return
+              setIsAdvancing(true)
+              try {
+                await onAdvance(lead)
+              } finally {
+                setIsAdvancing(false)
+              }
+            }}
+          >
+            {isAdvancing ? 'Movendo…' : 'Próxima coluna →'}
+          </Button>
+        )}
       </div>
     </article>
   )
@@ -570,12 +598,14 @@ function KanbanColumn({
   column,
   leads,
   onCardClick,
+  onAdvance,
   sort,
   onSortChange,
 }: {
   column: (typeof COLUMNS)[number]
   leads: LeadWithMeta[]
   onCardClick: (lead: LeadWithMeta) => void
+  onAdvance: (lead: LeadWithMeta) => Promise<void>
   sort: KanbanSort
   onSortChange: (sort: KanbanSort) => void
 }) {
@@ -653,7 +683,7 @@ function KanbanColumn({
       >
         <div className="kanban-column__cards">
           {leads.map((lead, index) => (
-            <LeadCard key={lead.placeId} lead={lead} index={index} onClick={onCardClick} />
+            <LeadCard key={lead.placeId} lead={lead} index={index} onClick={onCardClick} onAdvance={onAdvance} />
           ))}
         </div>
       </SortableContext>
@@ -1174,6 +1204,27 @@ function App({ user }: { user: User }) {
         console.error(err)
         setError('Erro ao salvar ordem dos leads')
       })
+    }
+  }
+
+  const handleAdvanceLead = async (lead: LeadWithMeta) => {
+    const currentLead = baseLeads.find((item) => item.placeId === lead.placeId)
+    if (!currentLead) return
+    const columnIndex = COLUMNS.findIndex((column) => column.id === (currentLead.kanbanState?.column ?? 'open'))
+    const nextColumn = COLUMNS[columnIndex + 1]
+    if (columnIndex < 0 || !nextColumn) return
+    const destinationLeads = baseLeads.filter((item) => item.kanbanState?.column === nextColumn.id)
+    const state: KanbanState = {
+      ...currentLead.kanbanState,
+      column: nextColumn.id,
+      order: Math.max(-1, ...destinationLeads.map((item) => item.kanbanState?.order ?? -1)) + 1,
+    }
+    try {
+      await updateLeadState(lead.placeId, state)
+      setBaseLeads((current) => current.map((item) => item.placeId === lead.placeId ? { ...item, kanbanState: state } : item))
+    } catch (err) {
+      console.error(err)
+      setError('Erro ao mover lead para a próxima coluna. Tente novamente.')
     }
   }
 
@@ -1707,6 +1758,7 @@ function App({ user }: { user: User }) {
                         column={column}
                         leads={leadsByColumn[column.id]}
                         onCardClick={handleCardClick}
+                        onAdvance={handleAdvanceLead}
                         sort={kanbanSorts[column.id]}
                         onSortChange={(sort) => setKanbanSorts((current) => ({ ...current, [column.id]: sort }))}
                       />
