@@ -29,7 +29,7 @@ interface LeadClientInfoProps {
   lead: LeadWithMeta
 }
 
-function InfoSection({
+export function InfoSection({
   title,
   children,
   compact = false,

@@ -86,18 +86,20 @@ test('CRM reads and exports the same grouped database records and confirms saved
     })
     assert.equal(created.status, 201)
     assert.equal((await created.json()).groupTitle, 'Leads clínicas')
-    const state = { column: 'followup', returnDate: '2026-09-20', collectedData: 'Saved notes' }
+    const state = { column: 'followup', returnDate: '2026-09-20', collectedData: 'Saved notes',
+      contactResearch: { profile: 'Perfil revisado', publicEmail: 'contato@example.com', sources: 'https://example.com' } }
     const saved = await (await request('/api/leads/new', 'PUT', { kanbanState: state })).json()
     assert.deepEqual(saved.kanbanState, state)
     assert.deepEqual((await (await request('/api/leads')).json()).find((lead) => lead.placeId === 'new'), saved)
     assert.equal((await request('/api/leads/ungrouped-0', 'PUT', { kanbanState: state })).status, 404)
     const batch = await (await request('/api/leads/batch', 'PUT', [
-      { placeId: 'grouped-0', kanbanState: { column: 'conversa', order: 0 } },
+      { placeId: 'grouped-0', kanbanState: { column: 'conversa', order: 0, contactResearch: state.contactResearch } },
       { placeId: 'ungrouped-0', kanbanState: state },
     ])).json()
     assert.equal(batch.updated, 1)
     assert.equal(batch.leads.length, 52)
     assert.equal(batch.leads.find((lead) => lead.placeId === 'grouped-0').kanbanState.column, 'conversa')
+    assert.deepEqual(batch.leads.find((lead) => lead.placeId === 'grouped-0').kanbanState.contactResearch, state.contactResearch)
     assert.equal(records.find((lead) => lead.placeId === 'ungrouped-0').kanbanState.column, 'open')
     assert.equal((await request('/api/leads/new/message-sent', 'PATCH', { sent: 'yes' })).status, 400)
     assert.equal((await request('/api/leads/ungrouped-0/message-sent', 'PATCH', { sent: true })).status, 404)

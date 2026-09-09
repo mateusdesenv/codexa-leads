@@ -1,3 +1,5 @@
+import type { ContactResearch } from '../shared/contact-research'
+
 export interface Lead {
   title: string
   subTitle: string | null
@@ -45,6 +47,7 @@ export interface KanbanState {
   proposalValue?: string
   proposalReturnDate?: string
   collectedData?: string
+  contactResearch?: ContactResearch
   interest?: 'alto' | 'medio' | 'baixo' | ''
   budget?: string
   returnDate?: string

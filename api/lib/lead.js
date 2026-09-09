@@ -1,4 +1,10 @@
 import mongoose from 'mongoose'
+import { CONTACT_RESEARCH_KEYS } from '../../shared/contact-research.js'
+
+const contactResearchSchema = new mongoose.Schema(
+  Object.fromEntries(CONTACT_RESEARCH_KEYS.map((key) => [key, { type: String }])),
+  { _id: false, minimize: false },
+)
 
 const leadSchema = new mongoose.Schema(
   {
@@ -31,6 +37,7 @@ const leadSchema = new mongoose.Schema(
       proposalValue: { type: String, default: null },
       proposalReturnDate: { type: String, default: null },
       collectedData: { type: String, default: null },
+      contactResearch: { type: contactResearchSchema, default: undefined },
       interest: { type: String, default: null },
       budget: { type: String, default: null },
       returnDate: { type: String, default: null },

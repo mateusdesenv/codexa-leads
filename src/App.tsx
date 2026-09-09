@@ -26,6 +26,7 @@ import Dashboard from './Dashboard'
 import AddLeadModal, { type NewLeadInput } from './AddLeadModal'
 import ImportLeadsModal from './ImportLeadsModal'
 import LeadClientInfo from './LeadClientInfo'
+import { ContactResearchFields } from './ContactResearchFields'
 import LeadGroupsTable, { type LeadGroup } from './LeadGroupsTable'
 import LeadsTable from './LeadsTable'
 import Packages from './Packages'
@@ -717,18 +718,6 @@ function KanbanColumn({
   )
 }
 
-const MESSAGE_TEMPLATE = `Oi, [nome]! Tudo bem? 😊
-
-Sou o Mateus, da Codexa. Dei uma olhada no perfil da [clínica] e identifiquei 2 pontos que, na minha visão, poderiam melhorar bastante a experiência de uma cliente que chega até vocês pelo Instagram.
-
-São coisas simples, mas que podem fazer diferença principalmente na hora de transformar uma pessoa interessada em uma cliente.
-
-Posso te mandar os 2 pontos? Prometo ser rapidinho`
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
 function LeadModal({
   lead,
   onClose,
@@ -742,13 +731,6 @@ function LeadModal({
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
 
-  const [message, setMessage] = useState(() =>
-    MESSAGE_TEMPLATE
-      .replace(/\[nome\]/g, () => '[nome]')
-      .replace(/\[clínica\]/g, () => lead.title),
-  )
-  const [contactName, setContactName] = useState('')
-  const [clinicName, setClinicName] = useState(lead.title)
   const [activeTab, setActiveTab] = useState<'cliente' | 'contato' | 'dados'>('dados')
 
   const tabItems: TabItem[] = [
@@ -763,18 +745,6 @@ function LeadModal({
     { value: 'medio', label: 'Médio' },
     { value: 'baixo', label: 'Baixo' },
   ]
-
-  const updateMessageForName = (nextName: string) =>
-    setMessage((prev) => {
-      const restored = contactName ? prev.replace(new RegExp(escapeRegExp(contactName), 'g'), '[nome]') : prev
-      return restored.replace(/\[nome\]/g, () => nextName || '[nome]')
-    })
-
-  const updateMessageForClinic = (nextClinic: string) =>
-    setMessage((prev) => {
-      const restored = clinicName ? prev.replace(new RegExp(escapeRegExp(clinicName), 'g'), '[clínica]') : prev
-      return restored.replace(/\[clínica\]/g, () => nextClinic || '[clínica]')
-    })
 
   useEffect(() => {
     document.body.classList.add('lead-modal-open')
@@ -840,38 +810,9 @@ function LeadModal({
           <div className="modal__column modal__column--contact">
             <h3 className="modal__column-title">Contato</h3>
 
-            <Input
-              label="Nome"
-              id="contact-name"
-              type="text"
-              placeholder="Ex: Ana"
-              value={contactName}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                setContactName(e.target.value)
-                updateMessageForName(e.target.value)
-              }}
-              leadingIcon={<Icon name="user" size={16} />}
-            />
-
-            <Input
-              label="Clínica"
-              id="clinic-name"
-              type="text"
-              value={clinicName}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                setClinicName(e.target.value)
-                updateMessageForClinic(e.target.value)
-              }}
-              leadingIcon={<Icon name="home" size={16} />}
-            />
-
-            <Textarea
-              label="Mensagem"
-              id="lead-message"
-              value={message}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value)}
-              rows={8}
-              className="modal__message"
+            <ContactResearchFields
+              value={state.contactResearch ?? {}}
+              onChange={(contactResearch) => setState((current) => ({ ...current, contactResearch }))}
             />
           </div>
         )}
