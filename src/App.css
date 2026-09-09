@@ -3530,28 +3530,19 @@ body.lead-modal-open .ds-dialog {
 @media (min-width: 761px) {
   .prospect-toolbar {
     position: relative;
+    /* Keep inline select menus above the board, but below dialogs. */
+    z-index: 30;
     display: grid;
     grid-template-columns: minmax(156px, 0.58fr) minmax(0, 2.6fr) auto;
     gap: 18px;
     align-items: end;
     padding: 16px;
-    overflow: hidden;
+    overflow: visible;
     border-color: color-mix(in srgb, var(--ds-green) 20%, var(--ds-line));
     background:
+      radial-gradient(circle 90px at calc(82% - 90px) 38px, color-mix(in srgb, var(--ds-green) 7%, transparent) 99%, transparent 100%),
       linear-gradient(108deg, color-mix(in srgb, var(--ds-green-mist) 78%, var(--ds-white)), var(--ds-white) 42%),
       var(--ds-white);
-  }
-
-  .prospect-toolbar::after {
-    position: absolute;
-    top: -52px;
-    right: 18%;
-    width: 180px;
-    height: 180px;
-    border-radius: 50%;
-    background: color-mix(in srgb, var(--ds-green) 7%, transparent);
-    content: '';
-    pointer-events: none;
   }
 
   .prospect-toolbar__heading,
