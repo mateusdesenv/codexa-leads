@@ -57,6 +57,7 @@ import type { ColumnId, KanbanState, Lead, LeadWithMeta, Temperature } from './t
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const AnchorButton = Button as any
 import { formatCalendarDate, parseCalendarDate } from './date'
+import { getMessageDay } from '../shared/message-day.js'
 import './App.css'
 import { useTheme, type ThemePreference } from './useTheme'
 
@@ -399,13 +400,20 @@ function LeadCard({
   index,
   onClick,
   onAdvance,
+  messageDay,
+  onToggleMessage,
 }: {
   lead: LeadWithMeta
   index: number
   onClick: (lead: LeadWithMeta) => void
   onAdvance: (lead: LeadWithMeta) => Promise<void>
+  messageDay: string
+  onToggleMessage: (lead: LeadWithMeta, sent: boolean) => Promise<void>
 }) {
   const [isAdvancing, setIsAdvancing] = useState(false)
+  const [isMarkingMessage, setIsMarkingMessage] = useState(false)
+  const [messageError, setMessageError] = useState<string | null>(null)
+  const messageSentToday = lead.messageSentOn === messageDay
   const nextColumn = COLUMNS[COLUMNS.findIndex((column) => column.id === lead.kanbanState.column) + 1]
   const {
     attributes,
@@ -427,7 +435,7 @@ function LeadCard({
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      className={`kanban-card kanban-card--${lead.temperature}`}
+      className={`kanban-card kanban-card--${lead.temperature}${messageSentToday ? ' kanban-card--message-sent' : ''}`}
       style={style}
       onClick={() => !isDragging && onClick(lead)}
     >
@@ -548,6 +556,37 @@ function LeadCard({
         >
           Ver detalhes
         </Button>
+        <Button
+          type="button"
+          variant="secondary"
+          size="small"
+          fullWidth
+          className="kanban-card__message-toggle"
+          aria-pressed={messageSentToday}
+          title={messageSentToday ? 'Desmarcar mensagem enviada hoje' : 'Marcar mensagem enviada hoje'}
+          loading={isMarkingMessage}
+          disabled={isMarkingMessage}
+          leadingIcon={<Icon name={messageSentToday ? 'check-circle' : 'message'} size={15} />}
+          onPointerDown={(event: React.PointerEvent) => event.stopPropagation()}
+          onTouchStart={(event: React.TouchEvent) => event.stopPropagation()}
+          onKeyDown={(event: React.KeyboardEvent) => event.stopPropagation()}
+          onClick={async (event: React.MouseEvent) => {
+            event.stopPropagation()
+            if (isMarkingMessage) return
+            setIsMarkingMessage(true)
+            setMessageError(null)
+            try {
+              await onToggleMessage(lead, !messageSentToday)
+            } catch (err) {
+              setMessageError(err instanceof Error ? err.message : 'Não foi possível salvar a marcação')
+            } finally {
+              setIsMarkingMessage(false)
+            }
+          }}
+        >
+          Mensagem enviada <span className="kanban-card__message-day">hoje</span>
+        </Button>
+        {messageError && <p className="kanban-card__message-error" role="alert">{messageError}</p>}
         {nextColumn && (
           <Button
             type="button"
@@ -582,6 +621,8 @@ function KanbanColumn({
   leads,
   onCardClick,
   onAdvance,
+  messageDay,
+  onToggleMessage,
   sort,
   onSortChange,
 }: {
@@ -589,6 +630,8 @@ function KanbanColumn({
   leads: LeadWithMeta[]
   onCardClick: (lead: LeadWithMeta) => void
   onAdvance: (lead: LeadWithMeta) => Promise<void>
+  messageDay: string
+  onToggleMessage: (lead: LeadWithMeta, sent: boolean) => Promise<void>
   sort: KanbanSort
   onSortChange: (sort: KanbanSort) => void
 }) {
@@ -666,7 +709,7 @@ function KanbanColumn({
       >
         <div className="kanban-column__cards">
           {leads.map((lead, index) => (
-            <LeadCard key={lead.placeId} lead={lead} index={index} onClick={onCardClick} onAdvance={onAdvance} />
+            <LeadCard key={lead.placeId} lead={lead} index={index} onClick={onCardClick} onAdvance={onAdvance} messageDay={messageDay} onToggleMessage={onToggleMessage} />
           ))}
         </div>
       </SortableContext>
@@ -985,6 +1028,19 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [importOpen, setImportOpen] = useState(false)
   const [addLeadOpen, setAddLeadOpen] = useState(false)
+  const [messageDay, setMessageDay] = useState(getMessageDay)
+
+  useEffect(() => {
+    const updateDay = () => setMessageDay(getMessageDay())
+    const timer = window.setInterval(updateDay, 30_000)
+    window.addEventListener('focus', updateDay)
+    document.addEventListener('visibilitychange', updateDay)
+    return () => {
+      window.clearInterval(timer)
+      window.removeEventListener('focus', updateDay)
+      document.removeEventListener('visibilitychange', updateDay)
+    }
+  }, [])
 
   const didDrag = useRef(false)
 
@@ -1238,6 +1294,18 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
       prev.map((l) => (l.placeId === placeId ? savedLead : l)),
     )
     setError(null)
+  }
+
+  const handleToggleMessage = async (lead: LeadWithMeta, sent: boolean) => {
+    const response = await apiFetch(`/api/leads/${encodeURIComponent(lead.placeId)}/message-sent`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sent }),
+    })
+    if (!response.ok) throw new Error('Não foi possível salvar a marcação. Tente novamente.')
+    const savedLead = await response.json() as Lead
+    setBaseLeads((current) => current.map((item) => item.placeId === savedLead.placeId ? savedLead : item))
+    setMessageDay(getMessageDay())
   }
 
   const handleCardClick = (lead: LeadWithMeta) => {
@@ -1783,6 +1851,8 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
                         leads={leadsByColumn[column.id]}
                         onCardClick={handleCardClick}
                         onAdvance={handleAdvanceLead}
+                        messageDay={messageDay}
+                        onToggleMessage={handleToggleMessage}
                         sort={kanbanSorts[column.id]}
                         onSortChange={(sort) => setKanbanSorts((current) => ({ ...current, [column.id]: sort }))}
                       />
@@ -1790,7 +1860,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
                   </div>
                   <DragOverlay dropAnimation={null}>
                     {activeDrag ? (
-                      <div className="kanban-card kanban-card--dragging">
+                      <div className={`kanban-card kanban-card--dragging${activeDrag.messageSentOn === messageDay ? ' kanban-card--message-sent' : ''}`}>
                         <div className="kanban-card__header">
                           <div className="kanban-card__title-wrap">
                             <h3 className="kanban-card__title">{activeDrag.title}</h3>

@@ -22,6 +22,7 @@ const leadSchema = new mongoose.Schema(
     placeId: { type: String, required: true, unique: true },
     groupId: { type: String, default: null },
     groupTitle: { type: String, default: null },
+    messageSentOn: { type: String, default: null },
     kanbanState: {
       column: { type: String, default: 'open' },
       nextAction: { type: String, default: null },

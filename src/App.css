@@ -2988,6 +2988,29 @@ body.lead-modal-open .ds-dialog {
   outline-offset: 2px;
 }
 
+.kanban-card.kanban-card--message-sent {
+  background: #effcf2;
+  border-color: #a7ddb3;
+}
+
+.kanban-card__message-toggle[aria-pressed="true"] {
+  color: #176b30;
+  background: #d9f5df;
+  border-color: #a7ddb3;
+}
+
+.kanban-card__message-day {
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.kanban-card__message-error {
+  margin: 0;
+  color: var(--ds-red);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 .kanban-card__title {
   font-size: .9rem;
   font-weight: 760;

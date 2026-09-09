@@ -1,5 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { getMessageDay } from '../shared/message-day.js'
 
 test('CRM reads and exports the same grouped database records and confirms saved state', async (t) => {
   process.env.MONGODB_URI = 'mongodb://localhost/test'
@@ -98,6 +99,19 @@ test('CRM reads and exports the same grouped database records and confirms saved
     assert.equal(batch.leads.length, 52)
     assert.equal(batch.leads.find((lead) => lead.placeId === 'grouped-0').kanbanState.column, 'conversa')
     assert.equal(records.find((lead) => lead.placeId === 'ungrouped-0').kanbanState.column, 'open')
+    assert.equal((await request('/api/leads/new/message-sent', 'PATCH', { sent: 'yes' })).status, 400)
+    assert.equal((await request('/api/leads/ungrouped-0/message-sent', 'PATCH', { sent: true })).status, 404)
+    const marked = await (await request('/api/leads/new/message-sent', 'PATCH', {
+      sent: true, messageSentOn: '1999-01-01', kanbanState: { column: 'perdido' },
+    })).json()
+    assert.equal(marked.messageSentOn, getMessageDay(), 'server determines the current day')
+    assert.deepEqual(marked.kanbanState, state, 'marking does not change the stage or lead details')
+    assert.equal((await (await request('/api/leads')).json()).find((lead) => lead.placeId === 'new').messageSentOn, marked.messageSentOn)
+    await request('/api/leads/new', 'PUT', { kanbanState: { ...state, column: 'conversa' } })
+    assert.equal(records.find((lead) => lead.placeId === 'new').messageSentOn, marked.messageSentOn, 'editing Kanban state preserves the daily marker')
+    const unmarked = await (await request('/api/leads/new/message-sent', 'PATCH', { sent: false })).json()
+    assert.equal(unmarked.messageSentOn, null)
+    assert.equal(unmarked.kanbanState.column, 'conversa')
     await request('/api/leads/group/seed', 'DELETE')
     assert.deepEqual(await (await request('/api/leads')).json(), [])
     assert.deepEqual(await (await request('/api/leads/export')).json(), [])

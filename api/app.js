@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url'
 import { connectToDatabase } from './lib/db.js'
 import { Lead } from './lib/lead.js'
 import { activeLeadFilter, findActiveLeads } from './lib/active-leads.js'
+import { getMessageDay } from '../shared/message-day.js'
 import { QnA } from './lib/qna.js'
 import { User } from './lib/user.js'
 
@@ -306,6 +307,25 @@ app.put('/api/leads/batch', async (req, res) => {
   } catch (err) {
     console.error(err)
     res.status(400).json({ error: err instanceof Error ? err.message : 'Erro ao atualizar leads' })
+  }
+})
+
+app.patch('/api/leads/:placeId/message-sent', async (req, res) => {
+  if (typeof req.body?.sent !== 'boolean') {
+    return res.status(400).json({ error: 'Informe se a mensagem foi enviada' })
+  }
+  try {
+    await connectToDatabase()
+    const lead = await Lead.findOneAndUpdate(
+      { ...activeLeadFilter, placeId: req.params.placeId },
+      { $set: { messageSentOn: req.body.sent ? getMessageDay() : null } },
+      { returnDocument: 'after' },
+    )
+    if (!lead) return res.status(404).json({ error: 'Lead não encontrado' })
+    res.json(lead)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Erro ao marcar mensagem enviada' })
   }
 })
 
