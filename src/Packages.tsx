@@ -12,6 +12,19 @@ interface Package {
 
 const PACKAGES: Package[] = [
   {
+    name: 'Árvore de Links',
+    label: 'Seus links em um só lugar',
+    description: 'Uma árvore de links para reunir seus principais canais e facilitar o contato.',
+    included: [
+      '1 árvore de links',
+    ],
+    excluded: [
+      'Landing page',
+      'Site institucional',
+    ],
+    value: 97,
+  },
+  {
     name: 'Codexa Start',
     label: 'Para começar',
     description: 'Uma presença objetiva para apresentar sua oferta e captar novos contatos.',
