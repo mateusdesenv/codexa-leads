@@ -686,14 +686,14 @@
   gap: 8px;
 }
 
-.kanban-card__data-row span {
+.kanban-card__data-row > span:not(.ds-badge) {
   color: var(--ds-gray);
   font-weight: 650;
   font-size: 0.68rem;
 }
 
 .kanban-card__data-row strong,
-.kanban-card__data-row time {
+.kanban-card__data-row > time {
   color: var(--ds-graphite);
   font-weight: 600;
   text-align: right;
@@ -4828,3 +4828,20 @@ body.lead-modal-open .ds-dialog {
 .access-waiting__card p { margin: 0; line-height: 1.6; overflow-wrap: anywhere; }
 .access-waiting__actions { display: flex; flex-wrap: wrap; gap: 12px; }
 .user-actions-menu .leads-table__actions-item:disabled { opacity: .45; cursor: not-allowed; }
+
+/* Apply the return status to the complete information box. */
+.kanban-card__data[data-return-tone="success"] { --return-bg: #e9f9ee; --return-color: #18743b; }
+.kanban-card__data[data-return-tone="warning"] { --return-bg: #fff5d6; --return-color: #906000; }
+.kanban-card__data[data-return-tone="info"] { --return-bg: #eaf3ff; --return-color: #2463a6; }
+.kanban-card__data[data-return-tone="danger"] { --return-bg: #ffeded; --return-color: #b42332; }
+html[data-theme="dark"] .kanban-card__data[data-return-tone="success"] { --return-bg: #14331f; --return-color: #4ade80; }
+html[data-theme="dark"] .kanban-card__data[data-return-tone="warning"] { --return-bg: #3a2e0f; --return-color: #fbbf24; }
+html[data-theme="dark"] .kanban-card__data[data-return-tone="info"] { --return-bg: #172554; --return-color: #60a5fa; }
+html[data-theme="dark"] .kanban-card__data[data-return-tone="danger"] { --return-bg: #3d1f23; --return-color: #f87171; }
+html .kanban-card__data[data-return-tone]:not([data-return-tone="neutral"]) {
+  background: var(--return-bg);
+  border-color: color-mix(in srgb, var(--return-color) 25%, var(--return-bg));
+}
+.kanban-card__data[data-return-tone]:not([data-return-tone="neutral"]) .kanban-card__data-row > span:not(.ds-badge) {
+  color: var(--return-color);
+}

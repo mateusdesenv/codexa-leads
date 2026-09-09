@@ -57,7 +57,7 @@ import type { ColumnId, KanbanState, Lead, LeadWithMeta, Temperature } from './t
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const AnchorButton = Button as any
-import { formatCalendarDate, parseCalendarDate } from './date'
+import { formatCalendarDate, getReturnDateTone, parseCalendarDate } from './date'
 import { getMessageDay } from '../shared/message-day.js'
 import './App.css'
 import { useTheme, type ThemePreference } from './useTheme'
@@ -481,7 +481,12 @@ function LeadCard({
           lead.kanbanState.proposalValue ||
           lead.kanbanState.proposalReturnDate ||
           lead.kanbanState.lostReason) && (
-          <div className="kanban-card__data">
+          <div
+            className="kanban-card__data"
+            data-return-tone={lead.kanbanState.returnDate || lead.kanbanState.proposalReturnDate
+              ? getReturnDateTone(lead.kanbanState.returnDate || lead.kanbanState.proposalReturnDate!)
+              : undefined}
+          >
             {lead.kanbanState.interest && (
               <div className="kanban-card__data-row">
                 <span>Interesse</span>
@@ -499,7 +504,9 @@ function LeadCard({
             {lead.kanbanState.returnDate && (
               <div className="kanban-card__data-row">
                 <span>Retorno</span>
-                <time dateTime={lead.kanbanState.returnDate}>{formatDate(lead.kanbanState.returnDate)}</time>
+                <Badge tone={getReturnDateTone(lead.kanbanState.returnDate)} size="small">
+                  <time dateTime={lead.kanbanState.returnDate}>{formatDate(lead.kanbanState.returnDate)}</time>
+                </Badge>
               </div>
             )}
             {lead.kanbanState.proposalValue && (
@@ -511,7 +518,9 @@ function LeadCard({
             {lead.kanbanState.proposalReturnDate && (
               <div className="kanban-card__data-row">
                 <span>Retorno proposta</span>
-                <time dateTime={lead.kanbanState.proposalReturnDate}>{formatDate(lead.kanbanState.proposalReturnDate)}</time>
+                <Badge tone={getReturnDateTone(lead.kanbanState.proposalReturnDate)} size="small">
+                  <time dateTime={lead.kanbanState.proposalReturnDate}>{formatDate(lead.kanbanState.proposalReturnDate)}</time>
+                </Badge>
               </div>
             )}
             {lead.kanbanState.lostReason && (

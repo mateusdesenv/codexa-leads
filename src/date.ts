@@ -12,3 +12,17 @@ export function formatCalendarDate(value?: string | null, fallback = ''): string
   if (Number.isNaN(date.getTime())) return value
   return date.toLocaleDateString('pt-BR')
 }
+
+export function getReturnDateTone(value: string, now = new Date()): 'success' | 'warning' | 'info' | 'danger' | 'neutral' {
+  const date = parseCalendarDate(value)
+  if (Number.isNaN(date.getTime())) return 'neutral'
+
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
+  date.setHours(0, 0, 0, 0)
+
+  if (date < today) return 'danger'
+  if (date.getTime() === today.getTime()) return 'success'
+  if (date.getTime() === tomorrow.getTime()) return 'warning'
+  return 'info'
+}
