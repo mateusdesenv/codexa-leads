@@ -288,6 +288,47 @@ export default function Dashboard({ leads, columns, onOpenKanban, onOpenLead }: 
         </Card>
       </div>
 
+      <Card className="dashboard-chart dashboard-pipeline" padding="large" as="article">
+        <div className="dashboard-chart__header">
+          <div>
+            <h3 id="dashboard-pipeline-title">Funil de leads</h3>
+            <p>Quantidade e percentual de leads em cada etapa do Kanban.</p>
+          </div>
+          <Badge tone="neutral" size="small">
+            {formatNumber.format(total)} {total === 1 ? 'lead' : 'leads'}
+          </Badge>
+        </div>
+
+        <ol className="dashboard-pipeline__stages" aria-labelledby="dashboard-pipeline-title">
+          {columns.map((column, index) => {
+            const count = counts[column.id]
+            return (
+              <li
+                key={column.id}
+                className="dashboard-pipeline__stage"
+                style={{
+                  '--stage-index': index,
+                  '--stage-color': column.color,
+                  '--stage-step': `${28 / Math.max(columns.length, 1)}%`,
+                } as CSSProperties}
+              >
+                <span className="dashboard-pipeline__label">{column.label}</span>
+                <span className="dashboard-pipeline__values">
+                  <strong>{percentage(count, total)}%</strong>
+                  <span>{formatNumber.format(count)} {count === 1 ? 'lead' : 'leads'}</span>
+                </span>
+              </li>
+            )
+          })}
+        </ol>
+
+        <p className="dashboard-pipeline__note">
+          {total === 0
+            ? 'Nenhum lead na base. As etapas serão preenchidas conforme os leads entrarem no Kanban.'
+            : 'Percentuais sobre o total da base. Cada lead aparece na sua etapa atual.'}
+        </p>
+      </Card>
+
       <div className="dashboard__charts">
         <Card className="dashboard-chart" padding="large" as="article">
           <div className="dashboard-chart__header">

@@ -7,6 +7,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { connectToDatabase } from './lib/db.js'
 import { Lead } from './lib/lead.js'
+import { activeLeadFilter, findActiveLeads } from './lib/active-leads.js'
 import { QnA } from './lib/qna.js'
 import { User } from './lib/user.js'
 
@@ -19,6 +20,10 @@ const app = express()
 
 app.use(cors())
 app.use(express.json({ limit: '10mb' }))
+app.use('/api', (_req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store')
+  next()
+})
 
 const ADMIN_EMAIL = 'mateus.desenv@gmail.com'
 
@@ -181,7 +186,7 @@ app.use('/api', requireAuthenticatedUser, async (request, response, next) => {
 app.get('/api/leads', async (_req, res) => {
   try {
     await connectToDatabase()
-    const leads = await Lead.find({})
+    const leads = await findActiveLeads()
     res.json(leads)
   } catch (err) {
     console.error(err)
@@ -192,7 +197,13 @@ app.get('/api/leads', async (_req, res) => {
 app.post('/api/leads', async (req, res) => {
   try {
     await connectToDatabase()
-    const lead = await Lead.create(req.body)
+    const groupId = req.body?.groupId
+    if (typeof groupId !== 'string' || !groupId.trim()) {
+      return res.status(400).json({ error: 'Selecione um grupo para cadastrar o lead' })
+    }
+    const group = await Lead.findOne({ groupId })
+    if (!group) return res.status(404).json({ error: 'Grupo não encontrado' })
+    const lead = await Lead.create({ ...req.body, groupId, groupTitle: group.groupTitle })
     res.status(201).json(lead)
   } catch (err) {
     console.error(err)
@@ -234,7 +245,7 @@ app.post('/api/leads/import', async (req, res) => {
 app.get('/api/leads/export', async (_req, res) => {
   try {
     await connectToDatabase()
-    const leads = await Lead.find({})
+    const leads = await findActiveLeads()
     const fileName = `codexa-leads-${new Date().toISOString().slice(0, 10)}.json`
     res.setHeader('Content-Type', 'application/json')
     res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`)
@@ -277,21 +288,21 @@ app.put('/api/leads/batch', async (req, res) => {
   try {
     await connectToDatabase()
     const items = Array.isArray(req.body) ? req.body : []
-    if (!items.length) return res.json({ updated: 0 })
+    if (!items.length) return res.json({ updated: 0, leads: await findActiveLeads() })
 
     const bulkOps = items
       .filter((item) => item && typeof item.placeId === 'string' && item.kanbanState)
       .map((item) => ({
         updateOne: {
-          filter: { placeId: item.placeId },
+          filter: { ...activeLeadFilter, placeId: item.placeId },
           update: { $set: { kanbanState: item.kanbanState } },
         },
       }))
 
-    if (!bulkOps.length) return res.json({ updated: 0 })
+    if (!bulkOps.length) return res.status(400).json({ error: 'Nenhuma atualização válida' })
 
     const result = await Lead.bulkWrite(bulkOps)
-    res.json({ updated: result.modifiedCount })
+    res.json({ updated: result.modifiedCount, leads: await findActiveLeads() })
   } catch (err) {
     console.error(err)
     res.status(400).json({ error: err instanceof Error ? err.message : 'Erro ao atualizar leads' })
@@ -302,7 +313,7 @@ app.put('/api/leads/:placeId', async (req, res) => {
   try {
     await connectToDatabase()
     const lead = await Lead.findOneAndUpdate(
-      { placeId: req.params.placeId },
+      { ...activeLeadFilter, placeId: req.params.placeId },
       { $set: { kanbanState: req.body.kanbanState } },
       { returnDocument: 'after' },
     )

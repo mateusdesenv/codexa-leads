@@ -33,14 +33,15 @@ export default function LeadGroupsTable({
   const groups = useMemo<LeadGroup[]>(() => {
     const map = new Map<string, LeadGroup>()
     for (const lead of leads) {
-      const key = lead.groupId ?? 'no-group'
+      if (!lead.groupId) continue
+      const key = lead.groupId
       const existing = map.get(key)
       if (existing) {
         existing.count += 1
       } else {
         map.set(key, {
-          groupId: lead.groupId ?? null,
-          groupTitle: lead.groupTitle?.trim() || 'Sem grupo',
+          groupId: lead.groupId,
+          groupTitle: lead.groupTitle?.trim() || 'Grupo',
           count: 1,
         })
       }

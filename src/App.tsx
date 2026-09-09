@@ -56,7 +56,6 @@ import type { ColumnId, KanbanState, Lead, LeadWithMeta, Temperature } from './t
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const AnchorButton = Button as any
-import { loadKanbanStates } from './storage'
 import { formatCalendarDate, parseCalendarDate } from './date'
 import './App.css'
 import { useTheme, type ThemePreference } from './useTheme'
@@ -130,8 +129,8 @@ const SOCIAL_HOSTS = [
   'beacons.ai',
 ]
 
-const fetchLeads = async (): Promise<Lead[]> => {
-  const res = await apiFetch('/api/leads')
+const fetchLeads = async (signal?: AbortSignal): Promise<Lead[]> => {
+  const res = await apiFetch('/api/leads', { signal })
   if (!res.ok) throw new Error('Não foi possível carregar os dados')
   return res.json()
 }
@@ -146,39 +145,15 @@ const updateLeadState = async (placeId: string, kanbanState: KanbanState): Promi
   return res.json()
 }
 
-const updateLeadsBatch = async (leads: { placeId: string; kanbanState: KanbanState }[]): Promise<void> => {
+const updateLeadsBatch = async (leads: { placeId: string; kanbanState: KanbanState }[]): Promise<Lead[]> => {
   const res = await apiFetch('/api/leads/batch', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(leads),
   })
   if (!res.ok) throw new Error('Erro ao atualizar leads')
-}
-
-const migrateLocalStates = async (leads: Lead[]) => {
-  const local = loadKanbanStates()
-  const placeIds = Object.keys(local)
-  if (!placeIds.length) return
-
-  const updates: Promise<Lead>[] = []
-  for (const lead of leads) {
-    const localState = local[lead.placeId]
-    if (!localState) continue
-    const remoteState = lead.kanbanState ?? { column: 'open' }
-    if (JSON.stringify(localState) !== JSON.stringify(remoteState)) {
-      updates.push(updateLeadState(lead.placeId, localState))
-    }
-  }
-
-  if (updates.length) {
-    await Promise.all(updates)
-  }
-
-  try {
-    localStorage.removeItem('codexa-leads-kanban')
-  } catch {
-    // noop
-  }
+  const payload = await res.json()
+  return payload.leads
 }
 
 function getHost(website: string): string | null {
@@ -718,9 +693,11 @@ function LeadModal({
 }: {
   lead: LeadWithMeta
   onClose: () => void
-  onSave: (placeId: string, state: KanbanState) => void
+  onSave: (placeId: string, state: KanbanState) => Promise<void>
 }) {
   const [state, setState] = useState<KanbanState>({ ...lead.kanbanState })
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   const [message, setMessage] = useState(() =>
     MESSAGE_TEMPLATE
@@ -763,10 +740,19 @@ function LeadModal({
     }
   }, [])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    onSave(lead.placeId, state)
-    onClose()
+    if (saving) return
+    setSaving(true)
+    setSaveError(null)
+    try {
+      await onSave(lead.placeId, state)
+      onClose()
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : 'Erro ao salvar lead')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const statusOptions = COLUMNS.map((c) => ({
@@ -951,11 +937,12 @@ function LeadModal({
           </div>
         )}
 
+        {saveError && <Alert tone="danger" title="Não foi possível salvar">{saveError}</Alert>}
         <div className="modal__actions">
-          <Button type="button" variant="secondary" onClick={onClose}>
+          <Button type="button" variant="secondary" onClick={onClose} disabled={saving}>
             Cancelar
           </Button>
-          <Button type="submit" variant="primary">
+          <Button type="submit" variant="primary" loading={saving}>
             Salvar
           </Button>
         </div>
@@ -992,7 +979,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
   const [kanbanSorts, setKanbanSorts] = useState<Record<ColumnId, KanbanSort>>(DEFAULT_KANBAN_SORT)
   const [selectedLead, setSelectedLead] = useState<LeadWithMeta | null>(null)
   const [activeDrag, setActiveDrag] = useState<LeadWithMeta | null>(null)
-  const [currentView, setCurrentView] = useState<'dashboard' | 'kanban' | 'table' | 'packages' | 'portfolio' | 'users' | 'help'>('dashboard')
+  const [currentView, setView] = useState<'dashboard' | 'kanban' | 'table' | 'packages' | 'portfolio' | 'users' | 'help'>('dashboard')
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
   const [navOpen, setNavOpen] = useState(false)
   const [filtersOpen, setFiltersOpen] = useState(false)
@@ -1001,20 +988,28 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
 
   const didDrag = useRef(false)
 
+  const setCurrentView = (view: typeof currentView) => {
+    if (view === currentView) return
+    setLoading(true)
+    setError(null)
+    setView(view)
+  }
+
   useEffect(() => {
-    fetchLeads()
-      .then(async (data) => {
+    const controller = new AbortController()
+    fetchLeads(controller.signal)
+      .then((data) => {
+        if (controller.signal.aborted) return
         setBaseLeads(data)
-        await migrateLocalStates(data)
-        const fresh = await fetchLeads()
-        setBaseLeads(fresh)
         setLoading(false)
       })
       .catch((err) => {
+        if (controller.signal.aborted) return
         setError(err instanceof Error ? err.message : 'Erro desconhecido')
         setLoading(false)
       })
-  }, [])
+    return () => controller.abort()
+  }, [currentView])
 
   const allLeads = baseLeads
 
@@ -1120,7 +1115,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
     if (lead) setActiveDrag(lead)
   }
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     setActiveDrag(null)
     setTimeout(() => {
       didDrag.current = false
@@ -1143,6 +1138,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
       {} as Record<ColumnId, Lead[]>,
     )
     baseLeads.forEach((lead) => {
+      if (lead.groupId !== activeLead.groupId) return
       byColumn[lead.kanbanState?.column ?? 'open'].push(lead)
     })
     COLUMNS.forEach((c) => {
@@ -1164,7 +1160,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
       targetIndex = byColumn[targetColumn].length
     } else {
       const overLead = baseLeads.find((l) => l.placeId === overId)
-      if (!overLead) return
+      if (!overLead || overLead.groupId !== activeLead.groupId) return
       targetColumn = overLead.kanbanState?.column ?? 'open'
       targetIndex = byColumn[targetColumn].findIndex((l) => l.placeId === overId)
       if (targetIndex === -1) return
@@ -1185,7 +1181,6 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
     }
 
     // Rebuild leads with updated column and order, persisting order only for non-open columns
-    const nextLeads: Lead[] = []
     const leadsToUpdate: { placeId: string; kanbanState: KanbanState }[] = []
 
     COLUMNS.forEach((c) => {
@@ -1195,7 +1190,6 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
           column: c.id,
           order: c.id === 'open' ? undefined : index,
         }
-        nextLeads.push({ ...lead, kanbanState: nextKanbanState })
         if (
           lead.kanbanState?.column !== c.id ||
           lead.kanbanState?.order !== nextKanbanState.order
@@ -1205,13 +1199,14 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
       })
     })
 
-    setBaseLeads(nextLeads)
-
     if (leadsToUpdate.length) {
-      updateLeadsBatch(leadsToUpdate).catch((err) => {
+      try {
+        setBaseLeads(await updateLeadsBatch(leadsToUpdate))
+        setError(null)
+      } catch (err) {
         console.error(err)
         setError('Erro ao salvar ordem dos leads')
-      })
+      }
     }
   }
 
@@ -1221,29 +1216,28 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
     const columnIndex = COLUMNS.findIndex((column) => column.id === (currentLead.kanbanState?.column ?? 'open'))
     const nextColumn = COLUMNS[columnIndex + 1]
     if (columnIndex < 0 || !nextColumn) return
-    const destinationLeads = baseLeads.filter((item) => item.kanbanState?.column === nextColumn.id)
+    const destinationLeads = baseLeads.filter((item) => item.groupId === currentLead.groupId && item.kanbanState?.column === nextColumn.id)
     const state: KanbanState = {
       ...currentLead.kanbanState,
       column: nextColumn.id,
       order: Math.max(-1, ...destinationLeads.map((item) => item.kanbanState?.order ?? -1)) + 1,
     }
     try {
-      await updateLeadState(lead.placeId, state)
-      setBaseLeads((current) => current.map((item) => item.placeId === lead.placeId ? { ...item, kanbanState: state } : item))
+      const savedLead = await updateLeadState(lead.placeId, state)
+      setBaseLeads((current) => current.map((item) => item.placeId === savedLead.placeId ? savedLead : item))
+      setError(null)
     } catch (err) {
       console.error(err)
       setError('Erro ao mover lead para a próxima coluna. Tente novamente.')
     }
   }
 
-  const handleSaveLead = (placeId: string, state: KanbanState) => {
+  const handleSaveLead = async (placeId: string, state: KanbanState) => {
+    const savedLead = await updateLeadState(placeId, state)
     setBaseLeads((prev) =>
-      prev.map((l) => (l.placeId === placeId ? { ...l, kanbanState: state } : l)),
+      prev.map((l) => (l.placeId === placeId ? savedLead : l)),
     )
-    updateLeadState(placeId, state).catch((err) => {
-      console.error(err)
-      setError('Erro ao salvar lead')
-    })
+    setError(null)
   }
 
   const handleCardClick = (lead: LeadWithMeta) => {
@@ -1254,6 +1248,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
   const handleRefresh = async () => {
     try {
       setLoading(true)
+      setError(null)
       const fresh = await fetchLeads()
       setBaseLeads(fresh)
     } catch (err) {
@@ -1444,7 +1439,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
             onClick={() => { setSelectedGroup(null); setCurrentView('dashboard'); setNavOpen(false) }}
             leadingIcon={<Icon name="home" size={18} />}
           >
-            Início
+            Dashboard
           </Button>
           <Button
             type="button"
@@ -1543,7 +1538,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
             <div>
               <h2>
                 {currentView === 'dashboard'
-                  ? 'Início'
+                  ? 'Dashboard'
                   : currentView === 'kanban'
                     ? 'Kanban'
                   : currentView === 'table'
