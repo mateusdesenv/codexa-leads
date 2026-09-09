@@ -131,6 +131,13 @@ const SOCIAL_HOSTS = [
   'beacons.ai',
 ]
 
+type SavedLeadGroup = { groupId: string; groupTitle: string; count: number }
+const fetchGroups = async (signal?: AbortSignal): Promise<SavedLeadGroup[]> => {
+  const res = await apiFetch('/api/lead-groups', { signal })
+  if (!res.ok) throw new Error('Não foi possível carregar as listas')
+  return res.json()
+}
+
 const fetchLeads = async (signal?: AbortSignal): Promise<Lead[]> => {
   const res = await apiFetch('/api/leads', { signal })
   if (!res.ok) throw new Error('Não foi possível carregar os dados')
@@ -963,6 +970,7 @@ function ProfileAvatar({ user, size = 'medium' }: { user: User; size?: 'medium' 
 }
 
 function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreference; onThemeChange: (theme: ThemePreference) => void }) {
+  const [savedGroups, setSavedGroups] = useState<SavedLeadGroup[]>([])
   const [baseLeads, setBaseLeads] = useState<Lead[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -1003,9 +1011,10 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
 
   useEffect(() => {
     const controller = new AbortController()
-    fetchLeads(controller.signal)
-      .then((data) => {
+    Promise.all([fetchLeads(controller.signal), fetchGroups(controller.signal)])
+      .then(([data, lists]) => {
         if (controller.signal.aborted) return
+        setSavedGroups(lists)
         setBaseLeads(data)
         setLoading(false)
       })
@@ -1051,7 +1060,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
   }, [leadsWithMeta, search, categoryFilter])
 
   const groups = useMemo(() => {
-    const map = new Map<string, { groupId: string; groupTitle: string; count: number }>()
+    const map = new Map<string, SavedLeadGroup>(savedGroups.map((group) => [group.groupId, { ...group, count: 0 }]))
     leadsWithMeta.forEach((lead) => {
       if (!lead.groupId) return
       const existing = map.get(lead.groupId)
@@ -1062,12 +1071,13 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
       }
     })
     return Array.from(map.values()).sort((a, b) => a.groupTitle.localeCompare(b.groupTitle))
-  }, [leadsWithMeta])
+  }, [leadsWithMeta, savedGroups])
 
   const activeKanbanGroup = groups.some((group) => group.groupId === kanbanGroupFilter)
     ? kanbanGroupFilter
     : (groups[0]?.groupId ?? '')
   const activeKanbanGroupInfo = groups.find((group) => group.groupId === activeKanbanGroup)
+  const addLeadGroup = currentView === 'table' ? groups.find((group) => group.groupId === selectedGroup) : activeKanbanGroupInfo
 
   const kanbanFilteredLeads = useMemo(() => {
     if (!activeKanbanGroup) return []
@@ -1104,8 +1114,8 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
 
   const selectedGroupTitle = useMemo(() => {
     if (!selectedGroup) return ''
-    return leadsWithMeta.find((lead) => lead.groupId === selectedGroup)?.groupTitle?.trim() || 'Grupo'
-  }, [leadsWithMeta, selectedGroup])
+    return groups.find((group) => group.groupId === selectedGroup)?.groupTitle || 'Grupo'
+  }, [groups, selectedGroup])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -1267,8 +1277,9 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
     try {
       setLoading(true)
       setError(null)
-      const fresh = await fetchLeads()
+      const [fresh, lists] = await Promise.all([fetchLeads(), fetchGroups()])
       setBaseLeads(fresh)
+      setSavedGroups(lists)
     } catch (err) {
       console.error(err)
       setError(err instanceof Error ? err.message : 'Erro ao atualizar')
@@ -1279,25 +1290,36 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
 
   const handleImportLeads = async (title: string, leads: Lead[]) => {
     try {
-      setLoading(true)
       const res = await apiFetch('/api/leads/import', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, leads }),
       })
       if (!res.ok) throw new Error('Erro ao importar leads')
-      const fresh = await fetchLeads()
+      const [fresh, lists] = await Promise.all([fetchLeads(), fetchGroups()])
       setBaseLeads(fresh)
+      setSavedGroups(lists)
     } catch (err) {
       console.error(err)
       throw err instanceof Error ? err : new Error('Erro ao importar leads')
-    } finally {
-      setLoading(false)
     }
   }
 
+  const handleCreateGroup = async (groupTitle: string) => {
+    const response = await apiFetch('/api/lead-groups', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ groupTitle }),
+    })
+    const payload = await response.json()
+    if (!response.ok) throw new Error(payload.error || 'Não foi possível criar a lista')
+    setSavedGroups((current) => [...current, payload])
+    setSearch('')
+    setCategoryFilter('')
+    setSelectedGroup(payload.groupId)
+    setKanbanGroupFilter(payload.groupId)
+  }
+
   const handleCreateLead = async (input: NewLeadInput) => {
-    if (!activeKanbanGroupInfo) throw new Error('Selecione um grupo antes de adicionar o lead')
+    if (!addLeadGroup) throw new Error('Selecione um grupo antes de adicionar o lead')
 
     const phone = input.phone || null
     const website = input.website
@@ -1323,8 +1345,8 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
       temporarilyClosed: false,
       categories: categoryName ? [categoryName] : [],
       placeId: `manual-${crypto.randomUUID()}`,
-      groupId: activeKanbanGroupInfo.groupId,
-      groupTitle: activeKanbanGroupInfo.groupTitle,
+      groupId: addLeadGroup.groupId,
+      groupTitle: addLeadGroup.groupTitle,
       kanbanState: {
         column: input.column,
         collectedData: input.collectedData || undefined,
@@ -1356,8 +1378,9 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
         body: JSON.stringify({ groupTitle: title }),
       })
       if (!res.ok) throw new Error('Erro ao editar grupo')
-      const fresh = await fetchLeads()
+      const [fresh, lists] = await Promise.all([fetchLeads(), fetchGroups()])
       setBaseLeads(fresh)
+      setSavedGroups(lists)
     } catch (err) {
       console.error(err)
       setError(err instanceof Error ? err.message : 'Erro ao editar grupo')
@@ -1369,8 +1392,9 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
     try {
       const res = await apiFetch(`/api/leads/group/${group.groupId}`, { method: 'DELETE' })
       if (!res.ok) throw new Error('Erro ao excluir grupo')
-      const fresh = await fetchLeads()
+      const [fresh, lists] = await Promise.all([fetchLeads(), fetchGroups()])
       setBaseLeads(fresh)
+      setSavedGroups(lists)
       if (selectedGroup === group.groupId) setSelectedGroup(null)
     } catch (err) {
       console.error(err)
@@ -1845,9 +1869,9 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
                 />
               )}
 
-              {addLeadOpen && activeKanbanGroupInfo && (
+              {addLeadOpen && addLeadGroup && (
                 <AddLeadModal
-                  groupTitle={activeKanbanGroupInfo.groupTitle}
+                  groupTitle={addLeadGroup.groupTitle}
                   onClose={() => setAddLeadOpen(false)}
                   onCreate={handleCreateLead}
                 />
@@ -1866,34 +1890,21 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
                   </Alert>
                 </div>
               ) : selectedGroup ? (
-                selectedGroupLeads.length === 0 ? (
-                  <div className="prospect-empty">
-                    <EmptyState
-                      icon="search"
-                      title="Nenhum lead encontrado"
-                      description="Tente ajustar os filtros."
-                    />
+                <>
+                  <div className="prospect-group-header">
+                    <Button type="button" variant="ghost" size="small" onClick={() => setSelectedGroup(null)} leadingIcon={<Icon name="arrow-left" size={16} />}>Voltar</Button>
+                    <h3 className="prospect-group-header__title">{selectedGroupTitle}</h3>
+                    <Button type="button" onClick={() => setAddLeadOpen(true)} leadingIcon={<Icon name="plus" size={16} />}>Novo lead</Button>
                   </div>
-                ) : (
-                  <>
-                    <div className="prospect-group-header">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="small"
-                        onClick={() => setSelectedGroup(null)}
-                        leadingIcon={<Icon name="arrow-left" size={16} />}
-                      >
-                        Voltar
-                      </Button>
-                      <h3 className="prospect-group-header__title">{selectedGroupTitle}</h3>
+                  {selectedGroupLeads.length === 0 ? (
+                    <div className="prospect-empty">
+                      <EmptyState icon="users" title={groups.find((group) => group.groupId === selectedGroup)?.count ? 'Nenhum lead encontrado' : 'Sua lista está vazia'} description={groups.find((group) => group.groupId === selectedGroup)?.count ? 'Tente ajustar os filtros.' : 'Clique em Novo lead para começar a preencher esta lista.'} />
                     </div>
-                    <LeadsTable leads={selectedGroupLeads} onLeadClick={handleCardClick} />
-                  </>
-                )
+                  ) : <LeadsTable leads={selectedGroupLeads} onLeadClick={handleCardClick} />}
+                </>
               ) : (
                 <LeadGroupsTable
-                  leads={leadsWithMeta}
+                  groups={groups}
                   onGroupClick={(group: LeadGroup) => setSelectedGroup(group.groupId)}
                   onEditGroup={handleEditGroup}
                   onDeleteGroup={handleDeleteGroup}
@@ -1908,21 +1919,27 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
                 />
               )}
 
+              {addLeadOpen && addLeadGroup && (
+                <AddLeadModal groupTitle={addLeadGroup.groupTitle} onClose={() => setAddLeadOpen(false)} onCreate={handleCreateLead} />
+              )}
+
               <Button
                 type="button"
                 className="leads-import-fab"
                 variant="primary"
                 size="large"
-                iconOnly
-                aria-label="Importar nova lista"
+                aria-label="Criar ou importar lista"
                 onClick={() => setImportOpen(true)}
-                leadingIcon={<Icon name="plus" size={24} />}
-              />
+                leadingIcon={<Icon name="plus" size={22} />}
+              >
+                Nova lista
+              </Button>
 
               <ImportLeadsModal
                 open={importOpen}
                 onClose={() => setImportOpen(false)}
                 onImport={handleImportLeads}
+                onCreateEmpty={handleCreateGroup}
               />
             </>
           ) : currentView === 'packages' ? (

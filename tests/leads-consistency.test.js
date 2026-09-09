@@ -7,6 +7,21 @@ test('CRM reads and exports the same grouped database records and confirms saved
   process.env.VITE_FIREBASE_API_KEY = 'test-key'
   global.mongoose = { conn: {}, promise: null }
   const { Lead } = await import('../api/lib/lead.js')
+  const { LeadGroup } = await import('../api/lib/lead-group.js')
+  const lists = []
+  LeadGroup.find = async () => lists.map((group) => ({ ...group }))
+  LeadGroup.findOne = async ({ groupId }) => lists.find((group) => group.groupId === groupId)
+  LeadGroup.create = async (group) => { lists.push({ ...group }); return group }
+  LeadGroup.updateOne = async ({ groupId }, update) => {
+    const group = lists.find((group) => group.groupId === groupId)
+    if (group) Object.assign(group, update.$set)
+    return { modifiedCount: group ? 1 : 0 }
+  }
+  LeadGroup.deleteOne = async ({ groupId }) => {
+    const index = lists.findIndex((group) => group.groupId === groupId)
+    if (index >= 0) lists.splice(index, 1)
+    return { deletedCount: index >= 0 ? 1 : 0 }
+  }
   const { default: app } = await import('../api/app.js')
   const records = [
     ...Array.from({ length: 51 }, (_, index) => ({
@@ -51,6 +66,10 @@ test('CRM reads and exports the same grouped database records and confirms saved
     }
     return { modifiedCount }
   }
+  Lead.findOneAndDelete = async (filter) => {
+    const index = records.findIndex((record) => matches(record, filter))
+    return index >= 0 ? records.splice(index, 1)[0] : null
+  }
   Lead.updateMany = async (filter, update) => {
     const selected = records.filter((record) => matches(record, filter))
     selected.forEach((record) => Object.assign(record, update.$set))
@@ -76,6 +95,7 @@ test('CRM reads and exports the same grouped database records and confirms saved
     const response = await request('/api/leads')
     assert.equal(response.headers.get('cache-control'), 'no-store')
     const active = await response.json()
+    assert.deepEqual(await (await request('/api/lead-groups')).json(), [{ groupId: 'seed', groupTitle: 'Leads clínicas', count: 51 }])
     assert.equal(active.length, 51)
     assert.deepEqual(await (await request('/api/leads/export')).json(), active)
     assert.equal((await request('/api/leads', 'POST', { title: 'No group' })).status, 400)
@@ -118,6 +138,30 @@ test('CRM reads and exports the same grouped database records and confirms saved
     assert.deepEqual(await (await request('/api/leads')).json(), [])
     assert.deepEqual(await (await request('/api/leads/export')).json(), [])
     assert.equal(records.length, 235, 'removing a group preserves stored records')
+    // Lists persist without leads and accept their first manual lead.
+    for (const groupTitle of ['', '   ', 'a'.repeat(121), 12]) {
+      assert.equal((await request('/api/lead-groups', 'POST', { groupTitle })).status, 400)
+    }
+    const listResponse = await request('/api/lead-groups', 'POST', { groupTitle: '  Lista manual  ' })
+    assert.equal(listResponse.status, 201)
+    const list = await listResponse.json()
+    assert.equal(list.groupTitle, 'Lista manual')
+    assert.equal(list.count, 0)
+    assert.deepEqual(await (await request('/api/lead-groups')).json(), [list])
+    assert.deepEqual(await (await request('/api/leads')).json(), [], 'creating a list creates no placeholder lead')
+    await request(`/api/leads/group/${list.groupId}`, 'PUT', { groupTitle: 'Renomeada' })
+    assert.equal((await (await request('/api/lead-groups')).json())[0].groupTitle, 'Renomeada')
+    const firstLead = await request('/api/leads', 'POST', {
+      placeId: 'manual-first', title: 'Primeiro lead', groupId: list.groupId, groupTitle: 'Nome antigo',
+    })
+    assert.equal(firstLead.status, 201)
+    assert.equal((await firstLead.json()).groupTitle, 'Renomeada')
+    assert.equal((await (await request('/api/lead-groups')).json())[0].count, 1)
+    await request('/api/leads/manual-first', 'DELETE')
+    assert.equal((await (await request('/api/lead-groups')).json())[0].count, 0, 'list survives removal of last lead')
+    await request(`/api/leads/group/${list.groupId}`, 'DELETE')
+    assert.deepEqual(await (await request('/api/lead-groups')).json(), [])
+    assert.equal((await request('/api/leads', 'POST', { groupId: list.groupId })).status, 404)
     failRead = true
     t.mock.method(console, 'error', () => {})
     assert.equal((await request('/api/leads')).status, 500, 'database failure never falls back to local leads')

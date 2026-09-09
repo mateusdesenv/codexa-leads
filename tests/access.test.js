@@ -45,7 +45,7 @@ test('access requests require administrator approval before CRM access', async (
   try {
     assert.equal((await request('/api/leads')).status, 401)
     assert.equal((await request('/api/leads', 'invalid')).status, 401)
-    for (const [path, method] of [['/api/leads', 'GET'], ['/api/leads', 'POST'], ['/api/qna', 'GET'], ['/api/leads/any', 'DELETE']]) {
+    for (const [path, method] of [['/api/lead-groups', 'GET'], ['/api/lead-groups', 'POST'], ['/api/leads', 'GET'], ['/api/leads', 'POST'], ['/api/qna', 'GET'], ['/api/leads/any', 'DELETE']]) {
       assert.equal((await request(path, 'pending', method)).status, 403)
     }
     const pending = await request('/api/users/me', 'pending', 'PUT', { accessStatus: 'approved', email: 'mateus.desenv@gmail.com' })

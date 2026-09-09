@@ -1551,19 +1551,46 @@ body.lead-modal-open .ds-dialog {
   background: #fee2e2;
 }
 
-.leads-import-fab {
+.prospect-app .leads-import-fab {
   position: fixed;
-  right: 24px;
-  bottom: 24px;
+  right: max(24px, env(safe-area-inset-right));
+  bottom: max(24px, env(safe-area-inset-bottom));
   z-index: 40;
-  border-radius: 50%;
-  box-shadow: 0 6px 18px rgba(37, 191, 68, 0.3);
+  width: auto;
+  min-width: 148px;
+  height: 56px;
+  padding: 0 22px;
+  gap: 10px;
+  border: 1px solid #169c39;
+  border-radius: 28px;
+  background: #187c38;
+  color: #fff;
+  font-size: .9rem;
+  font-weight: 700;
+  box-shadow: 0 8px 24px #125b3826, 0 2px 6px #125b381a;
+  transition: background .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+.prospect-app .leads-import-fab:hover {
+  background: #12682d;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px #125b3833;
+}
+.prospect-app .leads-import-fab:active { transform: translateY(0); }
+.prospect-app .leads-import-fab:focus-visible { outline: 3px solid #85dba0; outline-offset: 4px; }
+.import-modal__intro { margin: 0; color: var(--ds-gray); line-height: 1.6; }
+.import-modal__upload { padding: 16px; border: 1px dashed var(--ds-line); border-radius: 12px; background: var(--ds-off-white); }
+.import-modal__hint { margin: 10px 0 0; color: var(--ds-gray); font-size: .8rem; }
+@media (max-width: 760px) {
+  .prospect-app .leads-import-fab { right: 16px; bottom: max(16px, env(safe-area-inset-bottom)); height: 52px; padding: 0 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .prospect-app .leads-import-fab { transition: none; }
 }
 
 .import-modal__form {
   display: grid;
   gap: 16px;
-  min-width: 320px;
+  min-width: 0;
 }
 
 .import-modal__file-name {
@@ -1885,7 +1912,7 @@ body.lead-modal-open .ds-dialog {
 .leads-table__edit-dialog {
   display: grid;
   gap: 16px;
-  min-width: 320px;
+  min-width: 0;
 }
 
 .leads-table__edit-actions {
@@ -4845,3 +4872,6 @@ html .kanban-card__data[data-return-tone]:not([data-return-tone="neutral"]) {
 .kanban-card__data[data-return-tone]:not([data-return-tone="neutral"]) .kanban-card__data-row > span:not(.ds-badge) {
   color: var(--return-color);
 }
+
+.prospect-group-header { flex-wrap: wrap; }
+.prospect-group-header__title { min-width: 0; overflow-wrap: anywhere; flex: 1; }

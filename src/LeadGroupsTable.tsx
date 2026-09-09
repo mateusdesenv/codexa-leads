@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button, ConfirmDialog, DataTable, Dialog, Icon, Input } from 'codexa-ui'
 import type { DataTableColumn } from 'codexa-ui'
 
-import type { LeadWithMeta } from './types'
 
 export interface LeadGroup {
   groupId: string | null
@@ -11,12 +10,12 @@ export interface LeadGroup {
 }
 
 export default function LeadGroupsTable({
-  leads,
+  groups,
   onGroupClick,
   onEditGroup,
   onDeleteGroup,
 }: {
-  leads: LeadWithMeta[]
+  groups: LeadGroup[]
   onGroupClick: (group: LeadGroup) => void
   onEditGroup: (group: LeadGroup, newTitle: string) => Promise<void>
   onDeleteGroup: (group: LeadGroup) => Promise<void>
@@ -29,27 +28,6 @@ export default function LeadGroupsTable({
   const [deletingGroup, setDeletingGroup] = useState<LeadGroup | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
-
-  const groups = useMemo<LeadGroup[]>(() => {
-    const map = new Map<string, LeadGroup>()
-    for (const lead of leads) {
-      if (!lead.groupId) continue
-      const key = lead.groupId
-      const existing = map.get(key)
-      if (existing) {
-        existing.count += 1
-      } else {
-        map.set(key, {
-          groupId: lead.groupId,
-          groupTitle: lead.groupTitle?.trim() || 'Grupo',
-          count: 1,
-        })
-      }
-    }
-    return Array.from(map.values()).sort((a, b) =>
-      (a.groupTitle ?? '').localeCompare(b.groupTitle ?? '', 'pt-BR'),
-    )
-  }, [leads])
 
   const filteredGroups = useMemo(() => {
     if (!search.trim()) return groups

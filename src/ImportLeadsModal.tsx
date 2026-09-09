@@ -6,6 +6,7 @@ interface ImportLeadsModalProps {
   open: boolean
   onClose: () => void
   onImport: (title: string, leads: Lead[]) => Promise<void>
+  onCreateEmpty: (title: string) => Promise<void>
 }
 
 function isLead(value: unknown): value is Lead {
@@ -14,7 +15,7 @@ function isLead(value: unknown): value is Lead {
   return typeof obj.title === 'string' && typeof obj.placeId === 'string'
 }
 
-export default function ImportLeadsModal({ open, onClose, onImport }: ImportLeadsModalProps) {
+export default function ImportLeadsModal({ open, onClose, onImport, onCreateEmpty }: ImportLeadsModalProps) {
   const [title, setTitle] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -28,8 +29,9 @@ export default function ImportLeadsModal({ open, onClose, onImport }: ImportLead
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!file) {
-      setError('Selecione um arquivo JSON.')
+    if (isLoading) return
+    if (!file && !title.trim()) {
+      setError('Informe um nome para a lista.')
       return
     }
 
@@ -37,21 +39,20 @@ export default function ImportLeadsModal({ open, onClose, onImport }: ImportLead
     setError(null)
 
     try {
-      const text = await file.text()
-      const parsed = JSON.parse(text)
-      const raw = Array.isArray(parsed) ? parsed : [parsed]
-
-      if (!raw.length) {
-        throw new Error('O arquivo JSON está vazio.')
+      if (file) {
+        const text = await file.text()
+        const parsed = JSON.parse(text)
+        const raw = Array.isArray(parsed) ? parsed : [parsed]
+        if (!raw.length) throw new Error('O arquivo JSON está vazio.')
+        const validLeads = raw.filter(isLead)
+        if (!validLeads.length) {
+          throw new Error('Nenhum lead válido encontrado no arquivo. Verifique se cada item tem title e placeId.')
+        }
+        const finalTitle = title.trim() || `Importação em ${new Date().toLocaleDateString('pt-BR')}`
+        await onImport(finalTitle, validLeads)
+      } else {
+        await onCreateEmpty(title.trim())
       }
-
-      const validLeads = raw.filter(isLead)
-      if (!validLeads.length) {
-        throw new Error('Nenhum lead válido encontrado no arquivo. Verifique se cada item tem title e placeId.')
-      }
-
-      const finalTitle = title.trim() || `Importação em ${new Date().toLocaleDateString('pt-BR')}`
-      await onImport(finalTitle, validLeads)
       setTitle('')
       setFile(null)
       if (inputRef.current) inputRef.current.value = ''
@@ -64,42 +65,56 @@ export default function ImportLeadsModal({ open, onClose, onImport }: ImportLead
   }
 
   return (
-    <Dialog open={open} onClose={onClose} title="Importar nova lista">
+    <Dialog open={open} onClose={() => { if (!isLoading) onClose() }} title="Nova lista">
       <form className="import-modal__form" onSubmit={handleSubmit}>
+        <p className="import-modal__intro">Dê um nome à lista para começar a adicionar leads manualmente. Se já tiver um arquivo, importe os contatos abaixo.</p>
         <Input
-          label="Título do grupo"
+          label="Nome da lista"
           id="import-title"
           type="text"
           placeholder="Ex: Prospects setembro"
+          maxLength={120}
+          required={!file}
+          disabled={isLoading}
+          autoFocus
           value={title}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
         />
 
-        <FormField label="Arquivo JSON (Apify)" id="import-file">
+        <div className="import-modal__upload">
+        <FormField label="Importar contatos de um JSON (opcional)" id="import-file">
           <input
             id="import-file"
             ref={inputRef}
             className="import-modal__file"
             type="file"
             accept=".json,application/json"
+            disabled={isLoading}
             onChange={handleFileChange}
           />
         </FormField>
+        <p className="import-modal__hint">Sem arquivo, sua lista será criada vazia.</p>
+        </div>
 
         {file && (
           <p className="import-modal__file-name">
             <Icon name="file" size={14} /> {file.name}
+            <Button type="button" variant="ghost" size="small" disabled={isLoading} onClick={() => {
+              setFile(null)
+              setError(null)
+              if (inputRef.current) inputRef.current.value = ''
+            }}>Remover arquivo</Button>
           </p>
         )}
 
         {error && (
-          <Alert tone="danger" title="Erro na importação">
+          <Alert tone="danger" title="Não foi possível criar a lista">
             {error}
           </Alert>
         )}
 
         <div className="import-modal__actions">
-          <Button type="button" variant="secondary" onClick={onClose}>
+          <Button type="button" variant="secondary" onClick={onClose} disabled={isLoading}>
             Cancelar
           </Button>
           <Button
@@ -108,7 +123,7 @@ export default function ImportLeadsModal({ open, onClose, onImport }: ImportLead
             loading={isLoading}
             leadingIcon={<Icon name="plus" size={16} />}
           >
-            Importar
+            {file ? 'Importar e criar lista' : 'Criar lista vazia'}
           </Button>
         </div>
       </form>

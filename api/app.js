@@ -7,6 +7,8 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { connectToDatabase } from './lib/db.js'
 import { Lead } from './lib/lead.js'
+import { LeadGroup } from './lib/lead-group.js'
+import { randomUUID } from 'node:crypto'
 import { activeLeadFilter, findActiveLeads } from './lib/active-leads.js'
 import { getMessageDay } from '../shared/message-day.js'
 import { QnA } from './lib/qna.js'
@@ -184,6 +186,38 @@ app.use('/api', requireAuthenticatedUser, async (request, response, next) => {
   }
 })
 
+app.get('/api/lead-groups', async (_req, res) => {
+  try {
+    await connectToDatabase()
+    const [saved, leads] = await Promise.all([LeadGroup.find({}), findActiveLeads()])
+    const groups = new Map(saved.map((group) => [group.groupId, {
+      groupId: group.groupId, groupTitle: group.groupTitle, count: 0,
+    }]))
+    for (const lead of leads) {
+      const group = groups.get(lead.groupId)
+      if (group) group.count++
+      else groups.set(lead.groupId, { groupId: lead.groupId, groupTitle: lead.groupTitle || 'Grupo', count: 1 })
+    }
+    res.json([...groups.values()].sort((a, b) => a.groupTitle.localeCompare(b.groupTitle, 'pt-BR')))
+  } catch {
+    res.status(500).json({ error: 'Não foi possível carregar as listas' })
+  }
+})
+
+app.post('/api/lead-groups', async (req, res) => {
+  const title = req.body?.groupTitle
+  if (typeof title !== 'string' || !title.trim() || title.trim().length > 120) {
+    return res.status(400).json({ error: 'Informe um nome de até 120 caracteres para a lista' })
+  }
+  try {
+    await connectToDatabase()
+    const group = await LeadGroup.create({ groupId: `group-${randomUUID()}`, groupTitle: title.trim() })
+    res.status(201).json({ groupId: group.groupId, groupTitle: group.groupTitle, count: 0 })
+  } catch {
+    res.status(500).json({ error: 'Não foi possível criar a lista' })
+  }
+})
+
 app.get('/api/leads', async (_req, res) => {
   try {
     await connectToDatabase()
@@ -202,7 +236,7 @@ app.post('/api/leads', async (req, res) => {
     if (typeof groupId !== 'string' || !groupId.trim()) {
       return res.status(400).json({ error: 'Selecione um grupo para cadastrar o lead' })
     }
-    const group = await Lead.findOne({ groupId })
+    const group = await LeadGroup.findOne({ groupId }) || await Lead.findOne({ groupId })
     if (!group) return res.status(404).json({ error: 'Grupo não encontrado' })
     const lead = await Lead.create({ ...req.body, groupId, groupTitle: group.groupTitle })
     res.status(201).json(lead)
@@ -437,6 +471,7 @@ app.put('/api/leads/group/:groupId', async (req, res) => {
     if (!groupTitle || typeof groupTitle !== 'string' || !groupTitle.trim()) {
       return res.status(400).json({ error: 'Título do grupo é obrigatório' })
     }
+    await LeadGroup.updateOne({ groupId: req.params.groupId }, { $set: { groupTitle: groupTitle.trim() } })
     const result = await Lead.updateMany(
       { groupId: req.params.groupId },
       { $set: { groupTitle: groupTitle.trim() } },
@@ -455,6 +490,7 @@ app.delete('/api/leads/group/:groupId', async (req, res) => {
       { groupId: req.params.groupId },
       { $set: { groupId: null, groupTitle: null } },
     )
+    await LeadGroup.deleteOne({ groupId: req.params.groupId })
     res.json({ updated: result.modifiedCount })
   } catch (err) {
     console.error(err)
