@@ -35,8 +35,6 @@ import Packages from './Packages'
 import Portfolio from './Portfolio'
 import Preloader from './Preloader'
 import UserManagement from './UserManagement'
-import codexaLogo from 'codexa-ui/logos/logos-fundo-transparente/primary-logo.png'
-import codexaIcon from 'codexa-ui/logos/logos-fundo-transparente/icon-only.png'
 import {
   Alert,
   Badge,
@@ -62,6 +60,7 @@ const AnchorButton = Button as any
 import { formatCalendarDate, getReturnDateTone, parseCalendarDate } from './date'
 import { getMessageDay } from '../shared/message-day.js'
 import './App.css'
+import AppShell, { type AppView } from './AppShell'
 import { useTheme, type ThemePreference } from './useTheme'
 
 const COLUMNS: { id: ColumnId; label: string; emoji: string; color: string; icon: IconName }[] = [
@@ -954,52 +953,6 @@ function LeadModal({
   )
 }
 
-function ProfileAvatar({ user, size = 'medium' }: { user: User; size?: 'medium' | 'small' }) {
-  const [imageFailed, setImageFailed] = useState(false)
-  const label = user.displayName ?? user.email ?? 'Usuário'
-  const initials = label.split(' ').map((part) => part[0]).slice(0, 2).join('').toUpperCase()
-  const photoURL = imageFailed ? null : user.photoURL
-
-  return (
-    <span className={`profile-avatar profile-avatar--${size}`} aria-label={label}>
-      {photoURL ? (
-        <img src={photoURL} alt="" onError={() => setImageFailed(true)} />
-      ) : (
-        <span aria-hidden="true">{initials}</span>
-      )}
-    </span>
-  )
-}
-
-function ThemeControls({ theme, onThemeChange, placement }: {
-  theme: ThemePreference
-  onThemeChange: (theme: ThemePreference) => void
-  placement: 'sidebar' | 'drawer'
-}) {
-  return (
-          <fieldset className={`nav-appearance nav-appearance--${placement}`}>
-            <legend>Tema</legend>
-            <div className="nav-appearance__options">
-              {([
-                ['dark', 'Escuro'],
-                ['light', 'Claro'],
-              ] as const).map(([value, label]) => (
-                <label className="nav-appearance__option" key={value}>
-                  <input
-                    type="radio"
-                    name={`appearance-${placement}`}
-                    value={value}
-                    checked={theme === value}
-                    onChange={() => onThemeChange(value)}
-                  />
-                  <span>{label}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
-  )
-}
-
 function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreference; onThemeChange: (theme: ThemePreference) => void }) {
   const [savedGroups, setSavedGroups] = useState<SavedLeadGroup[]>([])
   const [baseLeads, setBaseLeads] = useState<Lead[]>([])
@@ -1011,9 +964,8 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
   const [kanbanSorts, setKanbanSorts] = useState<Record<ColumnId, KanbanSort>>(DEFAULT_KANBAN_SORT)
   const [selectedLead, setSelectedLead] = useState<LeadWithMeta | null>(null)
   const [activeDrag, setActiveDrag] = useState<LeadWithMeta | null>(null)
-  const [currentView, setView] = useState<'dashboard' | 'kanban' | 'table' | 'packages' | 'portfolio' | 'users' | 'help' | 'atlas-early-access' | 'briefing-leads'>('dashboard')
+  const [currentView, setView] = useState<AppView>('dashboard')
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
-  const [navOpen, setNavOpen] = useState(false)
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [importOpen, setImportOpen] = useState(false)
   const [addLeadOpen, setAddLeadOpen] = useState(false)
@@ -1438,231 +1390,14 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
   }
 
   return (
-    <div className="prospect-app">
-      <aside className="prospect-sidebar">
-        <ThemeControls theme={theme} onThemeChange={onThemeChange} placement="sidebar" />
-        <img src={codexaLogo} alt="Codexa" className="prospect-sidebar__logo" />
-        <div className="prospect-sidebar__brand">
-          <div className="prospect-sidebar__user">
-            <ProfileAvatar user={user} />
-            <div className="prospect-sidebar__user-info">
-              <span className="prospect-sidebar__user-name">{user.displayName ?? user.email ?? 'Usuário'}</span>
-              <Button
-                type="button"
-                variant="ghost"
-                size="small"
-                onClick={() => signOut(auth)}
-                leadingIcon={<Icon name="logout" size={14} />}
-              >
-                Sair
-              </Button>
-            </div>
-          </div>
-          <Button
-            type="button"
-            className="prospect-sidebar__menu"
-            variant="ghost"
-            size="small"
-            iconOnly
-            leadingIcon={<Icon name={navOpen ? 'x' : 'menu'} size={22} />}
-            onClick={() => setNavOpen((prev) => !prev)}
-            aria-label="Abrir menu"
-            aria-expanded={navOpen}
-          />
-        </div>
-
-        <nav className={`prospect-nav ${navOpen ? 'prospect-nav--open' : ''}`} aria-label="Navegação principal">
-          <ThemeControls theme={theme} onThemeChange={onThemeChange} placement="drawer" />
-          <div className="prospect-nav__header">
-            <img
-              src={codexaLogo}
-              alt="Codexa"
-              className="prospect-nav__logo"
-            />
-          </div>
-
-          <div className="prospect-nav__user">
-            <ProfileAvatar user={user} />
-            <div className="prospect-nav__user-info">
-              <span className="prospect-nav__user-name">{user.displayName ?? user.email ?? 'Usuário'}</span>
-              <Button
-                type="button"
-                variant="ghost"
-                size="small"
-                onClick={() => signOut(auth)}
-                leadingIcon={<Icon name="logout" size={14} />}
-              >
-                Sair
-              </Button>
-            </div>
-            <Button
-              type="button"
-              className="prospect-nav__close"
-              variant="ghost"
-              size="small"
-              iconOnly
-              leadingIcon={<Icon name="x" size={20} />}
-              onClick={() => setNavOpen(false)}
-              aria-label="Fechar menu"
-            />
-          </div>
-
-          <section className="prospect-nav__group" aria-labelledby="nav-workspace">
-            <h2 className="prospect-nav__group-title" id="nav-workspace">Workspace</h2>
-          <Button
-            type="button"
-            className="prospect-nav__btn"
-            variant={currentView === 'dashboard' ? 'primary' : 'ghost'}
-            onClick={() => { setSelectedGroup(null); setCurrentView('dashboard'); setNavOpen(false) }}
-            leadingIcon={<Icon name="home" size={18} />}
-          >
-            Dashboard
-          </Button>
-          <Button
-            type="button"
-            className="prospect-nav__btn"
-            variant={currentView === 'kanban' ? 'primary' : 'ghost'}
-            onClick={() => { setSelectedGroup(null); setCurrentView('kanban'); setNavOpen(false) }}
-            leadingIcon={<Icon name="sort" size={18} />}
-          >
-            Kanban
-          </Button>
-          <Button
-            type="button"
-            className="prospect-nav__btn"
-            variant={currentView === 'table' ? 'primary' : 'ghost'}
-            onClick={() => { setSelectedGroup(null); setCurrentView('table'); setNavOpen(false) }}
-            leadingIcon={<Icon name="users" size={18} />}
-          >
-            Leads
-          </Button>
-          <Button
-            type="button"
-            className="prospect-nav__btn"
-            variant={currentView === 'packages' ? 'primary' : 'ghost'}
-            onClick={() => { setSelectedGroup(null); setCurrentView('packages'); setNavOpen(false) }}
-            leadingIcon={<Icon name="file" size={18} />}
-          >
-            Pacotes
-          </Button>
-          <Button
-            type="button"
-            className="prospect-nav__btn"
-            variant={currentView === 'portfolio' ? 'primary' : 'ghost'}
-            onClick={() => { setSelectedGroup(null); setCurrentView('portfolio'); setNavOpen(false) }}
-            leadingIcon={<Icon name="file" size={18} />}
-          >
-            Portfólio
-          </Button>
-          <Button
-            type="button"
-            className="prospect-nav__btn"
-            variant={currentView === 'users' ? 'primary' : 'ghost'}
-            onClick={() => { setSelectedGroup(null); setCurrentView('users'); setNavOpen(false) }}
-            leadingIcon={<Icon name="user" size={18} />}
-          >
-            Usuários
-          </Button>
-          <Button
-            type="button"
-            className="prospect-nav__btn"
-            variant={currentView === 'help' ? 'primary' : 'ghost'}
-            onClick={() => { setSelectedGroup(null); setCurrentView('help'); setNavOpen(false) }}
-            leadingIcon={<Icon name="help" size={18} />}
-          >
-            Help
-          </Button>
-          </section>
-          <section className="prospect-nav__group" aria-labelledby="nav-atlas">
-            <h2 className="prospect-nav__group-title" id="nav-atlas">Atlas</h2>
-            <Button
-              type="button"
-              className="prospect-nav__btn"
-              variant={currentView === 'atlas-early-access' ? 'primary' : 'ghost'}
-              onClick={() => { setSelectedGroup(null); setCurrentView('atlas-early-access'); setNavOpen(false) }}
-              leadingIcon={<Icon name="users" size={18} />}
-            >
-              Acesso antecipado
-            </Button>
-          </section>
-          <section className="prospect-nav__group" aria-labelledby="nav-briefing">
-            <h2 className="prospect-nav__group-title" id="nav-briefing">Briefing</h2>
-            <Button
-              type="button"
-              className="prospect-nav__btn"
-              variant={currentView === 'briefing-leads' ? 'primary' : 'ghost'}
-              onClick={() => { setSelectedGroup(null); setCurrentView('briefing-leads'); setNavOpen(false) }}
-              leadingIcon={<Icon name="file" size={18} />}
-            >
-              Leads
-            </Button>
-          </section>
-
-        </nav>
-      </aside>
-
-      {navOpen && (
-        <div
-          className="prospect-nav-overlay"
-          onClick={() => setNavOpen(false)}
-          aria-hidden="true"
-        />
-      )}
-
-      <main className="prospect-main">
-        <header className={`prospect-header prospect-header--logged ${currentView === 'dashboard' ? 'prospect-header--home' : ''}`}>
-          <div className="prospect-header__page">
-            <img
-              src={codexaIcon}
-              alt="Codexa"
-              className="prospect-header__logo-mobile"
-            />
-            <div>
-              <h2>
-                {currentView === 'dashboard'
-                  ? 'Dashboard'
-                  : currentView === 'kanban'
-                    ? 'Kanban'
-                  : currentView === 'table'
-                    ? 'Leads'
-                    : currentView === 'packages'
-                      ? 'Pacotes'
-                      : currentView === 'portfolio'
-                        ? 'Portfólio'
-                        : currentView === 'users'
-                          ? 'Usuários'
-                        : currentView === 'atlas-early-access' ? 'Acesso antecipado' : currentView === 'briefing-leads' ? 'Leads do Briefing' : 'Help'}
-              </h2>
-              <p>
-                {currentView === 'dashboard'
-                  ? 'Resumo das tarefas e retornos do dia'
-                  : currentView === 'kanban'
-                    ? 'Kanban de prospecção comercial'
-                  : currentView === 'table'
-                    ? 'Lista completa de leads'
-                    : currentView === 'packages'
-                      ? 'Planos e valores para clínicas de estética'
-                      : currentView === 'portfolio'
-                        ? 'Projetos e soluções desenvolvidos pela Codexa'
-                        : currentView === 'users'
-                          ? 'Conta, perfil e permissões'
-                        : currentView === 'atlas-early-access' ? 'Interessados no acesso antecipado ao Atlas' : currentView === 'briefing-leads' ? 'Formulários recebidos pelo Codexa Briefing' : 'Base de conhecimento para prospecções'}
-              </p>
-            </div>
-          </div>
-          <Button
-            type="button"
-            className="prospect-header__menu"
-            variant="ghost"
-            size="small"
-            iconOnly
-            leadingIcon={<Icon name={navOpen ? 'x' : 'menu'} size={22} />}
-            onClick={() => setNavOpen((prev) => !prev)}
-            aria-label="Abrir menu"
-            aria-expanded={navOpen}
-          />
-        </header>
-
+    <AppShell
+      user={user}
+      theme={theme}
+      onThemeChange={onThemeChange}
+      currentView={currentView}
+      onNavigate={(view) => { setSelectedGroup(null); setCurrentView(view) }}
+      onSignOut={() => signOut(auth)}
+    >
         <div className="prospect-content">
           {(currentView === 'kanban' || (currentView === 'table' && selectedGroup)) && (
             <>
@@ -1996,8 +1731,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
             <Help />
           )}
         </div>
-      </main>
-    </div>
+    </AppShell>
   )
 }
 
