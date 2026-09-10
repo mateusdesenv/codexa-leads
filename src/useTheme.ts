@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 
-export type ThemePreference = 'dark' | 'light' | 'system'
+export type ThemePreference = 'dark' | 'light'
 const STORAGE_KEY = 'codexa-theme'
 
 function readPreference(): ThemePreference {
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved === 'dark' || saved === 'light' || saved === 'system') return saved
+    if (saved === 'dark' || saved === 'light') return saved
   } catch { /* Theme switching remains available when storage is blocked. */ }
   return 'dark'
 }
@@ -15,15 +15,8 @@ export function useTheme() {
   const [theme, setTheme] = useState<ThemePreference>(readPreference)
 
   useEffect(() => {
-    const system = window.matchMedia('(prefers-color-scheme: dark)')
-    const apply = () => {
-      document.documentElement.dataset.theme = theme === 'system'
-        ? (system.matches ? 'dark' : 'light')
-        : theme
-    }
-    apply()
-    system.addEventListener('change', apply)
-    return () => system.removeEventListener('change', apply)
+    document.documentElement.dataset.theme = theme
+    try { localStorage.setItem(STORAGE_KEY, theme) } catch { /* Keep the in-memory preference. */ }
   }, [theme])
 
   useEffect(() => {

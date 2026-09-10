@@ -23,6 +23,8 @@ import { auth } from './firebase'
 import AccessGate from './AccessGate'
 import Help from './Help'
 import Dashboard from './Dashboard'
+import AtlasEarlyAccess from './AtlasEarlyAccess'
+import BriefingLeads from './BriefingLeads'
 import AddLeadModal, { type NewLeadInput } from './AddLeadModal'
 import ImportLeadsModal from './ImportLeadsModal'
 import LeadClientInfo from './LeadClientInfo'
@@ -969,6 +971,35 @@ function ProfileAvatar({ user, size = 'medium' }: { user: User; size?: 'medium' 
   )
 }
 
+function ThemeControls({ theme, onThemeChange, placement }: {
+  theme: ThemePreference
+  onThemeChange: (theme: ThemePreference) => void
+  placement: 'sidebar' | 'drawer'
+}) {
+  return (
+          <fieldset className={`nav-appearance nav-appearance--${placement}`}>
+            <legend>Tema</legend>
+            <div className="nav-appearance__options">
+              {([
+                ['dark', 'Escuro'],
+                ['light', 'Claro'],
+              ] as const).map(([value, label]) => (
+                <label className="nav-appearance__option" key={value}>
+                  <input
+                    type="radio"
+                    name={`appearance-${placement}`}
+                    value={value}
+                    checked={theme === value}
+                    onChange={() => onThemeChange(value)}
+                  />
+                  <span>{label}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+  )
+}
+
 function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreference; onThemeChange: (theme: ThemePreference) => void }) {
   const [savedGroups, setSavedGroups] = useState<SavedLeadGroup[]>([])
   const [baseLeads, setBaseLeads] = useState<Lead[]>([])
@@ -980,7 +1011,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
   const [kanbanSorts, setKanbanSorts] = useState<Record<ColumnId, KanbanSort>>(DEFAULT_KANBAN_SORT)
   const [selectedLead, setSelectedLead] = useState<LeadWithMeta | null>(null)
   const [activeDrag, setActiveDrag] = useState<LeadWithMeta | null>(null)
-  const [currentView, setView] = useState<'dashboard' | 'kanban' | 'table' | 'packages' | 'portfolio' | 'users' | 'help'>('dashboard')
+  const [currentView, setView] = useState<'dashboard' | 'kanban' | 'table' | 'packages' | 'portfolio' | 'users' | 'help' | 'atlas-early-access' | 'briefing-leads'>('dashboard')
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
   const [navOpen, setNavOpen] = useState(false)
   const [filtersOpen, setFiltersOpen] = useState(false)
@@ -1409,6 +1440,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
   return (
     <div className="prospect-app">
       <aside className="prospect-sidebar">
+        <ThemeControls theme={theme} onThemeChange={onThemeChange} placement="sidebar" />
         <img src={codexaLogo} alt="Codexa" className="prospect-sidebar__logo" />
         <div className="prospect-sidebar__brand">
           <div className="prospect-sidebar__user">
@@ -1440,6 +1472,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
         </div>
 
         <nav className={`prospect-nav ${navOpen ? 'prospect-nav--open' : ''}`} aria-label="Navegação principal">
+          <ThemeControls theme={theme} onThemeChange={onThemeChange} placement="drawer" />
           <div className="prospect-nav__header">
             <img
               src={codexaLogo}
@@ -1474,6 +1507,8 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
             />
           </div>
 
+          <section className="prospect-nav__group" aria-labelledby="nav-workspace">
+            <h2 className="prospect-nav__group-title" id="nav-workspace">Workspace</h2>
           <Button
             type="button"
             className="prospect-nav__btn"
@@ -1537,27 +1572,32 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
           >
             Help
           </Button>
-          <fieldset className="nav-appearance">
-            <legend>Tema</legend>
-            <div className="nav-appearance__options">
-              {([
-                ['dark', 'Escuro'],
-                ['light', 'Claro'],
-                ['system', 'Sistema'],
-              ] as const).map(([value, label]) => (
-                <label className="nav-appearance__option" key={value}>
-                  <input
-                    type="radio"
-                    name="appearance"
-                    value={value}
-                    checked={theme === value}
-                    onChange={() => onThemeChange(value)}
-                  />
-                  <span>{label}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
+          </section>
+          <section className="prospect-nav__group" aria-labelledby="nav-atlas">
+            <h2 className="prospect-nav__group-title" id="nav-atlas">Atlas</h2>
+            <Button
+              type="button"
+              className="prospect-nav__btn"
+              variant={currentView === 'atlas-early-access' ? 'primary' : 'ghost'}
+              onClick={() => { setSelectedGroup(null); setCurrentView('atlas-early-access'); setNavOpen(false) }}
+              leadingIcon={<Icon name="users" size={18} />}
+            >
+              Acesso antecipado
+            </Button>
+          </section>
+          <section className="prospect-nav__group" aria-labelledby="nav-briefing">
+            <h2 className="prospect-nav__group-title" id="nav-briefing">Briefing</h2>
+            <Button
+              type="button"
+              className="prospect-nav__btn"
+              variant={currentView === 'briefing-leads' ? 'primary' : 'ghost'}
+              onClick={() => { setSelectedGroup(null); setCurrentView('briefing-leads'); setNavOpen(false) }}
+              leadingIcon={<Icon name="file" size={18} />}
+            >
+              Leads
+            </Button>
+          </section>
+
         </nav>
       </aside>
 
@@ -1591,7 +1631,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
                         ? 'Portfólio'
                         : currentView === 'users'
                           ? 'Usuários'
-                        : 'Help'}
+                        : currentView === 'atlas-early-access' ? 'Acesso antecipado' : currentView === 'briefing-leads' ? 'Leads do Briefing' : 'Help'}
               </h2>
               <p>
                 {currentView === 'dashboard'
@@ -1606,7 +1646,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
                         ? 'Projetos e soluções desenvolvidos pela Codexa'
                         : currentView === 'users'
                           ? 'Conta, perfil e permissões'
-                        : 'Base de conhecimento para prospecções'}
+                        : currentView === 'atlas-early-access' ? 'Interessados no acesso antecipado ao Atlas' : currentView === 'briefing-leads' ? 'Formulários recebidos pelo Codexa Briefing' : 'Base de conhecimento para prospecções'}
               </p>
             </div>
           </div>
@@ -1942,6 +1982,10 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
                 onCreateEmpty={handleCreateGroup}
               />
             </>
+          ) : currentView === 'briefing-leads' ? (
+            <BriefingLeads />
+          ) : currentView === 'atlas-early-access' ? (
+            <AtlasEarlyAccess />
           ) : currentView === 'packages' ? (
             <Packages />
           ) : currentView === 'portfolio' ? (

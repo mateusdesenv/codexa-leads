@@ -7,6 +7,8 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { connectToDatabase } from './lib/db.js'
 import { Lead } from './lib/lead.js'
+import { atlasWaitlist } from './lib/atlas-waitlist.js'
+import { briefingLeads } from './lib/briefing-leads.js'
 import { LeadGroup } from './lib/lead-group.js'
 import { randomUUID } from 'node:crypto'
 import { activeLeadFilter, findActiveLeads } from './lib/active-leads.js'
@@ -183,6 +185,35 @@ app.use('/api', requireAuthenticatedUser, async (request, response, next) => {
     return next()
   } catch {
     return response.status(503).json({ error: 'Não foi possível verificar a liberação' })
+  }
+})
+
+// Protected by authentication and account approval middleware above.
+app.get('/api/atlas/early-access', async (req, res) => {
+  const page = Number(req.query.page ?? 1)
+  if (!Number.isSafeInteger(page) || page < 1 || (req.query.q !== undefined && typeof req.query.q !== 'string')) {
+    return res.status(400).json({ error: 'Parâmetros de busca inválidos' })
+  }
+  const search = (req.query.q ?? '').trim()
+  if (search.length > 200) return res.status(400).json({ error: 'A busca deve ter até 200 caracteres' })
+  try {
+    return res.json(await atlasWaitlist.list({ search, page }))
+  } catch {
+    return res.status(503).json({ error: 'Não foi possível carregar os cadastros do Atlas' })
+  }
+})
+
+app.get('/api/briefing/leads', async (req, res) => {
+  const page = Number(req.query.page ?? 1)
+  if (!Number.isSafeInteger(page) || page < 1 || (req.query.q !== undefined && typeof req.query.q !== 'string')) {
+    return res.status(400).json({ error: 'Parâmetros de busca inválidos' })
+  }
+  const search = (req.query.q ?? '').trim()
+  if (search.length > 200) return res.status(400).json({ error: 'A busca deve ter até 200 caracteres' })
+  try {
+    return res.json(await briefingLeads.list({ search, page }))
+  } catch {
+    return res.status(503).json({ error: 'Não foi possível carregar os briefings' })
   }
 })
 
