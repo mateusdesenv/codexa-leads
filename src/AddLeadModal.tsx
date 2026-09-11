@@ -1,8 +1,10 @@
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { Alert, Button, Dialog, Icon, Input, Select, Textarea } from 'codexa-ui'
-import type { ColumnId } from './types'
+import LeadAssigneeSelect from './LeadAssigneeSelect'
+import type { ColumnId, LeadWithMeta } from './types'
 
 export interface NewLeadInput {
+  assigneeUid?: string | null
   title: string
   categoryName: string
   phone: string
@@ -14,6 +16,7 @@ export interface NewLeadInput {
 
 interface AddLeadModalProps {
   groupTitle: string
+  lead?: LeadWithMeta
   onClose: () => void
   onCreate: (input: NewLeadInput) => Promise<void>
 }
@@ -54,15 +57,17 @@ function formatBrazilianPhone(value: string): string {
   return `(${areaCode}) ${firstBlock}${lastBlock ? `-${lastBlock}` : ''}`
 }
 
-export default function AddLeadModal({ groupTitle, onClose, onCreate }: AddLeadModalProps) {
-  const [title, setTitle] = useState('')
-  const [categoryName, setCategoryName] = useState('')
-  const [phone, setPhone] = useState('')
+export default function AddLeadModal({ groupTitle, lead, onClose, onCreate }: AddLeadModalProps) {
+  const [assigneeUid, setAssigneeUid] = useState(lead?.assigneeUid ?? '')
+  const [title, setTitle] = useState(lead?.title ?? '')
+  const [categoryName, setCategoryName] = useState(lead?.categoryName ?? '')
+  const [phone, setPhone] = useState(lead?.phone ?? lead?.phoneUnformatted ?? '')
   const [phoneTouched, setPhoneTouched] = useState(false)
-  const [website, setWebsite] = useState('')
-  const [address, setAddress] = useState('')
-  const [column, setColumn] = useState<ColumnId>('open')
-  const [collectedData, setCollectedData] = useState('')
+  const [website, setWebsite] = useState(lead?.website ?? '')
+  const [address, setAddress] = useState(lead?.address ?? '')
+  const [column, setColumn] = useState<ColumnId>(lead?.kanbanState.column ?? 'open')
+  const [collectedData, setCollectedData] = useState(lead?.kanbanState.collectedData ?? '')
+  const submitLock = useRef(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const phoneDigits = getPhoneDigits(phone)
@@ -73,16 +78,18 @@ export default function AddLeadModal({ groupTitle, onClose, onCreate }: AddLeadM
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!title.trim()) return
+    if (submitLock.current || !title.trim()) return
     if (!phoneIsValid) {
       setPhoneTouched(true)
       return
     }
 
+    submitLock.current = true
     try {
       setSubmitting(true)
       setError(null)
       await onCreate({
+        assigneeUid: lead && assigneeUid === (lead.assigneeUid ?? '') ? undefined : assigneeUid || null,
         title: title.trim(),
         categoryName: categoryName.trim(),
         phone: phone.trim(),
@@ -94,18 +101,19 @@ export default function AddLeadModal({ groupTitle, onClose, onCreate }: AddLeadM
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Não foi possível adicionar o lead')
     } finally {
+      submitLock.current = false
       setSubmitting(false)
     }
   }
 
   return (
-    <Dialog open onClose={onClose} title="Adicionar novo lead">
+    <Dialog open onClose={() => { if (!submitLock.current) onClose() }} title={lead ? 'Editar lead' : 'Adicionar novo lead'}>
       <div className="add-lead-modal__group">
         <span className="add-lead-modal__group-icon" aria-hidden="true">
           <Icon name="users" size={18} />
         </span>
         <div>
-          <span>Adicionar ao grupo</span>
+          <span>{lead ? 'Grupo' : 'Adicionar ao grupo'}</span>
           <strong>{groupTitle}</strong>
         </div>
       </div>
@@ -113,11 +121,15 @@ export default function AddLeadModal({ groupTitle, onClose, onCreate }: AddLeadM
       <form className="add-lead-modal__form" onSubmit={handleSubmit}>
         {error && (
           <div className="add-lead-modal__full">
-            <Alert tone="danger" title="Erro ao adicionar lead">
+            <Alert tone="danger" title="Não foi possível salvar o lead">
               {error}
             </Alert>
           </div>
         )}
+
+        <div className="add-lead-modal__full">
+          <LeadAssigneeSelect value={assigneeUid} currentName={lead?.assigneeName} onChange={setAssigneeUid} disabled={submitting} />
+        </div>
 
         <Input
           label="Nome do lead"
@@ -181,7 +193,7 @@ export default function AddLeadModal({ groupTitle, onClose, onCreate }: AddLeadM
 
         <div className="add-lead-modal__full">
           <Select
-            label="Etapa inicial do funil"
+            label={lead ? 'Etapa do funil' : 'Etapa inicial do funil'}
             id="new-lead-column"
             value={column}
             onChange={(value: string) => setColumn(value as ColumnId)}
@@ -211,7 +223,7 @@ export default function AddLeadModal({ groupTitle, onClose, onCreate }: AddLeadM
             disabled={!title.trim() || !phoneIsValid || submitting}
             leadingIcon={<Icon name="plus" size={16} />}
           >
-            Adicionar lead
+            {lead ? 'Salvar alterações' : 'Adicionar lead'}
           </Button>
         </div>
       </form>

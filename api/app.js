@@ -9,6 +9,7 @@ import { connectToDatabase } from './lib/db.js'
 import { Lead } from './lib/lead.js'
 import { atlasWaitlist } from './lib/atlas-waitlist.js'
 import { briefingLeads } from './lib/briefing-leads.js'
+import { resolveLeadAssignee } from './lib/lead-assignee.js'
 import { LeadGroup } from './lib/lead-group.js'
 import { randomUUID } from 'node:crypto'
 import { activeLeadFilter, findActiveLeads } from './lib/active-leads.js'
@@ -217,6 +218,17 @@ app.get('/api/briefing/leads', async (req, res) => {
   }
 })
 
+app.get('/api/lead-assignees', async (_req, res) => {
+  try {
+    await connectToDatabase()
+    const users = await User.find({ accessStatus: 'approved' })
+    res.json(users.map((user) => ({ uid: user.firebaseUid, name: user.displayName?.trim() || user.email }))
+      .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')))
+  } catch {
+    res.status(500).json({ error: 'Não foi possível carregar os responsáveis' })
+  }
+})
+
 app.get('/api/lead-groups', async (_req, res) => {
   try {
     await connectToDatabase()
@@ -269,7 +281,8 @@ app.post('/api/leads', async (req, res) => {
     }
     const group = await LeadGroup.findOne({ groupId }) || await Lead.findOne({ groupId })
     if (!group) return res.status(404).json({ error: 'Grupo não encontrado' })
-    const lead = await Lead.create({ ...req.body, groupId, groupTitle: group.groupTitle })
+    const assignee = await resolveLeadAssignee(req.body.assigneeUid ?? null)
+    const lead = await Lead.create({ ...req.body, groupId, groupTitle: group.groupTitle, ...assignee })
     res.status(201).json(lead)
   } catch (err) {
     console.error(err)
@@ -394,12 +407,43 @@ app.patch('/api/leads/:placeId/message-sent', async (req, res) => {
   }
 })
 
+app.patch('/api/leads/:placeId/details', async (req, res) => {
+  const input = req.body ?? {}
+  const fields = ['title', 'categoryName', 'phone', 'website', 'address', 'column', 'collectedData']
+  const columns = ['open', 'em_contato', 'mensagem_enviada', 'contato', 'conversa', 'followup', 'proposta', 'negociacao', 'fechado', 'perdido']
+  if (fields.some((key) => typeof input[key] !== 'string') || !input.title.trim() || !columns.includes(input.column)) {
+    return res.status(400).json({ error: 'Informe um nome e os dados válidos do lead' })
+  }
+  try {
+    await connectToDatabase()
+    const phone = input.phone.trim() || null
+    const website = input.website.trim()
+    const lead = await Lead.findOneAndUpdate(
+      { ...activeLeadFilter, placeId: req.params.placeId },
+      { $set: {
+        ...await resolveLeadAssignee(input.assigneeUid),
+        title: input.title.trim(), categoryName: input.categoryName.trim() || null,
+        phone, phoneUnformatted: phone ? phone.replace(/\D/g, '') || phone : null,
+        website: website ? (/^https?:\/\//i.test(website) ? website : `https://${website}`) : null,
+        address: input.address.trim() || null,
+        'kanbanState.column': input.column,
+        'kanbanState.collectedData': input.collectedData.trim() || null,
+      } },
+      { returnDocument: 'after', runValidators: true },
+    )
+    if (!lead) return res.status(404).json({ error: 'Lead não encontrado' })
+    res.json(lead)
+  } catch (error) {
+    res.status(error.statusCode || 500).json({ error: error.statusCode === 400 ? error.message : 'Não foi possível editar o lead' })
+  }
+})
+
 app.put('/api/leads/:placeId', async (req, res) => {
   try {
     await connectToDatabase()
     const lead = await Lead.findOneAndUpdate(
       { ...activeLeadFilter, placeId: req.params.placeId },
-      { $set: { kanbanState: req.body.kanbanState } },
+      { $set: { kanbanState: req.body.kanbanState, ...await resolveLeadAssignee(req.body.assigneeUid) } },
       { returnDocument: 'after' },
     )
     if (!lead) return res.status(404).json({ error: 'Lead não encontrado' })

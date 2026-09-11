@@ -1,3 +1,4 @@
+import LeadActionIcon from './LeadActionIcon'
 import { apiFetch } from './api'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -25,6 +26,7 @@ import Help from './Help'
 import Dashboard from './Dashboard'
 import AtlasEarlyAccess from './AtlasEarlyAccess'
 import BriefingLeads from './BriefingLeads'
+import LeadAssigneeSelect from './LeadAssigneeSelect'
 import AddLeadModal, { type NewLeadInput } from './AddLeadModal'
 import ImportLeadsModal from './ImportLeadsModal'
 import LeadClientInfo from './LeadClientInfo'
@@ -145,11 +147,11 @@ const fetchLeads = async (signal?: AbortSignal): Promise<Lead[]> => {
   return res.json()
 }
 
-const updateLeadState = async (placeId: string, kanbanState: KanbanState): Promise<Lead> => {
+const updateLeadState = async (placeId: string, kanbanState: KanbanState, assigneeUid?: string | null): Promise<Lead> => {
   const res = await apiFetch(`/api/leads/${placeId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ kanbanState }),
+    body: JSON.stringify({ kanbanState, assigneeUid }),
   })
   if (!res.ok) throw new Error('Erro ao atualizar lead')
   return res.json()
@@ -320,7 +322,7 @@ function Actions({ lead }: { lead: Lead }) {
             size="small"
             iconOnly
             aria-label="Ligar"
-            leadingIcon={<Icon name="user" size={16} />}
+            leadingIcon={<LeadActionIcon action="phone" />}
           />
         ) : (
           <Button
@@ -330,7 +332,7 @@ function Actions({ lead }: { lead: Lead }) {
             disabled
             iconOnly
             aria-label="Ligar"
-            leadingIcon={<Icon name="user" size={16} />}
+            leadingIcon={<LeadActionIcon action="phone" />}
           />
         )}
       </Tooltip>
@@ -346,7 +348,7 @@ function Actions({ lead }: { lead: Lead }) {
             size="small"
             iconOnly
             aria-label="WhatsApp"
-            leadingIcon={<Icon name="message" size={16} />}
+            leadingIcon={<LeadActionIcon action="whatsapp" />}
           />
         ) : (
           <Button
@@ -356,7 +358,7 @@ function Actions({ lead }: { lead: Lead }) {
             disabled
             iconOnly
             aria-label="WhatsApp"
-            leadingIcon={<Icon name="message" size={16} />}
+            leadingIcon={<LeadActionIcon action="whatsapp" />}
           />
         )}
       </Tooltip>
@@ -372,7 +374,7 @@ function Actions({ lead }: { lead: Lead }) {
             size="small"
             iconOnly
             aria-label="Site"
-            leadingIcon={<Icon name="external-link" size={16} />}
+            leadingIcon={<LeadActionIcon action="website" />}
           />
         ) : (
           <Button
@@ -382,7 +384,7 @@ function Actions({ lead }: { lead: Lead }) {
             disabled
             iconOnly
             aria-label="Site"
-            leadingIcon={<Icon name="external-link" size={16} />}
+            leadingIcon={<LeadActionIcon action="website" />}
           />
         )}
       </Tooltip>
@@ -397,9 +399,28 @@ function Actions({ lead }: { lead: Lead }) {
           size="small"
           iconOnly
           aria-label="Maps"
-          leadingIcon={<Icon name="search" size={16} />}
+          leadingIcon={<LeadActionIcon action="maps" />}
         />
       </Tooltip>
+    </div>
+  )
+}
+
+function ReturnDateHighlight({ value, label }: { value: string; label: string }) {
+  const date = parseCalendarDate(value)
+  const valid = !Number.isNaN(date.getTime())
+
+  return (
+    <div className="kanban-card__return" data-return-tone={getReturnDateTone(value)}>
+      <div className="kanban-card__calendar" aria-hidden="true">
+        <div className="kanban-card__calendar-binding" />
+        <strong>{valid ? date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : '—'}</strong>
+        <span>{valid ? date.getFullYear() : ''}</span>
+      </div>
+      <div className="kanban-card__return-copy">
+        <strong>{label}</strong>
+        <time dateTime={value}>{formatDate(value)}</time>
+      </div>
     </div>
   )
 }
@@ -444,7 +465,7 @@ function LeadCard({
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      className={`kanban-card kanban-card--${lead.temperature}${messageSentToday ? ' kanban-card--message-sent' : ''}`}
+      className={`kanban-card kanban-card--model-two kanban-card--${lead.temperature}${messageSentToday ? ' kanban-card--message-sent' : ''}`}
       style={style}
       onClick={() => !isDragging && onClick(lead)}
     >
@@ -454,9 +475,9 @@ function LeadCard({
             {lead.title}
           </h3>
           {lead.categoryName && (
-            <Tag tone="neutral">
+            <span className="kanban-card__category">
               {lead.categoryName}
-            </Tag>
+            </span>
           )}
         </div>
         <div className="kanban-card__badges">
@@ -468,6 +489,13 @@ function LeadCard({
       </div>
 
       <div className="kanban-card__body">
+        <div className="kanban-card__assignee"><Icon name="user" size={14} /><span>Responsável: <strong>{lead.assigneeName || 'Sem responsável'}</strong></span></div>
+        {lead.kanbanState.returnDate && (
+          <ReturnDateHighlight value={lead.kanbanState.returnDate} label="Retorno" />
+        )}
+        {lead.kanbanState.proposalReturnDate && (
+          <ReturnDateHighlight value={lead.kanbanState.proposalReturnDate} label="Retorno da proposta" />
+        )}
         {lead.kanbanState.nextAction && (
           <div
             className={`kanban-card__next-action ${isOverdue(lead.kanbanState.dueDate) ? 'kanban-card__next-action--overdue' : ''}`}
@@ -485,15 +513,10 @@ function LeadCard({
 
         {(lead.kanbanState.interest ||
           lead.kanbanState.budget ||
-          lead.kanbanState.returnDate ||
           lead.kanbanState.proposalValue ||
-          lead.kanbanState.proposalReturnDate ||
           lead.kanbanState.lostReason) && (
           <div
             className="kanban-card__data"
-            data-return-tone={lead.kanbanState.returnDate || lead.kanbanState.proposalReturnDate
-              ? getReturnDateTone(lead.kanbanState.returnDate || lead.kanbanState.proposalReturnDate!)
-              : undefined}
           >
             {lead.kanbanState.interest && (
               <div className="kanban-card__data-row">
@@ -509,28 +532,14 @@ function LeadCard({
                 <strong>{lead.kanbanState.budget}</strong>
               </div>
             )}
-            {lead.kanbanState.returnDate && (
-              <div className="kanban-card__data-row">
-                <span>Retorno</span>
-                <Badge tone={getReturnDateTone(lead.kanbanState.returnDate)} size="small">
-                  <time dateTime={lead.kanbanState.returnDate}>{formatDate(lead.kanbanState.returnDate)}</time>
-                </Badge>
-              </div>
-            )}
+
             {lead.kanbanState.proposalValue && (
               <div className="kanban-card__data-row">
                 <span>Proposta</span>
                 <strong>{lead.kanbanState.proposalValue}</strong>
               </div>
             )}
-            {lead.kanbanState.proposalReturnDate && (
-              <div className="kanban-card__data-row">
-                <span>Retorno proposta</span>
-                <Badge tone={getReturnDateTone(lead.kanbanState.proposalReturnDate)} size="small">
-                  <time dateTime={lead.kanbanState.proposalReturnDate}>{formatDate(lead.kanbanState.proposalReturnDate)}</time>
-                </Badge>
-              </div>
-            )}
+
             {lead.kanbanState.lostReason && (
               <div className="kanban-card__data-row">
                 <span>Motivo perda</span>
@@ -550,30 +559,32 @@ function LeadCard({
 
       <div className="kanban-card__footer">
         <div className="kanban-card__footer-top">
-          <span className="kanban-card__rating">
+          <div className="kanban-card__status">
+            <Badge tone={getWebsiteTone(lead.websiteKind)} size="small">
+              <Icon name={getWebsiteIcon(lead.websiteKind)} size={12} /> {getWebsiteLabel(lead.websiteKind)}
+            </Badge>
             {lead.totalScore !== null && lead.totalScore !== undefined && (
-              <>
+              <span className="kanban-card__rating">
                 <Icon name="star" size={12} /> {lead.totalScore.toFixed(1)} ({lead.reviewsCount ?? 0})
-              </>
+              </span>
             )}
-          </span>
-          <Badge tone={getWebsiteTone(lead.websiteKind)} size="small">
-            <Icon name={getWebsiteIcon(lead.websiteKind)} size={12} /> {getWebsiteLabel(lead.websiteKind)}
-          </Badge>
-        </div>
-        <Actions lead={lead} />
+          </div>
         <Button
           type="button"
           variant="secondary"
           size="small"
-          fullWidth
+          className="kanban-card__details"
+          onPointerDown={(event: React.PointerEvent) => event.stopPropagation()}
+          onKeyDown={(event: React.KeyboardEvent) => event.stopPropagation()}
           onClick={(e: React.MouseEvent) => {
             e.stopPropagation()
             onClick(lead)
           }}
         >
-          Ver detalhes
+          Ver detalhes <span aria-hidden="true">→</span>
         </Button>
+        </div>
+        <Actions lead={lead} />
         <Button
           type="button"
           variant="secondary"
@@ -610,6 +621,8 @@ function LeadCard({
             type="button"
             size="small"
             fullWidth
+            className="kanban-card__advance"
+            variant="primary"
             disabled={isAdvancing}
             aria-label={`Mover para ${nextColumn.label}`}
             title={`Mover para ${nextColumn.label}`}
@@ -742,8 +755,9 @@ function LeadModal({
 }: {
   lead: LeadWithMeta
   onClose: () => void
-  onSave: (placeId: string, state: KanbanState) => Promise<void>
+  onSave: (placeId: string, state: KanbanState, assigneeUid?: string | null) => Promise<void>
 }) {
+  const [assigneeUid, setAssigneeUid] = useState(lead.assigneeUid ?? '')
   const [state, setState] = useState<KanbanState>({ ...lead.kanbanState })
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
@@ -752,8 +766,8 @@ function LeadModal({
 
   const tabItems: TabItem[] = [
     { id: 'dados', label: 'Dados' },
-    { id: 'cliente', label: 'Cliente' },
-    { id: 'contato', label: 'Contato' },
+    { id: 'cliente', label: 'Apify' },
+    { id: 'contato', label: 'Codex' },
   ]
 
   const interestOptions = [
@@ -776,7 +790,7 @@ function LeadModal({
     setSaving(true)
     setSaveError(null)
     try {
-      await onSave(lead.placeId, state)
+      await onSave(lead.placeId, state, assigneeUid === (lead.assigneeUid ?? '') ? undefined : assigneeUid || null)
       onClose()
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : 'Erro ao salvar lead')
@@ -809,6 +823,7 @@ function LeadModal({
       </div>
 
       <form className="modal__form" onSubmit={handleSubmit}>
+        <LeadAssigneeSelect value={assigneeUid} currentName={lead.assigneeName} onChange={setAssigneeUid} disabled={saving} />
         <Tabs
           items={tabItems}
           value={activeTab}
@@ -968,6 +983,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [importOpen, setImportOpen] = useState(false)
+  const [editingLead, setEditingLead] = useState<LeadWithMeta | null>(null)
   const [addLeadOpen, setAddLeadOpen] = useState(false)
   const [messageDay, setMessageDay] = useState(getMessageDay)
 
@@ -1231,8 +1247,8 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
     }
   }
 
-  const handleSaveLead = async (placeId: string, state: KanbanState) => {
-    const savedLead = await updateLeadState(placeId, state)
+  const handleSaveLead = async (placeId: string, state: KanbanState, assigneeUid?: string | null) => {
+    const savedLead = await updateLeadState(placeId, state, assigneeUid)
     setBaseLeads((prev) =>
       prev.map((l) => (l.placeId === placeId ? savedLead : l)),
     )
@@ -1310,6 +1326,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
       : null
     const categoryName = input.categoryName || null
     const newLead: Lead = {
+      assigneeUid: input.assigneeUid,
       title: input.title,
       subTitle: null,
       categoryName,
@@ -1350,6 +1367,23 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
     const createdLead = await response.json() as Lead
     setBaseLeads((current) => [...current, createdLead])
     setAddLeadOpen(false)
+  }
+
+  const handleEditLead = async (input: NewLeadInput) => {
+    if (!editingLead) return
+    const response = await apiFetch(`/api/leads/${encodeURIComponent(editingLead.placeId)}/details`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input),
+    })
+    const payload = await response.json()
+    if (!response.ok) throw new Error(payload.error || 'Não foi possível editar o lead')
+    setBaseLeads((current) => current.map((lead) => lead.placeId === payload.placeId ? payload : lead))
+    setEditingLead(null)
+  }
+
+  const handleDeleteLead = async (lead: LeadWithMeta) => {
+    const response = await apiFetch(`/api/leads/${encodeURIComponent(lead.placeId)}`, { method: 'DELETE' })
+    if (!response.ok) throw new Error('Não foi possível excluir o lead')
+    setBaseLeads((current) => current.filter((item) => item.placeId !== lead.placeId))
   }
 
   const handleEditGroup = async (group: LeadGroup, title: string) => {
@@ -1619,6 +1653,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
                           </span>
                         </div>
                         <div className="kanban-card__body">
+        <div className="kanban-card__assignee"><Icon name="user" size={14} /><span>Responsável: <strong>{activeDrag.assigneeName || 'Sem responsável'}</strong></span></div>
                           <div className="kanban-card__meta">
                             {activeDrag.totalScore !== null && activeDrag.totalScore !== undefined && (
                               <span className="kanban-card__rating">
@@ -1675,7 +1710,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
                     <div className="prospect-empty">
                       <EmptyState icon="users" title={groups.find((group) => group.groupId === selectedGroup)?.count ? 'Nenhum lead encontrado' : 'Sua lista está vazia'} description={groups.find((group) => group.groupId === selectedGroup)?.count ? 'Tente ajustar os filtros.' : 'Clique em Novo lead para começar a preencher esta lista.'} />
                     </div>
-                  ) : <LeadsTable leads={selectedGroupLeads} onLeadClick={handleCardClick} />}
+                  ) : <LeadsTable leads={selectedGroupLeads} onLeadClick={handleCardClick} onEditLead={setEditingLead} onDeleteLead={handleDeleteLead} />}
                 </>
               ) : (
                 <LeadGroupsTable
@@ -1696,6 +1731,10 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
 
               {addLeadOpen && addLeadGroup && (
                 <AddLeadModal groupTitle={addLeadGroup.groupTitle} onClose={() => setAddLeadOpen(false)} onCreate={handleCreateLead} />
+              )}
+
+              {editingLead && (
+                <AddLeadModal key={editingLead.placeId} lead={editingLead} groupTitle={editingLead.groupTitle || selectedGroupTitle} onClose={() => setEditingLead(null)} onCreate={handleEditLead} />
               )}
 
               <Button

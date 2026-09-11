@@ -32,7 +32,7 @@ test('access requests require administrator approval before CRM access', async (
     users.set(firebaseUid, user)
     return user
   }
-  User.find = () => ({ sort: async () => [...users.values()] })
+  User.find = (filter) => filter?.accessStatus ? Promise.resolve([...users.values()].filter((user) => user.accessStatus === filter.accessStatus)) : ({ sort: async () => [...users.values()] })
   Lead.find = async () => [{ title: 'Protected lead' }]
   const server = app.listen(0, '127.0.0.1')
   await new Promise((resolve) => server.once('listening', resolve))
@@ -45,7 +45,7 @@ test('access requests require administrator approval before CRM access', async (
   try {
     assert.equal((await request('/api/leads')).status, 401)
     assert.equal((await request('/api/leads', 'invalid')).status, 401)
-    for (const [path, method] of [['/api/lead-groups', 'GET'], ['/api/lead-groups', 'POST'], ['/api/leads', 'GET'], ['/api/leads', 'POST'], ['/api/qna', 'GET'], ['/api/leads/any', 'DELETE']]) {
+    for (const [path, method] of [['/api/lead-assignees', 'GET'], ['/api/leads/any/details', 'PATCH'], ['/api/lead-groups', 'GET'], ['/api/lead-groups', 'POST'], ['/api/leads', 'GET'], ['/api/leads', 'POST'], ['/api/qna', 'GET'], ['/api/leads/any', 'DELETE']]) {
       assert.equal((await request(path, 'pending', method)).status, 403)
     }
     const pending = await request('/api/users/me', 'pending', 'PUT', { accessStatus: 'approved', email: 'mateus.desenv@gmail.com' })
@@ -61,6 +61,9 @@ test('access requests require administrator approval before CRM access', async (
     const approval = await request('/api/users/new-user/approve', 'admin', 'PATCH')
     assert.equal((await approval.json()).accessStatus, 'approved')
     assert.equal((await request('/api/leads', 'pending')).status, 200)
+    const directory = await request('/api/lead-assignees', 'pending')
+    assert.equal(directory.status, 200)
+    assert.ok((await directory.json()).every((user) => Object.keys(user).sort().join(',') === 'name,uid'))
     const relogin = await request('/api/users/me', 'pending', 'PUT')
     assert.equal((await relogin.json()).accessStatus, 'approved')
     assert.equal((await request('/api/users/new-user', 'pending', 'DELETE')).status, 403)

@@ -21,6 +21,8 @@ export interface Lead {
   placeId: string
   groupId?: string | null
   groupTitle?: string | null
+  assigneeUid?: string | null
+  assigneeName?: string | null
   messageSentOn?: string | null
   kanbanState?: KanbanState
 }

@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
-import { DataTable, Tabs } from 'codexa-ui'
+import { Alert, ConfirmDialog, DataTable, Tabs } from 'codexa-ui'
 import type { DataTableColumn, TabItem } from 'codexa-ui'
-import { Badge, Button, Icon } from 'codexa-ui'
+import { Badge } from 'codexa-ui'
 
 import type { ColumnId, LeadWithMeta, Temperature } from './types'
 import { formatCalendarDate } from './date'
+import { groupLeadsByColumn } from '../shared/group-leads.js'
+import LeadActionsMenu from './LeadActionsMenu'
 
 type TableLead = LeadWithMeta
 
@@ -50,38 +52,23 @@ const formatDate = (value?: string | null): string => {
   return formatCalendarDate(value, '—')
 }
 
-const INITIAL_BY_COLUMN: Record<ColumnId, LeadWithMeta[]> = {
-  open: [],
-  em_contato: [],
-  mensagem_enviada: [],
-  contato: [],
-  conversa: [],
-  followup: [],
-  proposta: [],
-  negociacao: [],
-  fechado: [],
-  perdido: [],
-}
-
 export default function LeadsTable({
   leads,
   onLeadClick,
+  onEditLead,
+  onDeleteLead,
 }: {
   leads: TableLead[]
   onLeadClick: (lead: TableLead) => void
+  onEditLead: (lead: TableLead) => void
+  onDeleteLead: (lead: TableLead) => Promise<void>
 }) {
   const [activeColumn, setActiveColumn] = useState<ColumnId>('open')
 
-  const leadsByColumn = useMemo(() => {
-    const map = { ...INITIAL_BY_COLUMN }
-    leads.forEach((lead) => {
-      map[lead.kanbanState.column].push(lead)
-    })
-    COLUMN_ORDER.forEach((column) => {
-      map[column].sort((a, b) => b.score - a.score)
-    })
-    return map
-  }, [leads])
+  const [deletingLead, setDeletingLead] = useState<TableLead | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+  const leadsByColumn = useMemo(() => groupLeadsByColumn(leads, COLUMN_ORDER), [leads])
 
   const firstWithLeads = useMemo(
     () => COLUMN_ORDER.find((column) => leadsByColumn[column].length > 0),
@@ -112,6 +99,11 @@ export default function LeadsTable({
           {lead.categoryName && <span className="leads-table__category">{lead.categoryName}</span>}
         </div>
       ),
+    },
+    {
+      key: 'assignee',
+      header: 'Responsável',
+      render: (lead) => <span className="leads-table__cell--muted">{lead.assigneeName || 'Sem responsável'}</span>,
     },
     {
       key: 'address',
@@ -155,21 +147,38 @@ export default function LeadsTable({
       header: '',
       align: 'end',
       render: (lead) => (
-        <Button
-          type="button"
-          variant="ghost"
-          size="small"
-          onClick={() => onLeadClick(lead)}
-          leadingIcon={<Icon name="edit" size={16} />}
-        >
-          Abrir
-        </Button>
+        <LeadActionsMenu
+          title={lead.title}
+          onOpen={() => onLeadClick(lead)}
+          onEdit={() => onEditLead(lead)}
+          onDelete={() => { setDeleteError(null); setDeletingLead(lead) }}
+        />
       ),
     },
   ]
 
   return (
     <div className="leads-table">
+      {deleteError && <Alert tone="danger" title="Não foi possível excluir">{deleteError}</Alert>}
+      <ConfirmDialog
+        open={!!deletingLead}
+        onClose={() => { if (!deleting) setDeletingLead(null) }}
+        onConfirm={async () => {
+          if (!deletingLead || deleting) return
+          setDeleting(true)
+          setDeleteError(null)
+          try {
+            await onDeleteLead(deletingLead)
+            setDeletingLead(null)
+          } catch (error) {
+            setDeleteError(error instanceof Error ? error.message : 'Não foi possível excluir o lead')
+          } finally { setDeleting(false) }
+        }}
+        title="Excluir lead"
+        description={`Excluir “${deletingLead?.title ?? ''}”? Esta ação remove o lead e suas informações.`}
+        confirmLabel={deleting ? 'Excluindo...' : 'Excluir lead'}
+        tone="danger"
+      />
       <div className="leads-table__tabs">
         <Tabs
           items={tabItems}

@@ -8,6 +8,15 @@ test('CRM reads and exports the same grouped database records and confirms saved
   global.mongoose = { conn: {}, promise: null }
   const { Lead } = await import('../api/lib/lead.js')
   const { LeadGroup } = await import('../api/lib/lead-group.js')
+  const { User } = await import('../api/lib/user.js')
+  const assignees = [
+    { firebaseUid: 'owner', displayName: 'Mateus', email: 'owner@example.com', accessStatus: 'approved' },
+    { firebaseUid: 'helper', displayName: '', email: 'helper@example.com', accessStatus: 'approved' },
+    { firebaseUid: 'pending', displayName: 'Pendente', email: 'pending@example.com', accessStatus: 'pending' },
+  ]
+  User.find = async (filter) => assignees.filter((user) => user.accessStatus === filter.accessStatus)
+  User.findOne = async (filter) => assignees.find((user) => user.firebaseUid === filter.firebaseUid && user.accessStatus === filter.accessStatus)
+
   const lists = []
   LeadGroup.find = async () => lists.map((group) => ({ ...group }))
   LeadGroup.findOne = async ({ groupId }) => lists.find((group) => group.groupId === groupId)
@@ -56,7 +65,10 @@ test('CRM reads and exports the same grouped database records and confirms saved
   Lead.findOneAndUpdate = async (filter, update) => {
     const record = await Lead.findOne(filter)
     if (!record) return null
-    Object.assign(record, update.$set)
+    for (const [key, value] of Object.entries(update.$set)) {
+      if (key.startsWith('kanbanState.')) record.kanbanState[key.slice('kanbanState.'.length)] = value
+      else record[key] = value
+    }
     return record
   }
   Lead.bulkWrite = async (operations) => {
@@ -134,6 +146,24 @@ test('CRM reads and exports the same grouped database records and confirms saved
     const unmarked = await (await request('/api/leads/new/message-sent', 'PATCH', { sent: false })).json()
     assert.equal(unmarked.messageSentOn, null)
     assert.equal(unmarked.kanbanState.column, 'conversa')
+    const editInput = { title: 'Nome editado', categoryName: 'Terapia', phone: '(48) 99999-9999',
+      website: 'example.com', address: 'Endereço editado', column: 'proposta', collectedData: 'Notas atualizadas',
+      groupId: 'should-not-change', messageSentOn: 'should-not-change' }
+    assert.equal((await request('/api/leads/new/details', 'PATCH', { ...editInput, title: '  ' })).status, 400)
+    assert.equal((await request('/api/leads/new/details', 'PATCH', { ...editInput, column: 'invalid' })).status, 400)
+    assert.equal((await request('/api/leads/ungrouped-0/details', 'PATCH', editInput)).status, 404)
+    const editResponse = await request('/api/leads/new/details', 'PATCH', editInput)
+    assert.equal(editResponse.status, 200)
+    const edited = await editResponse.json()
+    assert.equal(edited.title, editInput.title)
+    assert.equal(edited.groupId, 'seed')
+    assert.equal(edited.website, 'https://example.com')
+    assert.equal(edited.phoneUnformatted, '48999999999')
+    assert.equal(edited.messageSentOn, null)
+    assert.equal(edited.kanbanState.column, 'proposta')
+    assert.equal(edited.kanbanState.returnDate, state.returnDate)
+    assert.deepEqual(edited.kanbanState.contactResearch, state.contactResearch)
+    assert.equal(edited.kanbanState.collectedData, editInput.collectedData)
     await request('/api/leads/group/seed', 'DELETE')
     assert.deepEqual(await (await request('/api/leads')).json(), [])
     assert.deepEqual(await (await request('/api/leads/export')).json(), [])
@@ -151,11 +181,34 @@ test('CRM reads and exports the same grouped database records and confirms saved
     assert.deepEqual(await (await request('/api/leads')).json(), [], 'creating a list creates no placeholder lead')
     await request(`/api/leads/group/${list.groupId}`, 'PUT', { groupTitle: 'Renomeada' })
     assert.equal((await (await request('/api/lead-groups')).json())[0].groupTitle, 'Renomeada')
+    assert.deepEqual(await (await request('/api/lead-assignees')).json(), [
+      { uid: 'helper', name: 'helper@example.com' }, { uid: 'owner', name: 'Mateus' },
+    ])
+    for (const uid of ['missing', 'pending', { uid: 'owner' }]) {
+      assert.equal((await request('/api/leads', 'POST', { title: 'Invalid', placeId: 'invalid', groupId: list.groupId, assigneeUid: uid })).status, 400)
+    }
     const firstLead = await request('/api/leads', 'POST', {
       placeId: 'manual-first', title: 'Primeiro lead', groupId: list.groupId, groupTitle: 'Nome antigo',
+      assigneeUid: 'owner', assigneeName: 'Untrusted name', kanbanState: { column: 'open', returnDate: '2026-09-20' },
     })
     assert.equal(firstLead.status, 201)
-    assert.equal((await firstLead.json()).groupTitle, 'Renomeada')
+    const firstRecord = await firstLead.json()
+    assert.equal(firstRecord.groupTitle, 'Renomeada')
+    assert.equal(firstRecord.assigneeUid, 'owner')
+    assert.equal(firstRecord.assigneeName, 'Mateus')
+    const movedLead = await (await request('/api/leads/manual-first', 'PUT', { kanbanState: { ...firstRecord.kanbanState, column: 'contato' } })).json()
+    assert.equal(movedLead.assigneeUid, 'owner', 'moving stages preserves responsibility')
+    const reassigned = await (await request('/api/leads/manual-first/details', 'PATCH', { ...editInput, assigneeUid: 'helper', assigneeName: 'forged' })).json()
+    assert.equal(reassigned.assigneeUid, 'helper')
+    assert.equal(reassigned.assigneeName, 'helper@example.com')
+    assert.equal(reassigned.kanbanState.returnDate, '2026-09-20')
+    assert.equal((await request('/api/leads/manual-first/details', 'PATCH', { ...editInput, assigneeUid: 'pending' })).status, 400)
+    assert.equal((await request('/api/leads/manual-first', 'PUT', { kanbanState: reassigned.kanbanState, assigneeUid: 'missing' })).status, 400)
+    const cleared = await (await request('/api/leads/manual-first', 'PUT', { kanbanState: reassigned.kanbanState, assigneeUid: null })).json()
+    assert.equal(cleared.assigneeUid, null)
+    assert.equal(cleared.assigneeName, null)
+    assert.equal((await (await request('/api/leads')).json()).find((lead) => lead.placeId === 'manual-first').assigneeUid, null)
+
     assert.equal((await (await request('/api/lead-groups')).json())[0].count, 1)
     await request('/api/leads/manual-first', 'DELETE')
     assert.equal((await (await request('/api/lead-groups')).json())[0].count, 0, 'list survives removal of last lead')
