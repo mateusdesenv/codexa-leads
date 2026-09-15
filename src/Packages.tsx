@@ -25,6 +25,20 @@ const PACKAGES: Package[] = [
     value: 97,
   },
   {
+    name: 'Formulário de Briefing + Árvore de Links',
+    label: 'Conheça seus clientes',
+    description: 'Reúna seus principais canais e colete as informações dos clientes com um formulário de briefing.',
+    included: [
+      '1 formulário de briefing',
+      '1 árvore de links',
+    ],
+    excluded: [
+      'Landing page',
+      'Site institucional',
+    ],
+    value: 497,
+  },
+  {
     name: 'Codexa Start',
     label: 'Para começar',
     description: 'Uma presença objetiva para apresentar sua oferta e captar novos contatos.',
