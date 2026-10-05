@@ -50,7 +50,7 @@ const PACKAGES: Package[] = [
       'Site institucional multipágina',
       'Árvore de links personalizada',
     ],
-    value: 797,
+    value: 997,
   },
   {
     name: 'Site Institucional Essencial',
