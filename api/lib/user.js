@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema(
     photoURL: { type: String, default: '' },
     providerId: { type: String, default: 'password' },
     accessStatus: { type: String, enum: ['pending', 'approved'], default: 'pending', index: true },
+    screenPermissions: { type: mongoose.Schema.Types.Mixed, default: undefined },
     approvedAt: { type: Date },
     approvedBy: { type: String },
     registeredAt: { type: Date },

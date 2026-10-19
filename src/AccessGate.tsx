@@ -3,10 +3,12 @@ import { onAuthStateChanged, signOut, type User } from 'firebase/auth'
 import { Alert, Button, Card } from 'codexa-ui'
 import { auth } from './firebase'
 import Login from './Login'
+import type { AccessProfile } from '../shared/permissions'
 import Preloader from './Preloader'
 import codexaLogo from 'codexa-ui/logos/logos-fundo-transparente/primary-logo.png'
 
-export default function AccessGate({ children }: { children: (user: User) => ReactNode }) {
+export default function AccessGate({ children }: { children: (user: User, access: AccessProfile) => ReactNode }) {
+  const [access, setAccess] = useState<AccessProfile | null>(null)
   const [user, setUser] = useState<User | null>()
   const [status, setStatus] = useState('checking')
   const [error, setError] = useState(false)
@@ -14,6 +16,7 @@ export default function AccessGate({ children }: { children: (user: User) => Rea
 
   useEffect(() => onAuthStateChanged(auth, (next) => {
     setStatus('checking')
+    setAccess(null)
     setUser(next)
   }), [])
 
@@ -30,6 +33,7 @@ export default function AccessGate({ children }: { children: (user: User) => Rea
         if (!response.ok) throw new Error('Falha na verificação')
         const data = await response.json()
         if (!cancelled) {
+          setAccess(current => JSON.stringify(current) === JSON.stringify(data) ? current : data)
           setStatus(data.accessStatus === 'approved' ? 'approved' : 'pending')
           setError(false)
         }
@@ -46,7 +50,7 @@ export default function AccessGate({ children }: { children: (user: User) => Rea
   if (user === undefined) return <Preloader />
   if (!user) return <Login />
   if (status === 'checking') return <Preloader />
-  if (status === 'approved') return children(user)
+  if (status === 'approved' && access) return children(user, access)
 
   return <main className="access-waiting">
     <Card padding="large" className="access-waiting__card">

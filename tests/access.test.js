@@ -6,6 +6,8 @@ test('access requests require administrator approval before CRM access', async (
   process.env.VITE_FIREBASE_API_KEY = 'test-key'
   global.mongoose = { conn: {}, promise: null }
   const { User } = await import('../api/lib/user.js')
+  const { LeadGroup } = await import('../api/lib/lead-group.js')
+  LeadGroup.find = async () => []
   const { Lead } = await import('../api/lib/lead.js')
   const { default: app } = await import('../api/app.js')
   const users = new Map()
@@ -58,8 +60,14 @@ test('access requests require administrator approval before CRM access', async (
     assert.equal((await admin.json()).accessStatus, 'approved')
     assert.equal((await request('/api/users', 'admin')).status, 200)
     assert.equal((await request('/api/users/missing/approve', 'admin', 'PATCH')).status, 404)
+    users.set('legacy-pending', { firebaseUid: 'legacy-pending', email: 'legacy@example.com', accessStatus: 'pending' })
+    const legacyApproval = await request('/api/users/legacy-pending/approve', 'admin', 'PATCH')
+    assert.equal(legacyApproval.status, 200)
+    assert.ok(Object.values((await legacyApproval.json()).screenPermissions).every(permission => !permission.read && !permission.write), 'old pending accounts do not become unrestricted on approval')
     const approval = await request('/api/users/new-user/approve', 'admin', 'PATCH')
     assert.equal((await approval.json()).accessStatus, 'approved')
+    assert.equal((await request('/api/leads', 'pending')).status, 403, 'approval alone does not grant screen permissions to a new account')
+    assert.equal((await request('/api/users/new-user/permissions', 'admin', 'PATCH', { screenPermissions: { table: { read: true, write: false } } })).status, 200)
     assert.equal((await request('/api/leads', 'pending')).status, 200)
     const directory = await request('/api/lead-assignees', 'pending')
     assert.equal(directory.status, 200)

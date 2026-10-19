@@ -7,15 +7,21 @@ export interface LeadGroup {
   groupId: string | null
   groupTitle: string | null
   count: number
+  visibility?: 'all' | 'selected'
+  viewerUids?: string[]
 }
 
 export default function LeadGroupsTable({
   groups,
+  readOnly = false,
+  onManageAccess,
   onGroupClick,
   onEditGroup,
   onDeleteGroup,
 }: {
   groups: LeadGroup[]
+  readOnly?: boolean
+  onManageAccess?: (group: LeadGroup) => void
   onGroupClick: (group: LeadGroup) => void
   onEditGroup: (group: LeadGroup, newTitle: string) => Promise<void>
   onDeleteGroup: (group: LeadGroup) => Promise<void>
@@ -108,7 +114,7 @@ export default function LeadGroupsTable({
             >
               Ver leads
             </Button>
-            {hasGroup && (
+            {hasGroup && (!readOnly || onManageAccess) && (
               <>
                 <Button
                   type="button"
@@ -130,7 +136,9 @@ export default function LeadGroupsTable({
                     aria-label="Ações do grupo"
                     style={{ top: menuPosition.top, right: menuPosition.right }}
                   >
+                    {onManageAccess && <button type="button" role="menuitem" className="leads-table__actions-item" onClick={() => { closeMenu(); onManageAccess(group) }}><Icon name="users" size={14} />Quem pode visualizar</button>}
                     <button
+                      disabled={readOnly}
                       type="button"
                       className="leads-table__actions-item"
                       role="menuitem"
@@ -144,6 +152,7 @@ export default function LeadGroupsTable({
                     </button>
                     <button
                       type="button"
+                      disabled={readOnly}
                       className="leads-table__actions-item leads-table__actions-item--danger"
                       role="menuitem"
                       onClick={() => {

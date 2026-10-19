@@ -3,14 +3,20 @@ import { createPortal } from 'react-dom'
 import { updateProfile, type User } from 'firebase/auth'
 import { Alert, Avatar, Button, Card, ConfirmDialog, Icon, Input, Tag } from 'codexa-ui'
 
+import PermissionsDialog from './PermissionsDialog'
+import type { ScreenPermissions } from '../shared/permissions'
+
 const ADMIN_EMAIL = 'mateus.desenv@gmail.com'
 
 type UserManagementProps = {
   user: User
+  readOnly?: boolean
+  administrator?: boolean
 }
 
 type SystemUser = {
   uid: string
+  screenPermissions: ScreenPermissions
   email: string
   displayName: string
   photoURL: string
@@ -35,7 +41,8 @@ const formatAccountDate = (value?: string) => {
     : new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium' }).format(date)
 }
 
-export default function UserManagement({ user }: UserManagementProps) {
+export default function UserManagement({ user, readOnly = false, administrator = false }: UserManagementProps) {
+  const [permissionsUser, setPermissionsUser] = useState<SystemUser | null>(null)
   const [name, setName] = useState(user.displayName ?? '')
   const [saving, setSaving] = useState(false)
   const [feedback, setFeedback] = useState<string | null>(null)
@@ -46,7 +53,7 @@ export default function UserManagement({ user }: UserManagementProps) {
   const [refresh, setRefresh] = useState(0)
   const [usersLoading, setUsersLoading] = useState(false)
   const [usersError, setUsersError] = useState<string | null>(null)
-  const isAdmin = user.email?.trim().toLowerCase() === ADMIN_EMAIL
+  const isAdmin = administrator
   const providerLabel = getProviderLabel(user)
 
   useEffect(() => {
@@ -91,6 +98,7 @@ export default function UserManagement({ user }: UserManagementProps) {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    if (readOnly) return
     setSaving(true)
     setFeedback(null)
     try {
@@ -140,9 +148,9 @@ export default function UserManagement({ user }: UserManagementProps) {
             </div>
           </div>
           <form className="user-management__form" onSubmit={handleSubmit}>
-            <Input label="Nome de exibição" id="user-display-name" value={name} onChange={(event: React.ChangeEvent<HTMLInputElement>) => setName(event.target.value)} placeholder="Como seu nome deve aparecer" />
+            <Input disabled={readOnly} label="Nome de exibição" id="user-display-name" value={name} onChange={(event: React.ChangeEvent<HTMLInputElement>) => setName(event.target.value)} placeholder="Como seu nome deve aparecer" />
             {feedback && <Alert tone={feedback.includes('sucesso') ? 'success' : 'danger'}>{feedback}</Alert>}
-            <Button type="submit" variant="primary" disabled={saving}>{saving ? 'Salvando...' : 'Salvar alterações'}</Button>
+            <Button type="submit" variant="primary" disabled={saving || readOnly}>{saving ? 'Salvando...' : 'Salvar alterações'}</Button>
           </form>
         </Card>
 
@@ -166,7 +174,7 @@ export default function UserManagement({ user }: UserManagementProps) {
               <Icon name="users" size={20} />
               <div>
                 <h2>Usuários do sistema</h2>
-                <p>Aprove as solicitações para liberar o acesso ao CRM.</p>
+                <p>Defina as permissões por tela e libere o acesso de cada usuário.</p>
               </div>
             </div>
             <Button variant="secondary" size="small" disabled={usersLoading} onClick={() => setRefresh((value) => value + 1)}>Atualizar solicitações</Button>
@@ -201,7 +209,7 @@ export default function UserManagement({ user }: UserManagementProps) {
                     <td>{getSystemProviderLabel(systemUser.providerId)}</td>
                     <td>{formatAccountDate(systemUser.registeredAt ?? systemUser.createdAt)}</td>
                     <td><Tag tone={systemUser.accessStatus === 'approved' ? 'success' : 'warning'}>{systemUser.accessStatus === 'approved' ? 'Liberado' : 'Aguardando liberação'}</Tag></td>
-                    <td><UserActionsMenu user={systemUser} busy={approving !== null || deleting} onApprove={() => approveUser(systemUser.uid)} onDelete={() => setDeletingUser(systemUser)} /></td>
+                    <td><UserActionsMenu user={systemUser} busy={approving !== null || deleting} onPermissions={() => setPermissionsUser(systemUser)} onApprove={() => approveUser(systemUser.uid)} onDelete={() => setDeletingUser(systemUser)} /></td>
                   </tr>
                 ))}
                 {!usersLoading && systemUsers.length === 0 && (
@@ -210,9 +218,10 @@ export default function UserManagement({ user }: UserManagementProps) {
               </tbody>
             </table>
           </div>
-          {usersError ? <Alert tone="danger">{usersError}</Alert> : <p className="user-management__table-note">Novas solicitações aparecem após a autenticação e permanecem bloqueadas até sua aprovação.</p>}
+          {usersError ? <Alert tone="danger">{usersError}</Alert> : <p className="user-management__table-note">Novas contas precisam de aprovação e de permissões por tela para acessar o CRM.</p>}
         </Card>
       )}
+      {permissionsUser && <PermissionsDialog target={permissionsUser} onClose={() => setPermissionsUser(null)} onSaved={() => setRefresh(value => value + 1)} />}
       <ConfirmDialog
         open={deletingUser !== null}
         onClose={() => { if (!deleting) setDeletingUser(null) }}
@@ -226,9 +235,10 @@ export default function UserManagement({ user }: UserManagementProps) {
   )
 }
 
-function UserActionsMenu({ user, busy, onApprove, onDelete }: {
+function UserActionsMenu({ user, busy, onApprove, onDelete, onPermissions }: {
   user: SystemUser
   busy: boolean
+  onPermissions: () => void
   onApprove: () => void
   onDelete: () => void
 }) {
@@ -264,7 +274,7 @@ function UserActionsMenu({ user, busy, onApprove, onDelete }: {
         leadingIcon={<Icon name="more-horizontal" size={18} />}
         onClick={(event) => {
           const rect = event.currentTarget.getBoundingClientRect()
-          setPosition(position ? null : { top: Math.max(8, Math.min(rect.bottom + 4, window.innerHeight - 110)), right: Math.max(8, window.innerWidth - rect.right) })
+          setPosition(position ? null : { top: Math.max(8, Math.min(rect.bottom + 4, window.innerHeight - 160)), right: Math.max(8, window.innerWidth - rect.right) })
         }} />
     </span>
     {position && createPortal(<div ref={menu} className="leads-table__actions-menu user-actions-menu" role="menu" tabIndex={-1} aria-label={`Ações para ${user.email}`} style={position}
@@ -279,6 +289,7 @@ function UserActionsMenu({ user, busy, onApprove, onDelete }: {
           items[next]?.focus()
         }
       }}>
+      <button type="button" role="menuitem" className="leads-table__actions-item" disabled={busy || owner} onClick={() => { close(); onPermissions() }}><Icon name="edit" size={16} />Permissões por tela</button>
       <button type="button" role="menuitem" className="leads-table__actions-item" disabled={busy || owner || user.accessStatus === 'approved'} onClick={() => { close(); onApprove() }}><Icon name="check-circle" size={16} />Liberar acesso</button>
       <button type="button" role="menuitem" className="leads-table__actions-item leads-table__actions-item--danger" disabled={busy || owner} onClick={() => { close(); onDelete() }}><Icon name="trash" size={16} />Excluir usuário</button>
     </div>, document.body)}
