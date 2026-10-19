@@ -1,6 +1,6 @@
 import LeadActionIcon from './LeadActionIcon'
-import { apiFetch } from './api'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { apiFetch, setRequestScreen } from './api'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   DndContext,
   DragOverlay,
@@ -35,8 +35,9 @@ import LeadGroupsTable, { type LeadGroup } from './LeadGroupsTable'
 import LeadsTable from './LeadsTable'
 import Packages from './Packages'
 import Portfolio from './Portfolio'
-import Preloader from './Preloader'
 import UserManagement from './UserManagement'
+import ListAccessDialog from './ListAccessDialog'
+import { SCREENS, type AccessProfile } from '../shared/permissions'
 import {
   Alert,
   Badge,
@@ -134,7 +135,7 @@ const SOCIAL_HOSTS = [
   'beacons.ai',
 ]
 
-type SavedLeadGroup = { groupId: string; groupTitle: string; count: number }
+type SavedLeadGroup = LeadGroup & { groupId: string; groupTitle: string }
 const fetchGroups = async (signal?: AbortSignal): Promise<SavedLeadGroup[]> => {
   const res = await apiFetch('/api/lead-groups', { signal })
   if (!res.ok) throw new Error('Não foi possível carregar as listas')
@@ -425,7 +426,9 @@ function LeadCard({
   onAdvance,
   messageDay,
   onToggleMessage,
+  readOnly = false,
 }: {
+  readOnly?: boolean
   lead: LeadWithMeta
   index: number
   onClick: (lead: LeadWithMeta) => void
@@ -445,7 +448,7 @@ function LeadCard({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: lead.placeId, data: { lead } })
+  } = useSortable({ disabled: readOnly, id: lead.placeId, data: { lead } })
 
   const style = {
     transform: CSS.Translate.toString(transform),
@@ -457,7 +460,7 @@ function LeadCard({
     <article
       ref={setNodeRef}
       {...listeners}
-      {...attributes}
+      {...(readOnly ? {} : attributes)}
       className={`kanban-card kanban-card--model-two kanban-card--${lead.temperature}${messageSentToday ? ' kanban-card--message-sent' : ''}`}
       style={style}
       onClick={() => !isDragging && onClick(lead)}
@@ -587,7 +590,7 @@ function LeadCard({
           aria-pressed={messageSentToday}
           title={messageSentToday ? 'Desmarcar mensagem enviada hoje' : 'Marcar mensagem enviada hoje'}
           loading={isMarkingMessage}
-          disabled={isMarkingMessage}
+          disabled={readOnly || isMarkingMessage}
           leadingIcon={<Icon name={messageSentToday ? 'check-circle' : 'message'} size={15} />}
           onPointerDown={(event: React.PointerEvent) => event.stopPropagation()}
           onTouchStart={(event: React.TouchEvent) => event.stopPropagation()}
@@ -616,7 +619,7 @@ function LeadCard({
             fullWidth
             className="kanban-card__advance"
             variant="primary"
-            disabled={isAdvancing}
+            disabled={readOnly || isAdvancing}
             aria-label={`Mover para ${nextColumn.label}`}
             title={`Mover para ${nextColumn.label}`}
             onPointerDown={(event: React.PointerEvent) => event.stopPropagation()}
@@ -649,7 +652,9 @@ function KanbanColumn({
   onToggleMessage,
   sort,
   onSortChange,
+  readOnly = false,
 }: {
+  readOnly?: boolean
   column: (typeof COLUMNS)[number]
   leads: LeadWithMeta[]
   onCardClick: (lead: LeadWithMeta) => void
@@ -733,7 +738,7 @@ function KanbanColumn({
       >
         <div className="kanban-column__cards">
           {leads.map((lead, index) => (
-            <LeadCard key={lead.placeId} lead={lead} index={index} onClick={onCardClick} onAdvance={onAdvance} messageDay={messageDay} onToggleMessage={onToggleMessage} />
+            <LeadCard readOnly={readOnly} key={lead.placeId} lead={lead} index={index} onClick={onCardClick} onAdvance={onAdvance} messageDay={messageDay} onToggleMessage={onToggleMessage} />
           ))}
         </div>
       </SortableContext>
@@ -745,7 +750,9 @@ function LeadModal({
   lead,
   onClose,
   onSave,
+  readOnly = false,
 }: {
+  readOnly?: boolean
   lead: LeadWithMeta
   onClose: () => void
   onSave: (placeId: string, state: KanbanState, assigneeUid?: string | null) => Promise<void>
@@ -779,7 +786,7 @@ function LeadModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (saving) return
+    if (saving || readOnly) return
     setSaving(true)
     setSaveError(null)
     try {
@@ -816,13 +823,14 @@ function LeadModal({
       </div>
 
       <form className="modal__form" onSubmit={handleSubmit}>
-        <LeadAssigneeSelect value={assigneeUid} currentName={lead.assigneeName} onChange={setAssigneeUid} disabled={saving} />
+        <LeadAssigneeSelect value={assigneeUid} currentName={lead.assigneeName} onChange={setAssigneeUid} disabled={saving || readOnly} />
         <Tabs
           items={tabItems}
           value={activeTab}
           onChange={(value) => setActiveTab(value as 'cliente' | 'contato' | 'dados')}
         />
 
+        <fieldset className="permission-fields" disabled={readOnly}>
         {activeTab === 'cliente' && (
           <div className="modal__column">
             <h3 className="modal__column-title">Cliente</h3>
@@ -946,12 +954,13 @@ function LeadModal({
           </div>
         )}
 
+        </fieldset>
         {saveError && <Alert tone="danger" title="Não foi possível salvar">{saveError}</Alert>}
         <div className="modal__actions">
           <Button type="button" variant="secondary" onClick={onClose} disabled={saving}>
             Cancelar
           </Button>
-          <Button type="submit" variant="primary" loading={saving}>
+          <Button type="submit" variant="primary" loading={saving} disabled={readOnly}>
             Salvar
           </Button>
         </div>
@@ -961,7 +970,7 @@ function LeadModal({
   )
 }
 
-function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreference; onThemeChange: (theme: ThemePreference) => void }) {
+function App({ user, access, theme, onThemeChange }: { user: User; access: AccessProfile; theme: ThemePreference; onThemeChange: (theme: ThemePreference) => void }) {
   const [savedGroups, setSavedGroups] = useState<SavedLeadGroup[]>([])
   const [baseLeads, setBaseLeads] = useState<Lead[]>([])
   const [loading, setLoading] = useState(true)
@@ -972,7 +981,14 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
   const [kanbanSorts, setKanbanSorts] = useState<Record<ColumnId, KanbanSort>>(DEFAULT_KANBAN_SORT)
   const [selectedLead, setSelectedLead] = useState<LeadWithMeta | null>(null)
   const [activeDrag, setActiveDrag] = useState<LeadWithMeta | null>(null)
-  const [currentView, setView] = useState<AppView>('dashboard')
+  const [requestedView, setView] = useState<AppView>('dashboard')
+  const allowedViews = SCREENS.filter(screen => access.screenPermissions[screen.id].read).map(screen => screen.id)
+  const currentView = allowedViews.includes(requestedView) ? requestedView : (allowedViews[0] ?? 'dashboard')
+  const canRead = access.screenPermissions[currentView].read
+  const canWrite = access.screenPermissions[currentView].write
+  const permissionsKey = JSON.stringify(access.screenPermissions)
+  const [accessGroup, setAccessGroup] = useState<LeadGroup | null>(null)
+  useLayoutEffect(() => { setRequestScreen(currentView) }, [currentView])
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [importOpen, setImportOpen] = useState(false)
@@ -995,28 +1011,37 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
   const didDrag = useRef(false)
 
   const setCurrentView = (view: typeof currentView) => {
-    if (view === currentView) return
+    if (view === currentView || !access.screenPermissions[view].read) return
     setLoading(true)
     setError(null)
+    setSelectedLead(null); setEditingLead(null); setAddLeadOpen(false); setImportOpen(false)
+    setBaseLeads([]); setSavedGroups([])
     setView(view)
   }
 
   useEffect(() => {
     const controller = new AbortController()
-    Promise.all([fetchLeads(controller.signal), fetchGroups(controller.signal)])
-      .then(([data, lists]) => {
+    if (!canRead || !['dashboard', 'kanban', 'table'].includes(currentView)) {
+      return () => controller.abort()
+    }
+    const load = async () => {
+      try {
+        const [data, lists] = await Promise.all([fetchLeads(controller.signal), fetchGroups(controller.signal)])
         if (controller.signal.aborted) return
-        setSavedGroups(lists)
-        setBaseLeads(data)
-        setLoading(false)
-      })
-      .catch((err) => {
+        setSavedGroups(lists); setBaseLeads(data); setError(null); setLoading(false)
+        setSelectedLead(current => current && data.some(lead => lead.placeId === current.placeId) ? current : null)
+        setEditingLead(current => current && data.some(lead => lead.placeId === current.placeId) ? current : null)
+        setSelectedGroup(current => current && lists.some(group => group.groupId === current) ? current : null)
+      } catch (error) {
         if (controller.signal.aborted) return
-        setError(err instanceof Error ? err.message : 'Erro desconhecido')
-        setLoading(false)
-      })
-    return () => controller.abort()
-  }, [currentView])
+        setBaseLeads([]); setSavedGroups([]); setSelectedLead(null); setEditingLead(null)
+        setError(error instanceof Error ? error.message : 'Não foi possível carregar os dados'); setLoading(false)
+      }
+    }
+    void load()
+    const timer = window.setInterval(load, 15000)
+    return () => { controller.abort(); window.clearInterval(timer) }
+  }, [currentView, canRead, permissionsKey])
 
   const allLeads = baseLeads
 
@@ -1412,21 +1437,19 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
     }
   }
 
-  if (loading) {
-    return <Preloader />
-  }
-
   return (
     <AppShell
       user={user}
+      allowedViews={allowedViews}
       theme={theme}
       onThemeChange={onThemeChange}
       currentView={currentView}
       onNavigate={(view) => { setSelectedGroup(null); setCurrentView(view) }}
       onSignOut={() => signOut(auth)}
     >
-        <div className="prospect-content">
-          {(currentView === 'kanban' || (currentView === 'table' && selectedGroup)) && (
+        <div className="prospect-content" key={currentView + permissionsKey}>
+          {canRead && !canWrite && <Alert tone="info">Você tem acesso de somente leitura nesta tela.</Alert>}
+          {canRead && (currentView === 'kanban' || (currentView === 'table' && selectedGroup)) && (
             <>
               <div className="prospect-toolbar">
                 <div className="prospect-toolbar__heading">
@@ -1542,7 +1565,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
             </>
           )}
 
-          {currentView === 'dashboard' ? (
+          {!canRead ? <EmptyState icon="users" title="Nenhuma tela liberada" description="O administrador precisa configurar as permissões da sua conta." /> : currentView === 'dashboard' ? (
             loading ? (
               <div className="prospect-loading">
                 <Spinner size="medium" label="Carregando dashboard..." />
@@ -1563,6 +1586,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
                 />
                 {selectedLead && (
                   <LeadModal
+                  readOnly={!canWrite}
                     lead={selectedLead}
                     onClose={() => setSelectedLead(null)}
                     onSave={handleSaveLead}
@@ -1587,7 +1611,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
                   <Button
                     type="button"
                     variant="primary"
-                    onClick={() => setAddLeadOpen(true)}
+                    disabled={!canWrite} onClick={() => setAddLeadOpen(true)}
                     leadingIcon={<Icon name="plus" size={17} />}
                   >
                     Novo lead
@@ -1622,6 +1646,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
                   <div className="kanban-board">
                     {COLUMNS.map((column) => (
                       <KanbanColumn
+                        readOnly={!canWrite}
                         key={column.id}
                         column={column}
                         leads={leadsByColumn[column.id]}
@@ -1666,6 +1691,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
 
               {selectedLead && (
                 <LeadModal
+                  readOnly={!canWrite}
                   lead={selectedLead}
                   onClose={() => setSelectedLead(null)}
                   onSave={handleSaveLead}
@@ -1697,16 +1723,18 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
                   <div className="prospect-group-header">
                     <Button type="button" variant="ghost" size="small" onClick={() => setSelectedGroup(null)} leadingIcon={<Icon name="arrow-left" size={16} />}>Voltar</Button>
                     <h3 className="prospect-group-header__title">{selectedGroupTitle}</h3>
-                    <Button type="button" onClick={() => setAddLeadOpen(true)} leadingIcon={<Icon name="plus" size={16} />}>Novo lead</Button>
+                    <Button type="button" disabled={!canWrite} onClick={() => setAddLeadOpen(true)} leadingIcon={<Icon name="plus" size={16} />}>Novo lead</Button>
                   </div>
                   {selectedGroupLeads.length === 0 ? (
                     <div className="prospect-empty">
                       <EmptyState icon="users" title={groups.find((group) => group.groupId === selectedGroup)?.count ? 'Nenhum lead encontrado' : 'Sua lista está vazia'} description={groups.find((group) => group.groupId === selectedGroup)?.count ? 'Tente ajustar os filtros.' : 'Clique em Novo lead para começar a preencher esta lista.'} />
                     </div>
-                  ) : <LeadsTable leads={selectedGroupLeads} onLeadClick={handleCardClick} onEditLead={setEditingLead} onDeleteLead={handleDeleteLead} />}
+                  ) : <LeadsTable readOnly={!canWrite} leads={selectedGroupLeads} onLeadClick={handleCardClick} onEditLead={setEditingLead} onDeleteLead={handleDeleteLead} />}
                 </>
               ) : (
                 <LeadGroupsTable
+                  readOnly={!canWrite}
+                  onManageAccess={access.isAdmin ? setAccessGroup : undefined}
                   groups={groups}
                   onGroupClick={(group: LeadGroup) => setSelectedGroup(group.groupId)}
                   onEditGroup={handleEditGroup}
@@ -1716,6 +1744,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
 
               {selectedLead && (
                 <LeadModal
+                  readOnly={!canWrite}
                   lead={selectedLead}
                   onClose={() => setSelectedLead(null)}
                   onSave={handleSaveLead}
@@ -1735,6 +1764,7 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
                 className="leads-import-fab"
                 variant="primary"
                 size="large"
+                disabled={!canWrite}
                 aria-label="Criar ou importar lista"
                 onClick={() => setImportOpen(true)}
                 leadingIcon={<Icon name="plus" size={22} />}
@@ -1758,16 +1788,17 @@ function App({ user, theme, onThemeChange }: { user: User; theme: ThemePreferenc
           ) : currentView === 'portfolio' ? (
             <Portfolio />
           ) : currentView === 'users' ? (
-            <UserManagement user={user} />
+            <UserManagement user={user} readOnly={!canWrite} administrator={access.isAdmin} />
           ) : (
-            <Help />
+            <Help readOnly={!canWrite} />
           )}
         </div>
+        {access.isAdmin && accessGroup && <ListAccessDialog key={accessGroup.groupId} group={accessGroup} onClose={() => setAccessGroup(null)} onSaved={async () => { setSavedGroups(await fetchGroups()) }} />}
     </AppShell>
   )
 }
 
 export default function ProtectedApp() {
   const [theme, selectTheme] = useTheme()
-  return <AccessGate>{(user) => <App key={user.uid} user={user} theme={theme} onThemeChange={selectTheme} />}</AccessGate>
+  return <AccessGate>{(user, access) => <App key={user.uid + JSON.stringify(access.screenPermissions)} user={user} access={access} theme={theme} onThemeChange={selectTheme} />}</AccessGate>
 }

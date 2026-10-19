@@ -16,6 +16,7 @@ import { activeLeadFilter, findActiveLeads } from './lib/active-leads.js'
 import { getMessageDay } from '../shared/message-day.js'
 import { QnA } from './lib/qna.js'
 import { User } from './lib/user.js'
+import { canViewGroup, parsePermissions, resolvePermissions } from '../shared/permissions.js'
 
 dotenv.config({ path: '.env.local' })
 
@@ -93,7 +94,9 @@ const requireAdmin = (request, response, next) => {
   return next()
 }
 
-const serializeUser = (user) => ({
+const serializeUser = (user, administrator = user.email?.trim().toLowerCase() === ADMIN_EMAIL) => ({
+  isAdmin: administrator,
+  screenPermissions: resolvePermissions(user, administrator),
   uid: user.firebaseUid,
   email: user.email,
   displayName: user.displayName,
@@ -122,10 +125,10 @@ app.put('/api/users/me', requireAuthenticatedUser, async (request, response) => 
     if (isAdmin(firebaseUser)) data.accessStatus = 'approved'
     const user = await User.findOneAndUpdate(
       { firebaseUid: firebaseUser.localId },
-      { $set: data, $setOnInsert: { firebaseUid: firebaseUser.localId } },
+      { $set: data, $setOnInsert: { firebaseUid: firebaseUser.localId, screenPermissions: resolvePermissions({}) } },
       { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true },
     )
-    return response.json(serializeUser(user))
+    return response.json(serializeUser(user, isAdmin(request.firebaseUser)))
   } catch (error) {
     console.error(error)
     return response.status(500).json({ error: 'Não foi possível sincronizar o usuário' })
@@ -136,7 +139,7 @@ app.get('/api/users', requireAuthenticatedUser, requireAdmin, async (_request, r
   try {
     await connectToDatabase()
     const users = await User.find({}).sort({ displayName: 1, email: 1 })
-    return response.json(users.map(serializeUser))
+    return response.json(users.map(user => serializeUser(user)))
   } catch (error) {
     console.error(error)
     return response.status(500).json({ error: 'Não foi possível buscar os usuários' })
@@ -146,9 +149,14 @@ app.get('/api/users', requireAuthenticatedUser, requireAdmin, async (_request, r
 app.patch('/api/users/:uid/approve', requireAuthenticatedUser, requireAdmin, async (request, response) => {
   try {
     await connectToDatabase()
+    const current = await User.findOne({ firebaseUid: request.params.uid })
+    if (!current) return response.status(404).json({ error: 'Usuário não encontrado' })
+    const approval = { accessStatus: 'approved', approvedAt: new Date(), approvedBy: request.firebaseUser.localId }
+    // Pending accounts created before permissions existed must not inherit legacy full access.
+    if (current.accessStatus !== 'approved' && current.screenPermissions == null) approval.screenPermissions = resolvePermissions({})
     const user = await User.findOneAndUpdate(
       { firebaseUid: request.params.uid },
-      { $set: { accessStatus: 'approved', approvedAt: new Date(), approvedBy: request.firebaseUser.localId } },
+      { $set: approval },
       { returnDocument: 'after' },
     )
     if (!user) return response.status(404).json({ error: 'Usuário não encontrado' })
@@ -173,19 +181,109 @@ app.delete('/api/users/:uid', requireAuthenticatedUser, requireAdmin, async (req
   }
 })
 
+// Only the owner can grant permissions or change a list's audience.
+app.patch('/api/users/:uid/permissions', requireAuthenticatedUser, requireAdmin, async (req, res) => {
+  const permissions = parsePermissions(req.body?.screenPermissions)
+  if (!permissions) return res.status(400).json({ error: 'Permissões inválidas. Escrita exige leitura.' })
+  try {
+    await connectToDatabase()
+    const target = await User.findOne({ firebaseUid: req.params.uid })
+    if (!target) return res.status(404).json({ error: 'Usuário não encontrado' })
+    if (target.email?.trim().toLowerCase() === ADMIN_EMAIL) return res.status(403).json({ error: 'O administrador mantém acesso completo' })
+    const user = await User.findOneAndUpdate({ firebaseUid: req.params.uid }, { $set: { screenPermissions: permissions } }, { returnDocument: 'after', runValidators: true })
+    return res.json(serializeUser(user))
+  } catch {
+    return res.status(503).json({ error: 'Não foi possível salvar as permissões' })
+  }
+})
+
+app.patch('/api/lead-groups/:groupId/access', requireAuthenticatedUser, requireAdmin, async (req, res) => {
+  const { visibility, viewerUids } = req.body ?? {}
+  if (!['all', 'selected'].includes(visibility) || !Array.isArray(viewerUids) || viewerUids.length > 500
+    || viewerUids.some(uid => typeof uid !== 'string' || !uid.trim() || uid.length > 128)) {
+    return res.status(400).json({ error: 'Selecione quem pode visualizar a lista' })
+  }
+  const uids = visibility === 'selected' ? [...new Set(viewerUids)] : []
+  try {
+    await connectToDatabase()
+    if (uids.length) {
+      const users = await User.find({ firebaseUid: { $in: uids }, accessStatus: 'approved' })
+      if (uids.some(uid => !users.some(user => user.firebaseUid === uid))) return res.status(400).json({ error: 'Selecione somente usuários com acesso liberado' })
+    }
+    const group = await LeadGroup.findOne({ groupId: req.params.groupId }) || await Lead.findOne({ ...activeLeadFilter, groupId: req.params.groupId })
+    if (!group) return res.status(404).json({ error: 'Lista não encontrada' })
+    await LeadGroup.updateOne({ groupId: req.params.groupId }, { $set: { groupTitle: group.groupTitle || 'Grupo', visibility, viewerUids: uids } }, { upsert: true, runValidators: true })
+    return res.json({ groupId: req.params.groupId, visibility, viewerUids: uids })
+  } catch {
+    return res.status(503).json({ error: 'Não foi possível salvar o acesso à lista' })
+  }
+})
+
 app.get('/api/health', (_request, response) => response.json({ ok: true }))
 
 app.use('/api', requireAuthenticatedUser, async (request, response, next) => {
   try {
-    if (isAdmin(request.firebaseUser)) return next()
+    request.isAdmin = isAdmin(request.firebaseUser)
+    if (request.isAdmin) return next()
     await connectToDatabase()
     const user = await User.findOne({ firebaseUid: request.firebaseUser.localId })
     if (user?.accessStatus !== 'approved') {
       return response.status(403).json({ code: 'ACCESS_PENDING', error: 'Aguardando liberação do administrador' })
     }
+    request.crmUser = user
     return next()
   } catch {
     return response.status(503).json({ error: 'Não foi possível verificar a liberação' })
+  }
+})
+
+app.use('/api', async (req, res, next) => {
+  req.leadFilter = activeLeadFilter
+  if (req.isAdmin) return next()
+  // Match Express's case-insensitive, non-strict routes without changing identifier case.
+  const routePath = req.path.replace(/\/+$/, '')
+  const route = routePath.toLowerCase()
+  const leadsRoute = /^\/(leads(?:\/|$)|lead-groups(?:\/|$)|lead-assignees$)/.test(route)
+  const read = ['GET', 'HEAD'].includes(req.method)
+  let screen
+  if (leadsRoute) {
+    screen = req.get('X-CRM-Screen') || 'table'
+    if (!['dashboard', 'kanban', 'table'].includes(screen)) return res.status(400).json({ error: 'Tela inválida' })
+    if (!read && (route.startsWith('/lead-groups') || route.startsWith('/leads/group/') || route === '/leads/import')) screen = 'table'
+  } else if (route.startsWith('/qna')) screen = 'help'
+  else if (route === '/atlas/early-access') screen = 'atlas-early-access'
+  else if (route === '/briefing/leads') screen = 'briefing-leads'
+  else return next()
+  const permission = resolvePermissions(req.crmUser)[screen]
+  if (!permission?.read || (!read && !permission.write)) return res.status(403).json({ code: 'SCREEN_FORBIDDEN', error: 'Você não tem permissão para esta ação nesta tela' })
+  if (!leadsRoute) return next()
+  try {
+    await connectToDatabase()
+    const savedGroups = await LeadGroup.find({})
+    req.savedGroups = savedGroups
+    const hidden = savedGroups.filter(group => !canViewGroup(group, req.firebaseUser.localId)).map(group => group.groupId)
+    req.leadFilter = { groupId: { ...activeLeadFilter.groupId, $nin: hidden } }
+    const groupId = route.startsWith('/leads/group/') ? decodeURIComponent(routePath.slice('/leads/group/'.length)) : req.method === 'POST' && route === '/leads' ? req.body?.groupId : null
+    if (typeof groupId === 'string' && hidden.includes(groupId)) return res.status(404).json({ error: 'Lista não encontrada' })
+    // Authorize the entire batch/import before the first mutation.
+    if (!read && route === '/leads/batch' && Array.isArray(req.body)) {
+      for (const item of req.body) {
+        if (!item || typeof item.placeId !== 'string') continue
+        const lead = await Lead.findOne({ placeId: item.placeId })
+        if (lead && (!lead.groupId?.trim() || hidden.includes(lead.groupId))) return res.status(404).json({ error: 'Lead não encontrado' })
+      }
+    }
+    if (!read && route === '/leads/import') {
+      const items = Array.isArray(req.body) ? req.body : req.body?.leads
+      for (const item of Array.isArray(items) ? items : []) {
+        if (!item || typeof item.placeId !== 'string') continue
+        const lead = await Lead.findOne({ placeId: item.placeId })
+        if (lead && (!lead.groupId?.trim() || hidden.includes(lead.groupId))) return res.status(404).json({ error: 'Lead não encontrado' })
+      }
+    }
+    return next()
+  } catch {
+    return res.status(503).json({ error: 'Não foi possível verificar o acesso às listas' })
   }
 })
 
@@ -229,12 +327,13 @@ app.get('/api/lead-assignees', async (_req, res) => {
   }
 })
 
-app.get('/api/lead-groups', async (_req, res) => {
+app.get('/api/lead-groups', async (req, res) => {
   try {
     await connectToDatabase()
-    const [saved, leads] = await Promise.all([LeadGroup.find({}), findActiveLeads()])
-    const groups = new Map(saved.map((group) => [group.groupId, {
+    const [saved, leads] = await Promise.all([req.savedGroups ?? LeadGroup.find({}), findActiveLeads(req.leadFilter)])
+    const groups = new Map(saved.filter(group => canViewGroup(group, req.firebaseUser.localId, req.isAdmin)).map((group) => [group.groupId, {
       groupId: group.groupId, groupTitle: group.groupTitle, count: 0,
+      ...(req.isAdmin && { visibility: group.visibility ?? 'all', viewerUids: group.viewerUids ?? [] }),
     }]))
     for (const lead of leads) {
       const group = groups.get(lead.groupId)
@@ -254,17 +353,17 @@ app.post('/api/lead-groups', async (req, res) => {
   }
   try {
     await connectToDatabase()
-    const group = await LeadGroup.create({ groupId: `group-${randomUUID()}`, groupTitle: title.trim() })
-    res.status(201).json({ groupId: group.groupId, groupTitle: group.groupTitle, count: 0 })
+    const group = await LeadGroup.create({ groupId: `group-${randomUUID()}`, groupTitle: title.trim(), visibility: 'selected', viewerUids: [req.firebaseUser.localId] })
+    res.status(201).json({ groupId: group.groupId, groupTitle: group.groupTitle, count: 0, ...(req.isAdmin && { visibility: group.visibility, viewerUids: group.viewerUids }) })
   } catch {
     res.status(500).json({ error: 'Não foi possível criar a lista' })
   }
 })
 
-app.get('/api/leads', async (_req, res) => {
+app.get('/api/leads', async (req, res) => {
   try {
     await connectToDatabase()
-    const leads = await findActiveLeads()
+    const leads = await findActiveLeads(req.leadFilter)
     res.json(leads)
   } catch (err) {
     console.error(err)
@@ -300,10 +399,11 @@ app.post('/api/leads/import', async (req, res) => {
       : `Importação em ${new Date().toLocaleDateString('pt-BR')}`
     const groupId = `group-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
 
+    await LeadGroup.create({ groupId, groupTitle: title, visibility: 'selected', viewerUids: [req.firebaseUser.localId] })
     const result = []
 
     for (const item of leads) {
-      if (!item.title || !item.placeId) continue
+      if (!item || typeof item.title !== 'string' || typeof item.placeId !== 'string' || !item.title.trim() || !item.placeId.trim()) continue
       const update = { ...item, groupId, groupTitle: title }
       if (!item.kanbanState) delete update.kanbanState
       const lead = await Lead.findOneAndUpdate(
@@ -321,10 +421,10 @@ app.post('/api/leads/import', async (req, res) => {
   }
 })
 
-app.get('/api/leads/export', async (_req, res) => {
+app.get('/api/leads/export', async (req, res) => {
   try {
     await connectToDatabase()
-    const leads = await findActiveLeads()
+    const leads = await findActiveLeads(req.leadFilter)
     const fileName = `codexa-leads-${new Date().toISOString().slice(0, 10)}.json`
     res.setHeader('Content-Type', 'application/json')
     res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`)
@@ -345,7 +445,7 @@ app.post('/api/leads/seed', requireAdmin, async (_req, res) => {
     const groupId = 'seed'
     const groupTitle = 'Leads iniciais'
     for (const item of seedData) {
-      if (!item.title || !item.placeId) continue
+      if (!item || typeof item.title !== 'string' || typeof item.placeId !== 'string' || !item.title.trim() || !item.placeId.trim()) continue
       const update = { ...item, groupId, groupTitle }
       if (!item.kanbanState) delete update.kanbanState
       const lead = await Lead.findOneAndUpdate(
@@ -367,13 +467,13 @@ app.put('/api/leads/batch', async (req, res) => {
   try {
     await connectToDatabase()
     const items = Array.isArray(req.body) ? req.body : []
-    if (!items.length) return res.json({ updated: 0, leads: await findActiveLeads() })
+    if (!items.length) return res.json({ updated: 0, leads: await findActiveLeads(req.leadFilter) })
 
     const bulkOps = items
       .filter((item) => item && typeof item.placeId === 'string' && item.kanbanState)
       .map((item) => ({
         updateOne: {
-          filter: { ...activeLeadFilter, placeId: item.placeId },
+          filter: { ...req.leadFilter, placeId: item.placeId },
           update: { $set: { kanbanState: item.kanbanState } },
         },
       }))
@@ -381,7 +481,7 @@ app.put('/api/leads/batch', async (req, res) => {
     if (!bulkOps.length) return res.status(400).json({ error: 'Nenhuma atualização válida' })
 
     const result = await Lead.bulkWrite(bulkOps)
-    res.json({ updated: result.modifiedCount, leads: await findActiveLeads() })
+    res.json({ updated: result.modifiedCount, leads: await findActiveLeads(req.leadFilter) })
   } catch (err) {
     console.error(err)
     res.status(400).json({ error: err instanceof Error ? err.message : 'Erro ao atualizar leads' })
@@ -395,7 +495,7 @@ app.patch('/api/leads/:placeId/message-sent', async (req, res) => {
   try {
     await connectToDatabase()
     const lead = await Lead.findOneAndUpdate(
-      { ...activeLeadFilter, placeId: req.params.placeId },
+      { ...req.leadFilter, placeId: req.params.placeId },
       { $set: { messageSentOn: req.body.sent ? getMessageDay() : null } },
       { returnDocument: 'after' },
     )
@@ -419,7 +519,7 @@ app.patch('/api/leads/:placeId/details', async (req, res) => {
     const phone = input.phone.trim() || null
     const website = input.website.trim()
     const lead = await Lead.findOneAndUpdate(
-      { ...activeLeadFilter, placeId: req.params.placeId },
+      { ...req.leadFilter, placeId: req.params.placeId },
       { $set: {
         ...await resolveLeadAssignee(input.assigneeUid),
         title: input.title.trim(), categoryName: input.categoryName.trim() || null,
@@ -442,7 +542,7 @@ app.put('/api/leads/:placeId', async (req, res) => {
   try {
     await connectToDatabase()
     const lead = await Lead.findOneAndUpdate(
-      { ...activeLeadFilter, placeId: req.params.placeId },
+      { ...req.leadFilter, placeId: req.params.placeId },
       { $set: { kanbanState: req.body.kanbanState, ...await resolveLeadAssignee(req.body.assigneeUid) } },
       { returnDocument: 'after' },
     )
@@ -576,7 +676,7 @@ app.delete('/api/leads/group/:groupId', async (req, res) => {
 app.delete('/api/leads/:placeId', async (req, res) => {
   try {
     await connectToDatabase()
-    const lead = await Lead.findOneAndDelete({ placeId: req.params.placeId })
+    const lead = await Lead.findOneAndDelete({ ...req.leadFilter, placeId: req.params.placeId })
     if (!lead) return res.status(404).json({ error: 'Lead não encontrado' })
     res.status(204).end()
   } catch (err) {

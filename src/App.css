@@ -5088,3 +5088,17 @@ html[data-theme="dark"] .kanban-card--model-two .ds-button.kanban-card__details 
   padding: 4px 0 4px 8px;
   white-space: nowrap;
 }
+
+.permission-fields { min-width: 0; margin: 0; padding: 0; border: 0; display: grid; gap: 1rem; }
+.access-editor { display: grid; gap: 1rem; min-width: 0; }
+.access-editor p { margin: 0; line-height: 1.5; }
+.access-editor__table-wrap { overflow-x: auto; }
+.access-editor__table { width: 100%; border-collapse: collapse; text-align: left; }
+.access-editor__table th, .access-editor__table td { padding: .7rem .5rem; border-bottom: 1px solid var(--ds-line, #d8dce2); }
+.access-editor__table td { text-align: center; }
+.access-editor input { accent-color: var(--ds-green-dark, #16843c); width: 1.1rem; height: 1.1rem; flex-shrink: 0; }
+.access-editor__choice { display: flex; align-items: center; gap: .7rem; cursor: pointer; }
+.access-editor__choice small { display: block; overflow-wrap: anywhere; opacity: .75; }
+.access-editor__viewers { display: grid; gap: .9rem; border: 1px solid var(--ds-line, #d8dce2); border-radius: .5rem; padding: 1rem; max-height: 40vh; overflow: auto; }
+.access-editor__note { font-size: .875rem; opacity: .8; }
+.access-editor__actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: .7rem; }

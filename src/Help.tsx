@@ -29,7 +29,7 @@ function formatTags(tags: string[]): string {
   return tags.join(', ')
 }
 
-export default function Help() {
+export default function Help({ readOnly = false }: { readOnly?: boolean }) {
   const [items, setItems] = useState<QnA[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -95,6 +95,7 @@ export default function Help() {
   }
 
   async function handleSave() {
+    if (readOnly) return
     if (!question.trim() || !answer.trim()) {
       setFormError('Pergunta e resposta são obrigatórias')
       return
@@ -150,7 +151,7 @@ export default function Help() {
         </div>
         <Button
           variant="primary"
-          onClick={openCreate}
+          disabled={readOnly} onClick={openCreate}
           leadingIcon={<Icon name="plus" size={18} />}
         >
           Nova pergunta
@@ -182,7 +183,7 @@ export default function Help() {
           action={
             <Button
               variant="primary"
-              onClick={openCreate}
+              disabled={readOnly} onClick={openCreate}
               leadingIcon={<Icon name="plus" size={16} />}
             >
               Nova pergunta
@@ -210,7 +211,7 @@ export default function Help() {
                 <Button
                   variant="ghost"
                   size="small"
-                  onClick={() => handleToggleFavorite(item)}
+                  disabled={readOnly} onClick={() => handleToggleFavorite(item)}
                   leadingIcon={
                     <Icon
                       name="star"
@@ -226,7 +227,7 @@ export default function Help() {
                 <Button
                   variant="ghost"
                   size="small"
-                  onClick={() => openEdit(item)}
+                  disabled={readOnly} onClick={() => openEdit(item)}
                   leadingIcon={<Icon name="edit" size={14} />}
                 >
                   Editar
@@ -234,7 +235,7 @@ export default function Help() {
                 <Button
                   variant="ghost"
                   size="small"
-                  onClick={() => setDeleteId(item.id!)}
+                  disabled={readOnly} onClick={() => setDeleteId(item.id!)}
                   leadingIcon={<Icon name="trash" size={14} />}
                 >
                   Excluir

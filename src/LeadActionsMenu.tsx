@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Button, Icon } from 'codexa-ui'
 
-export default function LeadActionsMenu({ title, onOpen, onEdit, onDelete }: {
+export default function LeadActionsMenu({ title, onOpen, onEdit, onDelete, readOnly = false }: {
+  readOnly?: boolean
   title: string
   onOpen: () => void
   onEdit: () => void
@@ -40,7 +41,7 @@ export default function LeadActionsMenu({ title, onOpen, onEdit, onDelete }: {
     />
     {position && createPortal(<div ref={menu} className="leads-table__actions-menu lead-actions-menu" role="menu" aria-label={`Ações de ${title}`} style={position}
       onKeyDown={(event) => {
-        const items = [...(menu.current?.querySelectorAll<HTMLButtonElement>('button') ?? [])]
+        const items = [...(menu.current?.querySelectorAll<HTMLButtonElement>('button:not(:disabled)') ?? [])]
         const index = items.indexOf(document.activeElement as HTMLButtonElement)
         if (event.key === 'Escape') { event.preventDefault(); setPosition(null); trigger.current?.focus() }
         if (event.key === 'Tab') setPosition(null)
@@ -51,8 +52,8 @@ export default function LeadActionsMenu({ title, onOpen, onEdit, onDelete }: {
         }
       }}>
       <button type="button" role="menuitem" className="leads-table__actions-item" onClick={() => run(onOpen)}><Icon name="external-link" size={16} />Abrir</button>
-      <button type="button" role="menuitem" className="leads-table__actions-item" onClick={() => run(onEdit)}><Icon name="edit" size={16} />Editar</button>
-      <button type="button" role="menuitem" className="leads-table__actions-item leads-table__actions-item--danger" onClick={() => run(onDelete)}><Icon name="trash" size={16} />Excluir</button>
+      <button type="button" role="menuitem" className="leads-table__actions-item" disabled={readOnly} onClick={() => run(onEdit)}><Icon name="edit" size={16} />Editar</button>
+      <button type="button" role="menuitem" className="leads-table__actions-item leads-table__actions-item--danger" disabled={readOnly} onClick={() => run(onDelete)}><Icon name="trash" size={16} />Excluir</button>
     </div>, document.body)}
   </>
 }

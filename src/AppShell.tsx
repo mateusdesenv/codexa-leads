@@ -28,6 +28,7 @@ type ShellProps = {
   user: { displayName: string | null; email: string | null; photoURL: string | null }
   theme: ThemePreference
   onThemeChange: (theme: ThemePreference) => void
+  allowedViews: AppView[]
   currentView: AppView
   onNavigate: (view: AppView) => void
   onSignOut: () => void
@@ -45,7 +46,7 @@ function ThemeIcon({ theme }: { theme: ThemePreference }) {
   )
 }
 
-function Navigation({ user, theme, onThemeChange, currentView, onNavigate, onSignOut, onClose }: Omit<ShellProps, 'children'> & { onClose?: () => void }) {
+function Navigation({ allowedViews, user, theme, onThemeChange, currentView, onNavigate, onSignOut, onClose }: Omit<ShellProps, 'children'> & { onClose?: () => void }) {
   const id = useId()
   const [failedPhoto, setFailedPhoto] = useState<string | null>(null)
   const name = user.displayName || user.email || 'Usuário'
@@ -65,9 +66,9 @@ function Navigation({ user, theme, onThemeChange, currentView, onNavigate, onSig
     </div>
     <div className="shell-brand"><img src={codexaLogo} alt="Codexa" /></div>
     <nav className="shell-nav__groups" aria-label="Navegação principal">
-      {navigation.map((group, index) => <section className="shell-nav__group" key={group.label} aria-labelledby={`${id}-group-${index}`}>
+      {navigation.filter(group => group.items.some(item => allowedViews.includes(item.view))).map((group, index) => <section className="shell-nav__group" key={group.label} aria-labelledby={`${id}-group-${index}`}>
         <h2 id={`${id}-group-${index}`}>{group.label}</h2>
-        {group.items.map(item => <button
+        {group.items.filter(item => allowedViews.includes(item.view)).map(item => <button
           type="button" className="shell-nav__link" key={item.view}
           aria-current={currentView === item.view ? 'page' : undefined}
           onClick={() => onNavigate(item.view)}
@@ -154,8 +155,8 @@ export default function AppShell({ children, ...props }: ShellProps) {
     <main className="prospect-main" id="workspace-content" ref={main} tabIndex={-1}>
       <header className="shell-header">
         <div className="shell-header__page">
-          <h1>{page.label}</h1>
-          <p className="shell-breadcrumb"><span>{group.label}</span><Icon name="chevron-right" size={13} /><span>{page.label}</span></p>
+          <h1>{props.allowedViews.length ? page.label : 'Acesso às telas'}</h1>
+          <p className="shell-breadcrumb"><span>{group.label}</span><Icon name="chevron-right" size={13} /><span>{props.allowedViews.length ? page.label : 'Permissões pendentes'}</span></p>
         </div>
         <time className="shell-header__date" dateTime={dateValue}><Icon name="calendar" size={17} /><span>{dateLabel}</span></time>
         <button type="button" ref={menuButton} className="shell-icon-button shell-header__menu" aria-label="Abrir menu" aria-expanded={menuOpen} aria-controls={drawerId} aria-haspopup="dialog" onClick={() => setMenuOpen(true)}><Icon name="menu" size={23} /></button>

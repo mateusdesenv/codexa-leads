@@ -54,10 +54,12 @@ const formatDate = (value?: string | null): string => {
 
 export default function LeadsTable({
   leads,
+  readOnly = false,
   onLeadClick,
   onEditLead,
   onDeleteLead,
 }: {
+  readOnly?: boolean
   leads: TableLead[]
   onLeadClick: (lead: TableLead) => void
   onEditLead: (lead: TableLead) => void
@@ -148,6 +150,7 @@ export default function LeadsTable({
       align: 'end',
       render: (lead) => (
         <LeadActionsMenu
+          readOnly={readOnly}
           title={lead.title}
           onOpen={() => onLeadClick(lead)}
           onEdit={() => onEditLead(lead)}
