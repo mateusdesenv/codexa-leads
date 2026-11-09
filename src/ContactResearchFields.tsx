@@ -6,10 +6,10 @@ import { formatCalendarDate } from './date'
 
 const fields: { key: keyof ContactResearch; label: string; rows: number; full?: boolean }[] = [
   { key: 'qualification', label: 'Qualificação da pesquisa', rows: 2, full: true },
-  { key: 'profile', label: 'Perfil da clínica', rows: 3 },
+  { key: 'profile', label: 'Perfil do negócio', rows: 3 },
   { key: 'approach', label: 'Hipótese para abordagem', rows: 3 },
   { key: 'websiteNotes', label: 'Situação do site', rows: 3 },
-  { key: 'whatsappStatus', label: 'Confirmação do WhatsApp', rows: 3 },
+  { key: 'whatsappStatus', label: 'Verificação do WhatsApp', rows: 3 },
   { key: 'observations', label: 'Observações da pesquisa', rows: 3, full: true },
   { key: 'sources', label: 'Fontes consultadas', rows: 3, full: true },
   { key: 'recordNotes', label: 'Informações complementares', rows: 2, full: true },
@@ -37,7 +37,7 @@ export function ContactResearchFields({ value, onChange }: {
   return (
     <Card className="lead-client-info contact-research-info" padding="medium" as="article">
       <div className="contact-research-info__header">
-        <h4 className="lead-client-info__title">Dados de contato</h4>
+        <h4 className="lead-client-info__title">Pesquisa</h4>
         <Button type="button" variant="secondary" size="small"
           leadingIcon={<Icon name={editing ? 'eye' : 'edit'} size={15} />}
           onClick={() => setEditing((current) => !current)}>
@@ -62,11 +62,11 @@ export function ContactResearchFields({ value, onChange }: {
           <InfoSection title="Pesquisa e perfil">
             {info('researchDate', 'Data da pesquisa')}
             {info('qualification', 'Qualificação da pesquisa', true)}
-            {info('profile', 'Perfil da clínica', true)}
+            {info('profile', 'Perfil do negócio', true)}
           </InfoSection>
           <InfoSection title="Canais e abordagem" compact>
             {info('publicEmail', 'E-mail público')}
-            {info('whatsappStatus', 'Confirmação do WhatsApp')}
+            {info('whatsappStatus', 'Verificação do WhatsApp')}
             {info('websiteNotes', 'Situação do site', true)}
             {info('approach', 'Hipótese para abordagem', true)}
           </InfoSection>

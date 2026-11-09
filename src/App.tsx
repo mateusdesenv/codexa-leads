@@ -762,12 +762,11 @@ function LeadModal({
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
 
-  const [activeTab, setActiveTab] = useState<'cliente' | 'contato' | 'dados'>('dados')
+  const [activeTab, setActiveTab] = useState('dados')
 
   const tabItems: TabItem[] = [
     { id: 'dados', label: 'Dados' },
-    { id: 'cliente', label: 'Apify' },
-    { id: 'contato', label: 'Codex' },
+    { id: 'cliente', label: 'Informações do cliente' },
   ]
 
   const interestOptions = [
@@ -827,26 +826,21 @@ function LeadModal({
         <Tabs
           items={tabItems}
           value={activeTab}
-          onChange={(value) => setActiveTab(value as 'cliente' | 'contato' | 'dados')}
+          onChange={setActiveTab}
         />
 
         <fieldset className="permission-fields" disabled={readOnly}>
         {activeTab === 'cliente' && (
           <div className="modal__column">
-            <h3 className="modal__column-title">Cliente</h3>
+            <h3 className="modal__column-title">Informações do cliente</h3>
 
-            <LeadClientInfo lead={lead} />
-          </div>
-        )}
-
-        {activeTab === 'contato' && (
-          <div className="modal__column modal__column--contact">
-            <h3 className="modal__column-title">Contato</h3>
-
-            <ContactResearchFields
-              value={state.contactResearch ?? {}}
-              onChange={(contactResearch) => setState((current) => ({ ...current, contactResearch }))}
-            />
+            <div className="lead-information">
+              <LeadClientInfo lead={lead} />
+              <ContactResearchFields
+                value={state.contactResearch ?? {}}
+                onChange={(contactResearch) => setState((current) => ({ ...current, contactResearch }))}
+              />
+            </div>
           </div>
         )}
 

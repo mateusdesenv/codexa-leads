@@ -891,6 +891,19 @@
   line-height: 1.35;
 }
 
+.lead-information {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 16px;
+}
+
+@media (min-width: 1000px) {
+  .lead-information {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  }
+}
+
 .modal__actions {
   grid-column: 1 / -1;
   display: flex;

@@ -58,7 +58,7 @@ export default function LeadClientInfo({ lead }: LeadClientInfoProps) {
 
   return (
     <Card className="lead-client-info" padding="medium" as="article">
-      <h4 className="lead-client-info__title">Dados do cliente</h4>
+      <h4 className="lead-client-info__title">Cadastro</h4>
 
       <InfoSection title="Identificação">
         <div className="lead-client-info__item">
