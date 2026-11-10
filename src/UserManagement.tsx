@@ -275,7 +275,7 @@ export default function UserManagement({
 }) {
   const [data, setData] = useState<AccessSnapshot | null>(null),
     [error, setError] = useState(''),
-    [loading, setLoading] = useState(false)
+    [loading, setLoading] = useState(administrator)
   const [tab, setTab] = useState('people'),
     [search, setSearch] = useState(''),
     [person, setPerson] = useState<Person | null>(null),
@@ -317,6 +317,9 @@ export default function UserManagement({
       })
       .catch((e) => {
         if (!cancelled) setError(e.message)
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
       })
     return () => {
       cancelled = true

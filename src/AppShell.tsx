@@ -3,6 +3,7 @@ import { Icon, type IconName } from 'codexa-ui'
 import codexaLogo from 'codexa-ui/logos/logos-fundo-transparente/primary-logo-reversed.png'
 import type { ThemePreference } from './useTheme'
 import './AppShell.css'
+import ScreenErrorBoundary from './ScreenErrorBoundary'
 
 const navigation = [
   { label: 'Comercial', items: [
@@ -155,7 +156,7 @@ export default function AppShell({ children, ...props }: ShellProps) {
         <time className="shell-header__date" dateTime={dateValue}><Icon name="calendar" size={17} /><span>{dateLabel}</span></time>
         <button type="button" ref={menuButton} className="shell-icon-button shell-header__menu" aria-label="Abrir menu" aria-expanded={menuOpen} aria-controls={drawerId} aria-haspopup="dialog" onClick={() => setMenuOpen(true)}><Icon name="menu" size={23} /></button>
       </header>
-      {children}
+      <ScreenErrorBoundary key={props.currentView}>{children}</ScreenErrorBoundary>
     </main>
   </div>
 }

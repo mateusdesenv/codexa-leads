@@ -94,6 +94,10 @@ export async function transaction(req, operation, revision) {
       fail(403, 'Seu acesso ao Leads está suspenso.')
     req.crmUser = u
     req.savedGroups = await LeadGroup.find({}).session(session)
+    for (const group of req.savedGroups) {
+      if (!Array.isArray(group.viewerUids)) group.viewerUids = []
+      if (!Array.isArray(group.assignees)) group.assignees = []
+    }
     const visible = req.savedGroups
       .filter(
         (g) =>
@@ -124,8 +128,9 @@ export async function snapshot() {
         groupId: g.groupId,
         groupTitle: g.groupTitle,
         visibility: g.visibility,
-        viewerUids: g.viewerUids,
-        assignees: g.assignees,
+        // lean() does not apply schema defaults to records created before these fields existed.
+        viewerUids: Array.isArray(g.viewerUids) ? g.viewerUids : [],
+        assignees: Array.isArray(g.assignees) ? g.assignees : [],
         archivedAt: g.archivedAt,
       })),
     }

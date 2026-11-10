@@ -131,6 +131,35 @@ test(
         { placeId: 'b1', title: 'B1', groupId: 'b', groupTitle: 'B' },
         { placeId: 'orphan', title: 'Orphan', groupId: null },
       ])
+      await t.test('legacy lists return safe membership arrays without changing stored access', async () => {
+        const legacy = [
+          { groupId: 'legacy-missing', groupTitle: 'Legacy missing' },
+          { groupId: 'legacy-null', groupTitle: 'Legacy null', viewerUids: null, assignees: null },
+          { groupId: 'legacy-viewers', groupTitle: 'Legacy viewers', visibility: 'selected', viewerUids: ['hub_ro'] },
+        ]
+        // Native inserts reproduce old records without applying today's schema defaults.
+        await LeadGroup.collection.insertMany(legacy)
+        try {
+          const result = await snap()
+          for (const record of legacy) {
+            const group = result.groups.find((g) => g.groupId === record.groupId)
+            assert.deepEqual(group.assignees, [])
+            assert.deepEqual(group.viewerUids, record.viewerUids ?? [])
+            const stored = await LeadGroup.collection.findOne({ groupId: record.groupId })
+            assert.equal(stored.assignees, record.assignees)
+            assert.deepEqual(stored.viewerUids, record.viewerUids)
+          }
+          const readerLists = await json('/api/lead-groups', 'reader')
+          assert.ok(readerLists.some((g) => g.groupId === 'legacy-viewers'))
+          assert.ok(!readerLists.some((g) => ['legacy-missing', 'legacy-null'].includes(g.groupId)))
+          const saved = await json('/api/admin/users/hub_fresh/access', 'admin', 'PUT', {
+            revision: result.revision, role: 'reader', accessStatus: 'approved', listIds: [], responsibleListIds: [],
+          })
+          assert.ok(saved.groups.every((g) => Array.isArray(g.assignees) && Array.isArray(g.viewerUids)))
+        } finally {
+          await LeadGroup.deleteMany({ groupId: { $in: legacy.map((g) => g.groupId) } })
+        }
+      })
       await t.test(
         'operator and reader only see assigned lists, including direct and mixed-case routes',
         async () => {
