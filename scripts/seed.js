@@ -2,8 +2,8 @@ import 'dotenv/config'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { connectToDatabase } from '../api/lib/db.js'
-import { Lead } from '../api/lib/lead.js'
+import { connectToDatabase } from '../server/lib/db.js'
+import { Lead } from '../server/lib/lead.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)

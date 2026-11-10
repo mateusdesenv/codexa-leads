@@ -33,6 +33,8 @@ Abra `http://127.0.0.1:4300/?codexa_launch=1`. O script sobe interface, API e Hu
 
 ## Publicação
 
+`api/[...path].js` é a única função pública. A implementação e os modelos ficam em `server/`; não coloque módulos auxiliares em `api/`, pois a Vercel os transforma em funções adicionais.
+
 Publique cliente e servidor juntos. Atualize abas antigas porque gravações agora exigem versão. Confirme entrada pelo Hub com o administrador e um membro, depois revise perfis/listas na tela Acessos do Leads. Não execute o seed de demonstração na base real. Não reverta apenas o cliente: versões antigas não enviam a revisão necessária.
 
 Registros fora das listas são recuperados explicitamente em Acessos do Leads. Arquivar não apaga vínculos. Restaure listas somente depois de conferir as participações preservadas.

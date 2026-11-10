@@ -15,11 +15,11 @@ test(
     })
     process.env.MONGODB_URI = replica.getUri('leads_test')
     process.env.CODEXA_HUB_URL = 'https://hub.test'
-    const { User } = await import('../api/lib/user.js')
-    const { Lead } = await import('../api/lib/lead.js')
-    const { LeadGroup } = await import('../api/lib/lead-group.js')
-    const { Audit } = await import('../api/lib/access-control.js')
-    const { default: app } = await import('../api/app.js')
+    const { User } = await import('../server/lib/user.js')
+    const { Lead } = await import('../server/lib/lead.js')
+    const { LeadGroup } = await import('../server/lib/lead-group.js')
+    const { Audit } = await import('../server/lib/access-control.js')
+    const { default: app } = await import('../server/app.js')
     const realFetch = global.fetch
     const identities = {
       admin: {

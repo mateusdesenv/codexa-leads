@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import mongoose from 'mongoose'
-import { Lead } from '../api/lib/lead.js'
+import { Lead } from '../server/lib/lead.js'
 import { parseContactResearch, getContactResearchBackfill, isMetropolitanClinicsGroup } from '../shared/contact-research.js'
 
 const notes = `Pesquisa: 2026-09-09. Pré-qualificação por dados públicos; interesse comercial não confirmado.

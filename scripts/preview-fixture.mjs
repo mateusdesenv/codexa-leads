@@ -12,10 +12,10 @@ process.env.MONGODB_URI = replica.getUri('ui_review')
 process.env.CODEXA_HUB_URL = 'http://127.0.0.1:4302'
 process.env.CODEXA_API_PROXY_TARGET = 'http://127.0.0.1:4301'
 process.env.VITE_CODEXA_HUB_URL = process.env.CODEXA_HUB_URL
-const { User } = await import('../api/lib/user.js')
-const { Lead } = await import('../api/lib/lead.js')
-const { LeadGroup } = await import('../api/lib/lead-group.js')
-const { default: app } = await import('../api/app.js')
+const { User } = await import('../server/lib/user.js')
+const { Lead } = await import('../server/lib/lead.js')
+const { LeadGroup } = await import('../server/lib/lead-group.js')
+const { default: app } = await import('../server/app.js')
 await mongoose.connect(process.env.MONGODB_URI)
 const people = {
   admin: {

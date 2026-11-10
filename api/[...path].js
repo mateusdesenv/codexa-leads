@@ -1,4 +1,4 @@
-import app from './app.js'
+import app from '../server/app.js'
 
 export default (req, res) => {
   if (!req.url.startsWith('/api')) {
