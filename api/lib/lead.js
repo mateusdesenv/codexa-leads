@@ -8,6 +8,8 @@ const contactResearchSchema = new mongoose.Schema(
 
 const leadSchema = new mongoose.Schema(
   {
+    version: { type: Number, default: 0 },
+    archivedAt: { type: Date, default: null },
     title: { type: String, required: true },
     subTitle: { type: String, default: null },
     categoryName: { type: String, default: null },

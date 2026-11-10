@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Button, Icon } from 'codexa-ui'
 
-export default function LeadActionsMenu({ title, onOpen, onEdit, onDelete, readOnly = false }: {
+export default function LeadActionsMenu({ title, onOpen, onEdit, onDelete, canArchive = false, readOnly = false }: {
+  canArchive?: boolean
   readOnly?: boolean
   title: string
   onOpen: () => void
@@ -53,7 +54,7 @@ export default function LeadActionsMenu({ title, onOpen, onEdit, onDelete, readO
       }}>
       <button type="button" role="menuitem" className="leads-table__actions-item" onClick={() => run(onOpen)}><Icon name="external-link" size={16} />Abrir</button>
       <button type="button" role="menuitem" className="leads-table__actions-item" disabled={readOnly} onClick={() => run(onEdit)}><Icon name="edit" size={16} />Editar</button>
-      <button type="button" role="menuitem" className="leads-table__actions-item leads-table__actions-item--danger" disabled={readOnly} onClick={() => run(onDelete)}><Icon name="trash" size={16} />Excluir</button>
+      <button type="button" role="menuitem" className="leads-table__actions-item leads-table__actions-item--danger" disabled={readOnly || !canArchive} onClick={() => run(onDelete)}><Icon name="trash" size={16} />Arquivar</button>
     </div>, document.body)}
   </>
 }

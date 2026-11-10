@@ -13,6 +13,7 @@ type DashboardColumn = {
 }
 
 type DashboardProps = {
+  administrator?: boolean
   leads: LeadWithMeta[]
   columns: DashboardColumn[]
   onOpenKanban: () => void
@@ -51,7 +52,7 @@ function percentage(value: number, total: number) {
   return total === 0 ? 0 : Math.round((value / total) * 100)
 }
 
-export default function Dashboard({ leads, columns, onOpenKanban, onOpenLead }: DashboardProps) {
+export default function Dashboard({ leads, columns, onOpenKanban, onOpenLead, administrator = false }: DashboardProps) {
   const total = leads.length
   const counts = columns.reduce(
     (acc, column) => ({
@@ -83,6 +84,7 @@ export default function Dashboard({ leads, columns, onOpenKanban, onOpenLead }: 
   const overdueReturns = scheduledReturns.filter(
     (lead) => getDateKey(lead.kanbanState.returnDate) < todayKey,
   )
+  const priorityReturns = [...overdueReturns, ...returnsToday]
   const upcomingReturns = scheduledReturns.filter(
     (lead) => getDateKey(lead.kanbanState.returnDate) > todayKey,
   )
@@ -165,17 +167,17 @@ export default function Dashboard({ leads, columns, onOpenKanban, onOpenLead }: 
           <div className="dashboard-agenda__header">
             <div>
               <span className="dashboard-agenda__eyebrow">Prioridade do dia</span>
-              <h3>Retornos de hoje</h3>
-              <p>Leads com data de retorno marcada para {formatCalendarDate(todayKey)}.</p>
+              <h3>{overdueReturns.length ? 'Retornos atrasados e de hoje' : 'Retornos de hoje'}</h3>
+              <p>{overdueReturns.length ? 'Comece pelos retornos vencidos, do mais antigo para o mais recente.' : `Retornos previstos para ${formatCalendarDate(todayKey)}.`}</p>
             </div>
-            <Badge tone={returnsToday.length > 0 ? 'warning' : 'success'} size="small">
-              {returnsToday.length > 0 ? `${returnsToday.length} pendente${returnsToday.length === 1 ? '' : 's'}` : 'Tudo em dia'}
+            <Badge tone={priorityReturns.length > 0 ? 'warning' : 'success'} size="small">
+              {priorityReturns.length > 0 ? `${priorityReturns.length} pendente${priorityReturns.length === 1 ? '' : 's'}` : 'Tudo em dia'}
             </Badge>
           </div>
 
-          {returnsToday.length > 0 ? (
-            <ul className="dashboard-task-list" aria-label="Leads com retorno para hoje">
-              {returnsToday.map((lead) => {
+          {priorityReturns.length > 0 ? (
+            <ul className="dashboard-task-list" aria-label="Retornos prioritários">
+              {priorityReturns.map((lead) => {
                 const column = columnById.get(lead.kanbanState.column)
                 return (
                   <li key={lead.placeId}>
@@ -185,7 +187,7 @@ export default function Dashboard({ leads, columns, onOpenKanban, onOpenLead }: 
                       </span>
                       <span className="dashboard-task__content">
                         <strong>{lead.title}</strong>
-                        <small>{lead.kanbanState.nextAction || 'Retomar o contato comercial'}</small>
+                        <small>{formatCalendarDate(lead.kanbanState.returnDate)} · {getDateKey(lead.kanbanState.returnDate) < todayKey ? 'Atrasado' : 'Hoje'} · {lead.kanbanState.nextAction || 'Retomar o contato comercial'}</small>
                         <span className="dashboard-task__meta">
                           {lead.groupTitle && <span>{lead.groupTitle}</span>}
                           {lead.categoryName && <span>{lead.categoryName}</span>}
@@ -260,7 +262,7 @@ export default function Dashboard({ leads, columns, onOpenKanban, onOpenLead }: 
           </span>
           <span className="dashboard-metric__label">Total de leads</span>
           <strong>{formatNumber.format(total)}</strong>
-          <small>Base comercial completa</small>
+          <small>{administrator ? 'Todas as listas ativas' : 'Listas que você pode acessar'}</small>
         </Card>
         <Card className="dashboard-metric" padding="medium">
           <span className="dashboard-metric__icon dashboard-metric__icon--open" aria-hidden="true">

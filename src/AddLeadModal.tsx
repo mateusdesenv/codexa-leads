@@ -1,5 +1,5 @@
 import { useRef, useState, type FormEvent } from 'react'
-import { Alert, Button, Dialog, Icon, Input, Select, Textarea } from 'codexa-ui'
+import { Alert, Button, ConfirmDialog, Dialog, Icon, Input, Select, Textarea } from 'codexa-ui'
 import LeadAssigneeSelect from './LeadAssigneeSelect'
 import type { ColumnId, LeadWithMeta } from './types'
 
@@ -15,6 +15,7 @@ export interface NewLeadInput {
 }
 
 interface AddLeadModalProps {
+  groupId?: string | null
   groupTitle: string
   lead?: LeadWithMeta
   onClose: () => void
@@ -22,7 +23,7 @@ interface AddLeadModalProps {
 }
 
 const STAGE_OPTIONS: { value: ColumnId; label: string }[] = [
-  { value: 'open', label: 'Open' },
+  { value: 'open', label: 'Novos' },
   { value: 'em_contato', label: 'Tentativa de ligação' },
   { value: 'mensagem_enviada', label: 'Mensagem enviada' },
   { value: 'contato', label: 'Contato feito' },
@@ -57,7 +58,7 @@ function formatBrazilianPhone(value: string): string {
   return `(${areaCode}) ${firstBlock}${lastBlock ? `-${lastBlock}` : ''}`
 }
 
-export default function AddLeadModal({ groupTitle, lead, onClose, onCreate }: AddLeadModalProps) {
+export default function AddLeadModal({ groupTitle, groupId, lead, onClose, onCreate }: AddLeadModalProps) {
   const [assigneeUid, setAssigneeUid] = useState(lead?.assigneeUid ?? '')
   const [title, setTitle] = useState(lead?.title ?? '')
   const [categoryName, setCategoryName] = useState(lead?.categoryName ?? '')
@@ -67,6 +68,9 @@ export default function AddLeadModal({ groupTitle, lead, onClose, onCreate }: Ad
   const [address, setAddress] = useState(lead?.address ?? '')
   const [column, setColumn] = useState<ColumnId>(lead?.kanbanState.column ?? 'open')
   const [collectedData, setCollectedData] = useState(lead?.kanbanState.collectedData ?? '')
+  const [discard, setDiscard] = useState(false)
+  const dirty = JSON.stringify([assigneeUid,title,categoryName,phone,website,address,column,collectedData]) !== JSON.stringify([lead?.assigneeUid??'',lead?.title??'',lead?.categoryName??'',lead?.phone??lead?.phoneUnformatted??'',lead?.website??'',lead?.address??'',lead?.kanbanState.column??'open',lead?.kanbanState.collectedData??''])
+  const close = () => { if(submitLock.current)return; if(dirty)setDiscard(true);else onClose() }
   const submitLock = useRef(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -107,13 +111,13 @@ export default function AddLeadModal({ groupTitle, lead, onClose, onCreate }: Ad
   }
 
   return (
-    <Dialog open onClose={() => { if (!submitLock.current) onClose() }} title={lead ? 'Editar lead' : 'Adicionar novo lead'}>
+    <><Dialog open onClose={close} title={lead ? 'Editar lead' : 'Adicionar novo lead'}>
       <div className="add-lead-modal__group">
         <span className="add-lead-modal__group-icon" aria-hidden="true">
           <Icon name="users" size={18} />
         </span>
         <div>
-          <span>{lead ? 'Grupo' : 'Adicionar ao grupo'}</span>
+          <span>{lead ? 'Lista' : 'Adicionar à lista'}</span>
           <strong>{groupTitle}</strong>
         </div>
       </div>
@@ -128,7 +132,7 @@ export default function AddLeadModal({ groupTitle, lead, onClose, onCreate }: Ad
         )}
 
         <div className="add-lead-modal__full">
-          <LeadAssigneeSelect value={assigneeUid} currentName={lead?.assigneeName} onChange={setAssigneeUid} disabled={submitting} />
+          <LeadAssigneeSelect groupId={lead?.groupId || groupId} value={assigneeUid} currentName={lead?.assigneeName} onChange={setAssigneeUid} disabled={submitting} />
         </div>
 
         <Input
@@ -213,7 +217,7 @@ export default function AddLeadModal({ groupTitle, lead, onClose, onCreate }: Ad
         </div>
 
         <div className="add-lead-modal__actions add-lead-modal__full">
-          <Button type="button" variant="secondary" onClick={onClose} disabled={submitting}>
+          <Button type="button" variant="secondary" onClick={close} disabled={submitting}>
             Cancelar
           </Button>
           <Button
@@ -227,6 +231,6 @@ export default function AddLeadModal({ groupTitle, lead, onClose, onCreate }: Ad
           </Button>
         </div>
       </form>
-    </Dialog>
+    </Dialog><ConfirmDialog open={discard} onClose={()=>setDiscard(false)} onConfirm={onClose} title="Descartar preenchimento?" description="As alterações ainda não foram salvas." confirmLabel="Descartar" tone="danger"/></>
   )
 }

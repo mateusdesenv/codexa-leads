@@ -6,7 +6,7 @@ import './AppShell.css'
 
 const navigation = [
   { label: 'Comercial', items: [
-    { view: 'dashboard', label: 'Início', icon: 'home' },
+    { view: 'dashboard', label: 'Meu dia', icon: 'home' },
     { view: 'table', label: 'Listas', icon: 'users' },
     { view: 'kanban', label: 'Kanban', icon: 'sort' },
   ] },

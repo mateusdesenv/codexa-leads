@@ -5115,3 +5115,38 @@ html[data-theme="dark"] .kanban-card--model-two .ds-button.kanban-card__details 
 .access-editor__viewers { display: grid; gap: .9rem; border: 1px solid var(--ds-line, #d8dce2); border-radius: .5rem; padding: 1rem; max-height: 40vh; overflow: auto; }
 .access-editor__note { font-size: .875rem; opacity: .8; }
 .access-editor__actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: .7rem; }
+
+.lead-groups-toolbar { display: flex; align-items: end; justify-content: space-between; gap: 20px; padding: 18px; margin-bottom: 24px; border: 1px solid var(--ds-line); border-radius: 14px; background: var(--ds-white); }
+.lead-groups-toolbar > .prospect-toolbar__field { width: min(100%, 420px); }
+.lead-groups-view { display: flex; gap: 6px; }
+.lead-groups-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.lead-group-card { display: flex; flex-direction: column; align-items: start; min-width: 0; padding: 22px; border: 1px solid var(--ds-line); border-radius: 14px; background: var(--ds-white); }
+.lead-group-card__icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; color: var(--ds-green-dark); background: var(--ds-green-ice); }
+.lead-group-card h3 { margin: 18px 0 14px; font-size: 1.05rem; line-height: 1.4; overflow-wrap: anywhere; }
+.lead-group-card__count { color: var(--ds-green-dark); background: var(--ds-green-ice); border-radius: 8px; padding: 5px 10px; font-size: .85rem; font-weight: 650; }
+.lead-group-card__actions { width: 100%; margin-top: auto; padding-top: 22px; }
+.lead-group-card__actions .leads-table__actions { justify-content: space-between; }
+@media (max-width: 1150px) { .lead-groups-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .lead-groups-grid { grid-template-columns: minmax(0, 1fr); } .lead-groups-toolbar { flex-wrap: wrap; } .lead-groups-toolbar > .prospect-toolbar__field { width: 100%; } }
+
+.lead-group-assignees { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; font-size: .78rem; color: var(--ds-gray); }
+.lead-group-assignees > span { padding: 4px 8px; border-radius: 6px; background: var(--ds-off-white); }
+.lead-group-assignees .lead-group-assignees__mine { color: var(--ds-green-dark); background: var(--ds-green-ice); font-weight: 650; }
+
+/* Access management shares the CRM's existing controls and spacing. */
+.access-toolbar { display:flex; gap:8px; flex-wrap:wrap; margin:20px 0; }
+.access-directory { display:grid; gap:12px; margin-top:16px; }
+.access-directory-row { display:flex; align-items:center; justify-content:space-between; gap:20px; }
+.access-directory-row small,.access-member-row small { display:block; overflow-wrap:anywhere; color:var(--ds-gray,#647067); }
+.access-directory-row p { margin:8px 0; }
+.access-warning { color:#a24d13; }
+.access-profile-fields { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.access-profile-fields label,.user-management label { display:grid; gap:8px; }
+.access-editor select,.user-management select { width:100%; min-height:42px; border:1px solid var(--ds-line,#ccd5cf); border-radius:8px; padding:8px; background:var(--ds-white,#fff); color:var(--ds-graphite,#18211c); }
+.access-member-grid { max-height:45vh; overflow:auto; }
+.access-member-heading,.access-member-row { display:grid; grid-template-columns:minmax(0,1fr) 65px 100px; gap:12px; align-items:center; padding:12px 4px; border-bottom:1px solid var(--ds-line,#ddd); }
+.access-member-heading { font-size:12px; font-weight:600; }
+.access-member-row input { width:18px; height:18px; justify-self:center; }
+.access-recovery-list { display:grid; gap:8px; max-height:50vh; overflow:auto; margin:16px 0; }
+.access-recovery-list label { display:flex; align-items:center; gap:10px; }
+@media(max-width:640px) { .access-directory-row { align-items:flex-start; flex-direction:column; gap:12px; } .access-profile-fields {grid-template-columns:1fr;} .access-member-heading,.access-member-row{grid-template-columns:minmax(0,1fr) 48px 85px;gap:6px;} }

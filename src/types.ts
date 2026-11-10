@@ -1,6 +1,8 @@
 import type { ContactResearch } from '../shared/contact-research'
 
 export interface Lead {
+  version?: number
+  archivedAt?: string | null
   title: string
   subTitle: string | null
   categoryName: string | null

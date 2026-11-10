@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { Alert, Button, Select } from 'codexa-ui'
 import { apiFetch } from './api'
 
-export default function LeadAssigneeSelect({ value, currentName, onChange, disabled = false }: {
+export default function LeadAssigneeSelect({ value, currentName, groupId, onChange, disabled = false }: {
+  groupId?: string | null
   value: string
   currentName?: string | null
   onChange: (value: string) => void
@@ -14,7 +15,7 @@ export default function LeadAssigneeSelect({ value, currentName, onChange, disab
   const [attempt, setAttempt] = useState(0)
   useEffect(() => {
     const controller = new AbortController()
-    apiFetch('/api/lead-assignees', { signal: controller.signal })
+    apiFetch('/api/lead-assignees?groupId=' + encodeURIComponent(groupId || ''), { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error('Não foi possível carregar')
         const data = await response.json()
@@ -23,7 +24,7 @@ export default function LeadAssigneeSelect({ value, currentName, onChange, disab
       .catch(() => { if (!controller.signal.aborted) setError(true) })
       .finally(() => { if (!controller.signal.aborted) setLoading(false) })
     return () => controller.abort()
-  }, [attempt])
+  }, [attempt, groupId])
   const options = [{ value: '', label: 'Sem responsável' }, ...users.map((user) => ({ value: user.uid, label: user.name }))]
   if (value && !users.some((user) => user.uid === value)) options.push({ value, label: currentName || 'Responsável atual' })
   return <div className="lead-assignee-field">

@@ -24,7 +24,7 @@ const COLUMN_ORDER: ColumnId[] = [
 ]
 
 const COLUMN_LABELS: Record<ColumnId, string> = {
-  open: 'Open',
+  open: 'Novos',
   em_contato: 'Tentativa de ligação',
   mensagem_enviada: 'Mensagem enviada',
   contato: 'Contato feito',
@@ -55,10 +55,12 @@ const formatDate = (value?: string | null): string => {
 export default function LeadsTable({
   leads,
   readOnly = false,
+  canArchive = false,
   onLeadClick,
   onEditLead,
   onDeleteLead,
 }: {
+  canArchive?: boolean
   readOnly?: boolean
   leads: TableLead[]
   onLeadClick: (lead: TableLead) => void
@@ -149,7 +151,7 @@ export default function LeadsTable({
       header: '',
       align: 'end',
       render: (lead) => (
-        <LeadActionsMenu
+        <LeadActionsMenu canArchive={canArchive}
           readOnly={readOnly}
           title={lead.title}
           onOpen={() => onLeadClick(lead)}
@@ -162,7 +164,7 @@ export default function LeadsTable({
 
   return (
     <div className="leads-table">
-      {deleteError && <Alert tone="danger" title="Não foi possível excluir">{deleteError}</Alert>}
+      {deleteError && <Alert tone="danger" title="Não foi possível arquivar">{deleteError}</Alert>}
       <ConfirmDialog
         open={!!deletingLead}
         onClose={() => { if (!deleting) setDeletingLead(null) }}
@@ -174,12 +176,12 @@ export default function LeadsTable({
             await onDeleteLead(deletingLead)
             setDeletingLead(null)
           } catch (error) {
-            setDeleteError(error instanceof Error ? error.message : 'Não foi possível excluir o lead')
+            setDeleteError(error instanceof Error ? error.message : 'Não foi possível arquivar o lead')
           } finally { setDeleting(false) }
         }}
-        title="Excluir lead"
-        description={`Excluir “${deletingLead?.title ?? ''}”? Esta ação remove o lead e suas informações.`}
-        confirmLabel={deleting ? 'Excluindo...' : 'Excluir lead'}
+        title="Arquivar lead"
+        description={`Arquivar “${deletingLead?.title ?? ''}”? O registro será preservado e poderá ser restaurado em Acessos do Leads → Recuperação.`}
+        confirmLabel={deleting ? 'Arquivando...' : 'Arquivar lead'}
         tone="danger"
       />
       <div className="leads-table__tabs">

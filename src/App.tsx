@@ -19,8 +19,8 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { signOut, type User } from 'firebase/auth'
-import { auth } from './firebase'
+import { logoutSession, type SessionUser as User } from './session'
+
 import AccessGate from './AccessGate'
 import Help from './Help'
 import Dashboard from './Dashboard'
@@ -32,6 +32,7 @@ import { ContactResearchFields } from './ContactResearchFields'
 import LeadGroupsTable, { type LeadGroup } from './LeadGroupsTable'
 import LeadsTable from './LeadsTable'
 import UserManagement from './UserManagement'
+import { loadAccess, saveAccess } from './access-api'
 import ListAccessDialog from './ListAccessDialog'
 import { CRM_SCREENS, type AccessProfile } from '../shared/permissions'
 import {
@@ -39,6 +40,7 @@ import {
   Badge,
   Button,
   Dialog,
+  ConfirmDialog,
   EmptyState,
   Icon,
   Input,
@@ -63,7 +65,7 @@ import AppShell, { type AppView } from './AppShell'
 import { useTheme, type ThemePreference } from './useTheme'
 
 const COLUMNS: { id: ColumnId; label: string; emoji: string; color: string; icon: IconName }[] = [
-  { id: 'open', label: 'Open', emoji: '🟢', color: '#25BF44', icon: 'check-circle' },
+  { id: 'open', label: 'Novos', emoji: '🟢', color: '#25BF44', icon: 'check-circle' },
   { id: 'em_contato', label: 'Tentativa de ligação', emoji: '📞', color: '#3B82F6', icon: 'send' },
   { id: 'mensagem_enviada', label: 'Mensagem enviada', emoji: '✉️', color: '#6366F1', icon: 'message' },
   { id: 'contato', label: 'Contato feito', emoji: '✅', color: '#2DD4A0', icon: 'check' },
@@ -144,23 +146,23 @@ const fetchLeads = async (signal?: AbortSignal): Promise<Lead[]> => {
   return res.json()
 }
 
-const updateLeadState = async (placeId: string, kanbanState: KanbanState, assigneeUid?: string | null): Promise<Lead> => {
+const updateLeadState = async (placeId: string, kanbanState: KanbanState, assigneeUid?: string | null, version = 0): Promise<Lead> => {
   const res = await apiFetch(`/api/leads/${placeId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ kanbanState, assigneeUid }),
+    body: JSON.stringify({ kanbanState, assigneeUid, version }),
   })
-  if (!res.ok) throw new Error('Erro ao atualizar lead')
+  if (!res.ok) throw new Error((await res.json()).error || 'Erro ao atualizar lead')
   return res.json()
 }
 
-const updateLeadsBatch = async (leads: { placeId: string; kanbanState: KanbanState }[]): Promise<Lead[]> => {
+const updateLeadsBatch = async (leads: { placeId: string; kanbanState: KanbanState; version?: number }[]): Promise<Lead[]> => {
   const res = await apiFetch('/api/leads/batch', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(leads),
   })
-  if (!res.ok) throw new Error('Erro ao atualizar leads')
+  if (!res.ok) throw new Error((await res.json()).error || 'Erro ao atualizar leads')
   const payload = await res.json()
   return payload.leads
 }
@@ -751,12 +753,15 @@ function LeadModal({
   readOnly?: boolean
   lead: LeadWithMeta
   onClose: () => void
-  onSave: (placeId: string, state: KanbanState, assigneeUid?: string | null) => Promise<void>
+  onSave: (placeId: string, state: KanbanState, assigneeUid?: string | null, version?: number) => Promise<void>
 }) {
   const [assigneeUid, setAssigneeUid] = useState(lead.assigneeUid ?? '')
   const [state, setState] = useState<KanbanState>({ ...lead.kanbanState })
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [discard, setDiscard] = useState(false)
+  const dirty = assigneeUid !== (lead.assigneeUid??'') || JSON.stringify(state) !== JSON.stringify(lead.kanbanState)
+  const close = () => { if(saving)return; if(dirty&&!readOnly)setDiscard(true);else onClose() }
 
   const [activeTab, setActiveTab] = useState('dados')
 
@@ -785,7 +790,7 @@ function LeadModal({
     setSaving(true)
     setSaveError(null)
     try {
-      await onSave(lead.placeId, state, assigneeUid === (lead.assigneeUid ?? '') ? undefined : assigneeUid || null)
+      await onSave(lead.placeId, state, assigneeUid === (lead.assigneeUid ?? '') ? undefined : assigneeUid || null, lead.version ?? 0)
       onClose()
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : 'Erro ao salvar lead')
@@ -805,7 +810,7 @@ function LeadModal({
   ]
 
   return (
-    <Dialog open onClose={onClose} title={lead.title}>
+    <><Dialog open onClose={close} title={lead.title}>
       <div className="modal__meta">
         <Badge tone={getTemperatureTone(lead.temperature)} size="small">
           {getTemperatureEmoji(lead.temperature)} {getTemperatureLabel(lead.temperature)} — Score {lead.score}
@@ -818,7 +823,7 @@ function LeadModal({
       </div>
 
       <form className="modal__form" onSubmit={handleSubmit}>
-        <LeadAssigneeSelect value={assigneeUid} currentName={lead.assigneeName} onChange={setAssigneeUid} disabled={saving || readOnly} />
+        <LeadAssigneeSelect groupId={lead.groupId} value={assigneeUid} currentName={lead.assigneeName} onChange={setAssigneeUid} disabled={saving || readOnly} />
         <Tabs
           items={tabItems}
           value={activeTab}
@@ -947,7 +952,7 @@ function LeadModal({
         </fieldset>
         {saveError && <Alert tone="danger" title="Não foi possível salvar">{saveError}</Alert>}
         <div className="modal__actions">
-          <Button type="button" variant="secondary" onClick={onClose} disabled={saving}>
+          <Button type="button" variant="secondary" onClick={close} disabled={saving}>
             Cancelar
           </Button>
           <Button type="submit" variant="primary" loading={saving} disabled={readOnly}>
@@ -956,7 +961,7 @@ function LeadModal({
         </div>
       </form>
 
-    </Dialog>
+    </Dialog><ConfirmDialog open={discard} onClose={()=>setDiscard(false)} onConfirm={onClose} title="Descartar alterações?" description="O preenchimento ainda não foi salvo." confirmLabel="Descartar" tone="danger"/></>
   )
 }
 
@@ -967,7 +972,7 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('')
-  const [kanbanGroupFilter, setKanbanGroupFilter] = useState('')
+  const [kanbanGroupFilter, setKanbanGroupFilter] = useState(() => { try { return localStorage.getItem('leads-last-list-' + access.uid) || '' } catch { return '' } })
   const [kanbanSorts, setKanbanSorts] = useState<Record<ColumnId, KanbanSort>>(DEFAULT_KANBAN_SORT)
   const [selectedLead, setSelectedLead] = useState<LeadWithMeta | null>(null)
   const [activeDrag, setActiveDrag] = useState<LeadWithMeta | null>(null)
@@ -1082,7 +1087,8 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
 
   const activeKanbanGroup = groups.some((group) => group.groupId === kanbanGroupFilter)
     ? kanbanGroupFilter
-    : (groups[0]?.groupId ?? '')
+    : ([...groups].sort((a,b) => Number(!!b.assignees?.some(p => p.uid === access.uid)) - Number(!!a.assignees?.some(p => p.uid === access.uid)) || Number(b.count > 0) - Number(a.count > 0) || a.groupTitle.localeCompare(b.groupTitle, 'pt-BR'))[0]?.groupId ?? '')
+  useEffect(() => { if (activeKanbanGroup) { try { localStorage.setItem('leads-last-list-' + access.uid, activeKanbanGroup) } catch { /* Storage unavailable. */ } } }, [activeKanbanGroup, access.uid])
   const activeKanbanGroupInfo = groups.find((group) => group.groupId === activeKanbanGroup)
   const addLeadGroup = currentView === 'table' ? groups.find((group) => group.groupId === selectedGroup) : activeKanbanGroupInfo
 
@@ -1204,7 +1210,7 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
     }
 
     // Rebuild leads with updated column and order, persisting order only for non-open columns
-    const leadsToUpdate: { placeId: string; kanbanState: KanbanState }[] = []
+    const leadsToUpdate: { placeId: string; kanbanState: KanbanState; version?: number }[] = []
 
     COLUMNS.forEach((c) => {
       byColumn[c.id].forEach((lead, index) => {
@@ -1217,7 +1223,7 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
           lead.kanbanState?.column !== c.id ||
           lead.kanbanState?.order !== nextKanbanState.order
         ) {
-          leadsToUpdate.push({ placeId: lead.placeId, kanbanState: nextKanbanState })
+          leadsToUpdate.push({ placeId: lead.placeId, kanbanState: nextKanbanState, version: lead.version ?? 0 })
         }
       })
     })
@@ -1246,7 +1252,7 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
       order: Math.max(-1, ...destinationLeads.map((item) => item.kanbanState?.order ?? -1)) + 1,
     }
     try {
-      const savedLead = await updateLeadState(lead.placeId, state)
+      const savedLead = await updateLeadState(lead.placeId, state, undefined, currentLead.version ?? 0)
       setBaseLeads((current) => current.map((item) => item.placeId === savedLead.placeId ? savedLead : item))
       setError(null)
     } catch (err) {
@@ -1255,8 +1261,8 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
     }
   }
 
-  const handleSaveLead = async (placeId: string, state: KanbanState, assigneeUid?: string | null) => {
-    const savedLead = await updateLeadState(placeId, state, assigneeUid)
+  const handleSaveLead = async (placeId: string, state: KanbanState, assigneeUid?: string | null, version = 0) => {
+    const savedLead = await updateLeadState(placeId, state, assigneeUid, version)
     setBaseLeads((prev) =>
       prev.map((l) => (l.placeId === placeId ? savedLead : l)),
     )
@@ -1267,9 +1273,9 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
     const response = await apiFetch(`/api/leads/${encodeURIComponent(lead.placeId)}/message-sent`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sent }),
+      body: JSON.stringify({ sent, version: lead.version ?? 0 }),
     })
-    if (!response.ok) throw new Error('Não foi possível salvar a marcação. Tente novamente.')
+    if (!response.ok) throw new Error((await response.json()).error || 'Não foi possível salvar a marcação.')
     const savedLead = await response.json() as Lead
     setBaseLeads((current) => current.map((item) => item.placeId === savedLead.placeId ? savedLead : item))
     setMessageDay(getMessageDay())
@@ -1300,9 +1306,9 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
       const res = await apiFetch('/api/leads/import', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, leads }),
+        body: JSON.stringify({ title, leads, confirmed: true }),
       })
-      if (!res.ok) throw new Error('Erro ao importar leads')
+      if (!res.ok) throw new Error((await res.json()).error || 'Erro ao importar leads')
       const [fresh, lists] = await Promise.all([fetchLeads(), fetchGroups()])
       setBaseLeads(fresh)
       setSavedGroups(lists)
@@ -1380,7 +1386,7 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
   const handleEditLead = async (input: NewLeadInput) => {
     if (!editingLead) return
     const response = await apiFetch(`/api/leads/${encodeURIComponent(editingLead.placeId)}/details`, {
-      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input),
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...input, version: editingLead.version ?? 0 }),
     })
     const payload = await response.json()
     if (!response.ok) throw new Error(payload.error || 'Não foi possível editar o lead')
@@ -1389,42 +1395,22 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
   }
 
   const handleDeleteLead = async (lead: LeadWithMeta) => {
-    const response = await apiFetch(`/api/leads/${encodeURIComponent(lead.placeId)}`, { method: 'DELETE' })
-    if (!response.ok) throw new Error('Não foi possível excluir o lead')
+    const response = await apiFetch(`/api/leads/${encodeURIComponent(lead.placeId)}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ version: lead.version ?? 0 }) })
+    if (!response.ok) throw new Error((await response.json()).error || 'Não foi possível arquivar o lead')
     setBaseLeads((current) => current.filter((item) => item.placeId !== lead.placeId))
   }
 
   const handleEditGroup = async (group: LeadGroup, title: string) => {
     if (!group.groupId) return
-    try {
-      const res = await apiFetch(`/api/leads/group/${group.groupId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ groupTitle: title }),
-      })
-      if (!res.ok) throw new Error('Erro ao editar grupo')
-      const [fresh, lists] = await Promise.all([fetchLeads(), fetchGroups()])
-      setBaseLeads(fresh)
-      setSavedGroups(lists)
-    } catch (err) {
-      console.error(err)
-      setError(err instanceof Error ? err.message : 'Erro ao editar grupo')
-    }
+    const current = await loadAccess()
+    await saveAccess(`/api/leads/group/${encodeURIComponent(group.groupId)}`, { revision: current.revision, groupTitle: title, expectedTitle: group.groupTitle })
+    await handleRefresh()
   }
-
   const handleDeleteGroup = async (group: LeadGroup) => {
     if (!group.groupId) return
-    try {
-      const res = await apiFetch(`/api/leads/group/${group.groupId}`, { method: 'DELETE' })
-      if (!res.ok) throw new Error('Erro ao excluir grupo')
-      const [fresh, lists] = await Promise.all([fetchLeads(), fetchGroups()])
-      setBaseLeads(fresh)
-      setSavedGroups(lists)
-      if (selectedGroup === group.groupId) setSelectedGroup(null)
-    } catch (err) {
-      console.error(err)
-      setError(err instanceof Error ? err.message : 'Erro ao excluir grupo')
-    }
+    const current = await loadAccess()
+    await saveAccess(`/api/admin/lists/${encodeURIComponent(group.groupId)}/archive`, { revision: current.revision, archived: true }, 'PATCH')
+    await handleRefresh()
   }
 
   return (
@@ -1435,7 +1421,7 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
       onThemeChange={onThemeChange}
       currentView={currentView}
       onNavigate={(view) => { setSelectedGroup(null); setCurrentView(view) }}
-      onSignOut={() => signOut(auth)}
+      onSignOut={() => logoutSession()}
     >
         <div className="prospect-content" key={currentView + permissionsKey}>
           {canRead && !canWrite && <Alert tone="info">Você tem acesso de somente leitura nesta tela.</Alert>}
@@ -1477,7 +1463,7 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
                   {currentView === 'kanban' && (
                     <div className="prospect-toolbar__field prospect-toolbar__field--group">
                       <Select
-                        label="Grupo"
+                        label="Lista"
                         id="kanban-group"
                         value={activeKanbanGroup}
                         onChange={(value: string) => setKanbanGroupFilter(value)}
@@ -1536,7 +1522,7 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
                     {currentView === 'kanban' && (
                       <div className="prospect-filters__field">
                         <Select
-                          label="Grupo"
+                          label="Lista"
                           id="kanban-group-mobile"
                           value={activeKanbanGroup}
                           onChange={(value: string) => setKanbanGroupFilter(value)}
@@ -1566,9 +1552,12 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
                   {error}
                 </Alert>
               </div>
+            ) : !groups.length && !access.isAdmin ? (
+              <EmptyState icon="users" title="Sua conta está pronta; falta liberar suas listas" description="Você já entrou pelo Hub. Peça ao administrador para selecionar as listas que você poderá acessar." />
             ) : (
               <>
                 <Dashboard
+                  administrator={access.isAdmin}
                   leads={leadsWithMeta}
                   columns={COLUMNS}
                   onOpenKanban={() => setCurrentView('kanban')}
@@ -1593,9 +1582,9 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
                       <Icon name="users" size={18} />
                     </span>
                     <div>
-                      <span>Grupo em exibição</span>
+                      <span>Lista em exibição</span>
                       <strong>{activeKanbanGroupInfo.groupTitle}</strong>
-                      <small>{kanbanFilteredLeads.length} {kanbanFilteredLeads.length === 1 ? 'lead neste grupo' : 'leads neste grupo'}</small>
+                      <small>{kanbanFilteredLeads.length} {kanbanFilteredLeads.length === 1 ? 'lead nesta lista' : 'leads nesta lista'}</small>
                     </div>
                   </div>
                   <Button
@@ -1623,8 +1612,8 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
                 <div className="prospect-empty">
                   <EmptyState
                     icon="search"
-                    title="Nenhum lead encontrado"
-                    description="Tente ajustar os filtros."
+                    title={!groups.length ? "Nenhuma lista liberada" : activeKanbanGroupInfo?.count ? "Nenhum resultado para os filtros" : "Esta lista ainda não tem leads"}
+                    description={!groups.length ? "O administrador precisa liberar uma lista para você." : activeKanbanGroupInfo?.count ? "Limpe a busca ou ajuste os filtros." : canWrite ? "Adicione o primeiro lead para começar." : "Os leads aparecerão aqui quando forem cadastrados."}
                   />
                 </div>
               ) : (
@@ -1690,7 +1679,7 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
 
               {addLeadOpen && addLeadGroup && (
                 <AddLeadModal
-                  groupTitle={addLeadGroup.groupTitle}
+                  groupId={addLeadGroup.groupId} groupTitle={addLeadGroup.groupTitle}
                   onClose={() => setAddLeadOpen(false)}
                   onCreate={handleCreateLead}
                 />
@@ -1713,20 +1702,23 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
                   <div className="prospect-group-header">
                     <Button type="button" variant="ghost" size="small" onClick={() => setSelectedGroup(null)} leadingIcon={<Icon name="arrow-left" size={16} />}>Voltar</Button>
                     <h3 className="prospect-group-header__title">{selectedGroupTitle}</h3>
+                    <Button variant="secondary" onClick={() => { setKanbanGroupFilter(selectedGroup || ''); setCurrentView('kanban') }}>Abrir no Kanban</Button>
                     <Button type="button" disabled={!canWrite} onClick={() => setAddLeadOpen(true)} leadingIcon={<Icon name="plus" size={16} />}>Novo lead</Button>
                   </div>
                   {selectedGroupLeads.length === 0 ? (
                     <div className="prospect-empty">
                       <EmptyState icon="users" title={groups.find((group) => group.groupId === selectedGroup)?.count ? 'Nenhum lead encontrado' : 'Sua lista está vazia'} description={groups.find((group) => group.groupId === selectedGroup)?.count ? 'Tente ajustar os filtros.' : 'Clique em Novo lead para começar a preencher esta lista.'} />
                     </div>
-                  ) : <LeadsTable readOnly={!canWrite} leads={selectedGroupLeads} onLeadClick={handleCardClick} onEditLead={setEditingLead} onDeleteLead={handleDeleteLead} />}
+                  ) : <LeadsTable canArchive={access.isAdmin} readOnly={!canWrite} leads={selectedGroupLeads} onLeadClick={handleCardClick} onEditLead={setEditingLead} onDeleteLead={handleDeleteLead} />}
                 </>
               ) : (
                 <LeadGroupsTable
-                  readOnly={!canWrite}
+                  currentUserUid={access.uid}
+                  readOnly={!access.isAdmin}
+                  onOpenKanban={(group) => { setKanbanGroupFilter(group.groupId || ''); setCurrentView('kanban') }}
                   onManageAccess={access.isAdmin ? setAccessGroup : undefined}
                   groups={groups}
-                  onGroupClick={(group: LeadGroup) => setSelectedGroup(group.groupId)}
+                  onGroupClick={(group: LeadGroup) => { setSelectedGroup(group.groupId); setKanbanGroupFilter(group.groupId || '') }}
                   onEditGroup={handleEditGroup}
                   onDeleteGroup={handleDeleteGroup}
                 />
@@ -1742,25 +1734,24 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
               )}
 
               {addLeadOpen && addLeadGroup && (
-                <AddLeadModal groupTitle={addLeadGroup.groupTitle} onClose={() => setAddLeadOpen(false)} onCreate={handleCreateLead} />
+                <AddLeadModal groupId={addLeadGroup.groupId} groupTitle={addLeadGroup.groupTitle} onClose={() => setAddLeadOpen(false)} onCreate={handleCreateLead} />
               )}
 
               {editingLead && (
                 <AddLeadModal key={editingLead.placeId} lead={editingLead} groupTitle={editingLead.groupTitle || selectedGroupTitle} onClose={() => setEditingLead(null)} onCreate={handleEditLead} />
               )}
 
-              <Button
+              {access.isAdmin && <Button
                 type="button"
                 className="leads-import-fab"
                 variant="primary"
                 size="large"
-                disabled={!canWrite}
                 aria-label="Criar ou importar lista"
                 onClick={() => setImportOpen(true)}
                 leadingIcon={<Icon name="plus" size={22} />}
               >
                 Nova lista
-              </Button>
+              </Button>}
 
               <ImportLeadsModal
                 open={importOpen}

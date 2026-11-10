@@ -1,559 +1,918 @@
 import 'dotenv/config'
 import dotenv from 'dotenv'
 import express from 'express'
-import cors from 'cors'
-import fs from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
-import { connectToDatabase } from './lib/db.js'
-import { Lead } from './lib/lead.js'
-import { atlasWaitlist } from './lib/atlas-waitlist.js'
-import { briefingLeads } from './lib/briefing-leads.js'
-import { resolveLeadAssignee } from './lib/lead-assignee.js'
-import { LeadGroup } from './lib/lead-group.js'
 import { randomUUID } from 'node:crypto'
-import { activeLeadFilter, findActiveLeads } from './lib/active-leads.js'
-import { getMessageDay } from '../shared/message-day.js'
-import { QnA } from './lib/qna.js'
+import { centralIdentity } from './lib/central-access.js'
+import { connectToDatabase } from './lib/db.js'
 import { User } from './lib/user.js'
-import { canViewGroup, parsePermissions, resolvePermissions } from '../shared/permissions.js'
-
-dotenv.config({ path: '.env.local' })
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
+import { Lead } from './lib/lead.js'
+import { LeadGroup } from './lib/lead-group.js'
+import { QnA } from './lib/qna.js'
+import { getMessageDay } from '../shared/message-day.js'
+import {
+  canViewGroup,
+  canOperate,
+  resolvePermissions,
+} from '../shared/permissions.js'
+import {
+  owner,
+  publicUser,
+  fail,
+  transaction,
+  snapshot,
+  audit,
+  Audit,
+  versionFilter,
+  editableLead,
+  eligibleAssignee,
+  validateMembers,
+  uids,
+} from './lib/access-control.js'
+dotenv.config({ path: '.env.local', quiet: true })
 const app = express()
-
-app.use(cors())
 app.use(express.json({ limit: '10mb' }))
 app.use('/api', (_req, res, next) => {
   res.setHeader('Cache-Control', 'no-store')
   next()
 })
-
-const ADMIN_EMAIL = 'mateus.desenv@gmail.com'
-
-const toDate = (timestamp) => {
-  const value = Number(timestamp)
-  if (!Number.isFinite(value)) return undefined
-  const date = new Date(value)
-  return Number.isNaN(date.getTime()) ? undefined : date
-}
-
-const getBearerToken = (request) => {
-  const authorization = request.get('authorization') ?? ''
-  return authorization.startsWith('Bearer ') ? authorization.slice(7) : null
-}
-
-const resolveFirebaseUser = async (idToken) => {
-  const apiKey = process.env.FIREBASE_WEB_API_KEY || process.env.VITE_FIREBASE_API_KEY
-  if (!apiKey) {
-    const error = new Error('Firebase não configurado no servidor')
-    error.statusCode = 500
-    throw error
-  }
-
-  const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encodeURIComponent(apiKey)}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ idToken }),
-  })
-  const payload = await response.json().catch(() => ({}))
-  const firebaseUser = payload.users?.[0]
-
-  if (!response.ok || !firebaseUser?.localId || !firebaseUser?.email) {
-    const error = new Error('Sessão inválida')
-    error.statusCode = 401
-    throw error
-  }
-
-  return firebaseUser
-}
-
-const requireAuthenticatedUser = async (request, response, next) => {
-  try {
-    const token = getBearerToken(request)
-    if (!token) {
-      return response.status(401).json({ error: 'Sessão não informada' })
-    }
-    request.firebaseUser = await resolveFirebaseUser(token)
-    return next()
-  } catch (error) {
-    const status = error?.statusCode ?? 401
-    return response.status(status).json({ error: status === 401 ? 'Sessão inválida' : 'Não foi possível validar a sessão' })
-  }
-}
-
-const isAdmin = (user) => user?.email?.trim().toLowerCase() === ADMIN_EMAIL && user.emailVerified === true
-
-const requireAdmin = (request, response, next) => {
-  if (!isAdmin(request.firebaseUser)) {
-    return response.status(403).json({ error: 'Acesso restrito ao administrador' })
-  }
-  return next()
-}
-
-const serializeUser = (user, administrator = user.email?.trim().toLowerCase() === ADMIN_EMAIL) => ({
-  isAdmin: administrator,
-  screenPermissions: resolvePermissions(user, administrator),
-  uid: user.firebaseUid,
-  email: user.email,
-  displayName: user.displayName,
-  photoURL: user.photoURL,
-  providerId: user.providerId,
-  registeredAt: user.registeredAt,
-  lastSignInAt: user.lastSignInAt,
-  createdAt: user.createdAt,
-  accessStatus: user.accessStatus ?? 'pending',
-  approvedAt: user.approvedAt,
-})
-
-app.put('/api/users/me', requireAuthenticatedUser, async (request, response) => {
-  try {
+const route = (fn) => (req, res, next) =>
+  Promise.resolve(fn(req, res)).catch(next)
+app.get('/api/health', (_req, res) =>
+  res.json({ ok: true, authentication: 'hub-only' }),
+)
+app.use('/api', (req, res, next) => {
+  ;(async () => {
+    const token = req.get('authorization')?.match(/^Bearer (.+)$/)?.[1]
+    if (!token?.startsWith('cx_')) fail(401, 'Entre pelo Hub Codexa.')
+    const identity = await centralIdentity(token, 'leads')
     await connectToDatabase()
-    const firebaseUser = request.firebaseUser
-    const providerId = firebaseUser.providerUserInfo?.[0]?.providerId ?? 'password'
-    const data = {
-      email: firebaseUser.email,
-      displayName: firebaseUser.displayName ?? '',
-      photoURL: firebaseUser.photoUrl ?? '',
-      providerId,
-      registeredAt: toDate(firebaseUser.createdAt),
-      lastSignInAt: toDate(firebaseUser.lastLoginAt),
+    const email = identity.email.trim().toLowerCase()
+    const matches = await User.find({
+      $or: [{ email }, { hubUid: identity.uid }],
+    }).limit(3)
+    if (
+      matches.length > 1 ||
+      (matches[0]?.hubUid && matches[0].hubUid !== identity.uid)
+    )
+      fail(
+        403,
+        'Conta ambígua. O administrador precisa revisar o vínculo com o Hub.',
+      )
+    const existing = matches[0]
+    req.firebaseUser = {
+      localId: existing?.firebaseUid || 'hub_' + identity.uid,
+      hubUid: identity.uid,
+      email,
+      displayName: identity.name || email,
     }
-    if (isAdmin(firebaseUser)) data.accessStatus = 'approved'
+    req.isAdmin = owner(req.firebaseUser)
+    req.crmUser = existing
+    // Authentication has no independent Firebase/password fallback.
+  })()
+    .then(() => next())
+    .catch(next)
+})
+app.put(
+  '/api/users/me',
+  route(async (req, res) => {
+    const identity = req.firebaseUser
+    const data = {
+      email: identity.email,
+      hubUid: identity.hubUid,
+      displayName: identity.displayName,
+      providerId: 'hub',
+    }
+    if (!req.crmUser || req.crmUser.accessStatus === 'pending' || req.isAdmin)
+      data.accessStatus = 'approved'
     const user = await User.findOneAndUpdate(
-      { firebaseUid: firebaseUser.localId },
-      { $set: data, $setOnInsert: { firebaseUid: firebaseUser.localId, screenPermissions: resolvePermissions({}) } },
+      { firebaseUid: identity.localId },
+      {
+        $set: data,
+        $setOnInsert: { role: 'reader', firebaseUid: identity.localId },
+      },
       { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true },
     )
-    return response.json(serializeUser(user, isAdmin(request.firebaseUser)))
-  } catch (error) {
-    console.error(error)
-    return response.status(500).json({ error: 'Não foi possível sincronizar o usuário' })
-  }
+    res.json(publicUser(user))
+  }),
+)
+app.get(
+  '/api/users/me',
+  route(async (req, res) => {
+    if (!req.crmUser)
+      fail(401, 'Reabra o Leads pelo Hub para sincronizar sua conta.')
+    res.json(publicUser(req.crmUser))
+  }),
+)
+app.use('/api', (req, res, next) => {
+  if (!req.isAdmin && req.crmUser?.accessStatus !== 'approved')
+    return res.status(403).json({
+      code: 'ACCESS_SUSPENDED',
+      error: 'Seu acesso ao Leads está suspenso. Fale com o administrador.',
+    })
+  next()
 })
-
-app.get('/api/users', requireAuthenticatedUser, requireAdmin, async (_request, response) => {
-  try {
-    await connectToDatabase()
-    const users = await User.find({}).sort({ displayName: 1, email: 1 })
-    return response.json(users.map(user => serializeUser(user)))
-  } catch (error) {
-    console.error(error)
-    return response.status(500).json({ error: 'Não foi possível buscar os usuários' })
-  }
-})
-
-app.patch('/api/users/:uid/approve', requireAuthenticatedUser, requireAdmin, async (request, response) => {
-  try {
-    await connectToDatabase()
-    const current = await User.findOne({ firebaseUid: request.params.uid })
-    if (!current) return response.status(404).json({ error: 'Usuário não encontrado' })
-    const approval = { accessStatus: 'approved', approvedAt: new Date(), approvedBy: request.firebaseUser.localId }
-    // Pending accounts created before permissions existed must not inherit legacy full access.
-    if (current.accessStatus !== 'approved' && current.screenPermissions == null) approval.screenPermissions = resolvePermissions({})
-    const user = await User.findOneAndUpdate(
-      { firebaseUid: request.params.uid },
-      { $set: approval },
-      { returnDocument: 'after' },
+const admin = (req, _res, next) => {
+  if (!req.isAdmin)
+    return next(
+      Object.assign(new Error('Acesso restrito ao administrador.'), {
+        statusCode: 403,
+      }),
     )
-    if (!user) return response.status(404).json({ error: 'Usuário não encontrado' })
-    return response.json(serializeUser(user))
-  } catch {
-    return response.status(500).json({ error: 'Não foi possível liberar o acesso' })
-  }
-})
-
-app.delete('/api/users/:uid', requireAuthenticatedUser, requireAdmin, async (request, response) => {
-  try {
-    await connectToDatabase()
-    const user = await User.findOne({ firebaseUid: request.params.uid })
-    if (!user) return response.status(404).json({ error: 'Usuário não encontrado' })
-    if (user.firebaseUid === request.firebaseUser.localId || user.email?.trim().toLowerCase() === ADMIN_EMAIL) {
-      return response.status(403).json({ error: 'A conta do administrador não pode ser excluída' })
+  next()
+}
+const revision = (req) => {
+  if (!Number.isSafeInteger(req.body?.revision) || req.body.revision < 0)
+    fail(428, 'Recarregue os acessos antes de salvar.')
+  return req.body.revision
+}
+app.get(
+  '/api/admin/access',
+  admin,
+  route(async (_req, res) => res.json(await snapshot())),
+)
+app.get(
+  '/api/users',
+  admin,
+  route(async (_req, res) => res.json((await snapshot()).users)),
+)
+app.get(
+  '/api/admin/history',
+  admin,
+  route(async (_req, res) =>
+    res.json(await Audit.find({}).sort({ createdAt: -1 }).limit(100).lean()),
+  ),
+)
+app.put(
+  '/api/admin/users/:uid/access',
+  admin,
+  route(async (req, res) => {
+    const {
+      role: profile,
+      accessStatus,
+      listIds,
+      responsibleListIds,
+    } = req.body ?? {}
+    if (
+      !['operator', 'reader'].includes(profile) ||
+      !['approved', 'suspended'].includes(accessStatus)
+    )
+      fail(400, 'Perfil ou situação inválida.')
+    const lists = uids(listIds),
+      responsibilities = uids(responsibleListIds)
+    if (
+      responsibilities.some((id) => !lists.includes(id)) ||
+      (responsibilities.length &&
+        (profile !== 'operator' || accessStatus !== 'approved'))
+    )
+      fail(
+        400,
+        'Responsáveis precisam de perfil Operador ativo e acesso às listas.',
+      )
+    await transaction(
+      req,
+      async (session) => {
+        const target = await User.findOne({
+          firebaseUid: req.params.uid,
+        }).session(session)
+        if (!target) fail(404, 'Pessoa não encontrada.')
+        if (owner(target)) fail(403, 'O administrador mantém acesso completo.')
+        if (
+          lists.some(
+            (id) =>
+              !req.savedGroups.some((g) => g.groupId === id && !g.archivedAt),
+          )
+        )
+          fail(400, 'Uma lista não está mais disponível.')
+        const before = {
+          user: publicUser(target),
+          lists: req.savedGroups
+            .filter((g) => g.viewerUids.includes(target.firebaseUid))
+            .map((g) => g.groupId),
+          responsibleLists: req.savedGroups
+            .filter((g) =>
+              g.assignees.some((a) => a.uid === target.firebaseUid),
+            )
+            .map((g) => g.groupId),
+        }
+        target.role = profile
+        target.accessStatus = accessStatus
+        target.screenPermissions = resolvePermissions(target)
+        await target.save({ session })
+        for (const group of req.savedGroups.filter((g) => !g.archivedAt)) {
+          group.viewerUids = group.viewerUids.filter(
+            (uid) => uid !== target.firebaseUid,
+          )
+          group.assignees = group.assignees.filter(
+            (a) => a.uid !== target.firebaseUid,
+          )
+          if (lists.includes(group.groupId))
+            group.viewerUids.push(target.firebaseUid)
+          if (responsibilities.includes(group.groupId))
+            group.assignees.push({
+              uid: target.firebaseUid,
+              name: target.displayName || target.email,
+            })
+          group.visibility = 'selected'
+          await group.save({ session })
+        }
+        await audit(session, req, 'user-access', target.firebaseUid, before, {
+          role: profile,
+          accessStatus,
+          listIds: lists,
+          responsibleListIds: responsibilities,
+        })
+      },
+      revision(req),
+    )
+    res.json(await snapshot())
+  }),
+)
+app.put(
+  '/api/admin/lists/:groupId/access',
+  admin,
+  route(async (req, res) => {
+    await transaction(
+      req,
+      async (session) => {
+        const group = req.savedGroups.find(
+          (g) => g.groupId === req.params.groupId && !g.archivedAt,
+        )
+        if (!group) fail(404, 'Lista não encontrada.')
+        const before = group.toObject()
+        Object.assign(
+          group,
+          await validateMembers(
+            req.body.viewerUids,
+            req.body.assigneeUids,
+            session,
+          ),
+        )
+        await group.save({ session })
+        await audit(
+          session,
+          req,
+          'list-access',
+          group.groupId,
+          before,
+          group.toObject(),
+        )
+      },
+      revision(req),
+    )
+    res.json(await snapshot())
+  }),
+)
+app.patch(
+  '/api/admin/lists/:groupId/archive',
+  admin,
+  route(async (req, res) => {
+    if (typeof req.body.archived !== 'boolean')
+      fail(400, 'Informe a ação de arquivamento.')
+    await transaction(
+      req,
+      async (session) => {
+        const group = req.savedGroups.find(
+          (g) => g.groupId === req.params.groupId,
+        )
+        if (!group) fail(404, 'Lista não encontrada.')
+        const before = group.toObject()
+        group.archivedAt = req.body.archived ? new Date() : null
+        await group.save({ session })
+        await audit(
+          session,
+          req,
+          req.body.archived ? 'archive-list' : 'restore-list',
+          group.groupId,
+          before,
+          group.toObject(),
+        )
+      },
+      revision(req),
+    )
+    res.json(await snapshot())
+  }),
+)
+app.get(
+  '/api/admin/recovery',
+  admin,
+  route(async (_req, res) => {
+    const groups = await LeadGroup.find({}).lean()
+    const records = await Lead.find({
+      $or: [
+        { groupId: { $nin: groups.map((g) => g.groupId) } },
+        { archivedAt: { $ne: null } },
+      ],
+    })
+      .select('placeId title groupId groupTitle version archivedAt')
+      .limit(1000)
+      .lean()
+    res.json({ records, limit: 1000 })
+  }),
+)
+app.post(
+  '/api/admin/recovery',
+  admin,
+  route(async (req, res) => {
+    const items = req.body.items
+    if (
+      !Array.isArray(items) ||
+      !items.length ||
+      items.length > 1000 ||
+      items.some((i) => !i || typeof i.placeId !== 'string')
+    )
+      fail(400, 'Selecione até 1.000 registros.')
+    await transaction(
+      req,
+      async (session) => {
+        const group = req.savedGroups.find(
+          (g) => g.groupId === req.body.groupId && !g.archivedAt,
+        )
+        if (!group) fail(400, 'Escolha uma lista ativa.')
+        for (const item of items) {
+          const lead = await Lead.findOne({ placeId: item.placeId }).session(
+            session,
+          )
+          if (
+            !lead ||
+            (!lead.archivedAt &&
+              req.savedGroups.some((g) => g.groupId === lead.groupId))
+          )
+            fail(
+              409,
+              'Um registro já está vinculado. Recarregue a recuperação.',
+            )
+          const updated = await Lead.findOneAndUpdate(
+            { placeId: item.placeId, ...versionFilter(item.version) },
+            {
+              $set: {
+                groupId: group.groupId,
+                groupTitle: group.groupTitle,
+                archivedAt: null,
+              },
+              $inc: { version: 1 },
+            },
+            { session, returnDocument: 'after' },
+          )
+          if (!updated)
+            fail(409, 'Um registro mudou. Nenhum registro foi recuperado.')
+        }
+        await audit(session, req, 'recover-leads', group.groupId, null, {
+          ids: items.map((i) => i.placeId),
+        })
+      },
+      revision(req),
+    )
+    res.json({ recovered: items.length })
+  }),
+)
+// Old permission/delete endpoints cannot bypass the versioned administration workflow.
+app.all(
+  [
+    '/api/users/:uid/permissions',
+    '/api/users/:uid/approve',
+    '/api/users/:uid',
+    '/api/lead-groups/:groupId/access',
+    '/api/lead-groups/:groupId/assignees',
+  ],
+  admin,
+  (_req, res) =>
+    res.status(410).json({
+      error:
+        'Use Acessos do Leads para revisar e salvar a configuração completa.',
+    }),
+)
+app.all(['/api/atlas/early-access', '/api/briefing/leads'], (_req, res) =>
+  res.status(410).json({
+    error:
+      'Esta integração não faz mais parte do Leads. Abra o aplicativo correspondente pelo Hub.',
+  }),
+)
+app.use('/api', (req, _res, next) => {
+  ;(async () => {
+    req.savedGroups = await LeadGroup.find({})
+    const visible = req.savedGroups
+      .filter(
+        (g) =>
+          !g.archivedAt &&
+          canViewGroup(g, req.firebaseUser.localId, req.isAdmin),
+      )
+      .map((g) => g.groupId)
+    req.leadFilter = { groupId: { $in: visible }, archivedAt: null }
+    const permissions = resolvePermissions(req.crmUser, req.isAdmin)
+    const p = req.path.toLowerCase().replace(/\/+$/, '')
+    if (/^\/(leads|lead-groups|lead-assignees)(\/|$)/.test(p)) {
+      if (!['dashboard', 'table', 'kanban'].some((id) => permissions[id].read))
+        fail(403, 'Nenhuma tela comercial liberada.')
+      if (
+        !['GET', 'HEAD'].includes(req.method) &&
+        !canOperate(req.crmUser, req.isAdmin)
+      )
+        fail(403, 'Seu perfil permite somente consulta.')
     }
-    await User.deleteOne({ firebaseUid: user.firebaseUid, email: { $ne: ADMIN_EMAIL } })
-    return response.status(204).end()
-  } catch {
-    return response.status(500).json({ error: 'Não foi possível excluir o usuário' })
-  }
+  })()
+    .then(() => next())
+    .catch(next)
 })
-
-// Only the owner can grant permissions or change a list's audience.
-app.patch('/api/users/:uid/permissions', requireAuthenticatedUser, requireAdmin, async (req, res) => {
-  const permissions = parsePermissions(req.body?.screenPermissions)
-  if (!permissions) return res.status(400).json({ error: 'Permissões inválidas. Escrita exige leitura.' })
-  try {
-    await connectToDatabase()
-    const target = await User.findOne({ firebaseUid: req.params.uid })
-    if (!target) return res.status(404).json({ error: 'Usuário não encontrado' })
-    if (target.email?.trim().toLowerCase() === ADMIN_EMAIL) return res.status(403).json({ error: 'O administrador mantém acesso completo' })
-    const user = await User.findOneAndUpdate({ firebaseUid: req.params.uid }, { $set: { screenPermissions: permissions } }, { returnDocument: 'after', runValidators: true })
-    return res.json(serializeUser(user))
-  } catch {
-    return res.status(503).json({ error: 'Não foi possível salvar as permissões' })
-  }
-})
-
-app.patch('/api/lead-groups/:groupId/access', requireAuthenticatedUser, requireAdmin, async (req, res) => {
-  const { visibility, viewerUids } = req.body ?? {}
-  if (!['all', 'selected'].includes(visibility) || !Array.isArray(viewerUids) || viewerUids.length > 500
-    || viewerUids.some(uid => typeof uid !== 'string' || !uid.trim() || uid.length > 128)) {
-    return res.status(400).json({ error: 'Selecione quem pode visualizar a lista' })
-  }
-  const uids = visibility === 'selected' ? [...new Set(viewerUids)] : []
-  try {
-    await connectToDatabase()
-    if (uids.length) {
-      const users = await User.find({ firebaseUid: { $in: uids }, accessStatus: 'approved' })
-      if (uids.some(uid => !users.some(user => user.firebaseUid === uid))) return res.status(400).json({ error: 'Selecione somente usuários com acesso liberado' })
-    }
-    const group = await LeadGroup.findOne({ groupId: req.params.groupId }) || await Lead.findOne({ ...activeLeadFilter, groupId: req.params.groupId })
-    if (!group) return res.status(404).json({ error: 'Lista não encontrada' })
-    await LeadGroup.updateOne({ groupId: req.params.groupId }, { $set: { groupTitle: group.groupTitle || 'Grupo', visibility, viewerUids: uids } }, { upsert: true, runValidators: true })
-    return res.json({ groupId: req.params.groupId, visibility, viewerUids: uids })
-  } catch {
-    return res.status(503).json({ error: 'Não foi possível salvar o acesso à lista' })
-  }
-})
-
-app.get('/api/health', (_request, response) => response.json({ ok: true }))
-
-app.use('/api', requireAuthenticatedUser, async (request, response, next) => {
-  try {
-    request.isAdmin = isAdmin(request.firebaseUser)
-    if (request.isAdmin) return next()
-    await connectToDatabase()
-    const user = await User.findOne({ firebaseUid: request.firebaseUser.localId })
-    if (user?.accessStatus !== 'approved') {
-      return response.status(403).json({ code: 'ACCESS_PENDING', error: 'Aguardando liberação do administrador' })
-    }
-    request.crmUser = user
-    return next()
-  } catch {
-    return response.status(503).json({ error: 'Não foi possível verificar a liberação' })
-  }
-})
-
-app.use('/api', async (req, res, next) => {
-  req.leadFilter = activeLeadFilter
-  if (req.isAdmin) return next()
-  // Match Express's case-insensitive, non-strict routes without changing identifier case.
-  const routePath = req.path.replace(/\/+$/, '')
-  const route = routePath.toLowerCase()
-  const leadsRoute = /^\/(leads(?:\/|$)|lead-groups(?:\/|$)|lead-assignees$)/.test(route)
-  const read = ['GET', 'HEAD'].includes(req.method)
-  let screen
-  if (leadsRoute) {
-    screen = req.get('X-CRM-Screen') || 'table'
-    if (!['dashboard', 'kanban', 'table'].includes(screen)) return res.status(400).json({ error: 'Tela inválida' })
-    if (!read && (route.startsWith('/lead-groups') || route.startsWith('/leads/group/') || route === '/leads/import')) screen = 'table'
-  } else if (route.startsWith('/qna')) screen = 'help'
-  else if (route === '/atlas/early-access') screen = 'atlas-early-access'
-  else if (route === '/briefing/leads') screen = 'briefing-leads'
-  else return next()
-  const permission = resolvePermissions(req.crmUser)[screen]
-  if (!permission?.read || (!read && !permission.write)) return res.status(403).json({ code: 'SCREEN_FORBIDDEN', error: 'Você não tem permissão para esta ação nesta tela' })
-  if (!leadsRoute) return next()
-  try {
-    await connectToDatabase()
-    const savedGroups = await LeadGroup.find({})
-    req.savedGroups = savedGroups
-    const hidden = savedGroups.filter(group => !canViewGroup(group, req.firebaseUser.localId)).map(group => group.groupId)
-    req.leadFilter = { groupId: { ...activeLeadFilter.groupId, $nin: hidden } }
-    const groupId = route.startsWith('/leads/group/') ? decodeURIComponent(routePath.slice('/leads/group/'.length)) : req.method === 'POST' && route === '/leads' ? req.body?.groupId : null
-    if (typeof groupId === 'string' && hidden.includes(groupId)) return res.status(404).json({ error: 'Lista não encontrada' })
-    // Authorize the entire batch/import before the first mutation.
-    if (!read && route === '/leads/batch' && Array.isArray(req.body)) {
-      for (const item of req.body) {
-        if (!item || typeof item.placeId !== 'string') continue
-        const lead = await Lead.findOne({ placeId: item.placeId })
-        if (lead && (!lead.groupId?.trim() || hidden.includes(lead.groupId))) return res.status(404).json({ error: 'Lead não encontrado' })
-      }
-    }
-    if (!read && route === '/leads/import') {
-      const items = Array.isArray(req.body) ? req.body : req.body?.leads
-      for (const item of Array.isArray(items) ? items : []) {
-        if (!item || typeof item.placeId !== 'string') continue
-        const lead = await Lead.findOne({ placeId: item.placeId })
-        if (lead && (!lead.groupId?.trim() || hidden.includes(lead.groupId))) return res.status(404).json({ error: 'Lead não encontrado' })
-      }
-    }
-    return next()
-  } catch {
-    return res.status(503).json({ error: 'Não foi possível verificar o acesso às listas' })
-  }
-})
-
-// Protected by authentication and account approval middleware above.
-app.get('/api/atlas/early-access', async (req, res) => {
-  const page = Number(req.query.page ?? 1)
-  if (!Number.isSafeInteger(page) || page < 1 || (req.query.q !== undefined && typeof req.query.q !== 'string')) {
-    return res.status(400).json({ error: 'Parâmetros de busca inválidos' })
-  }
-  const search = (req.query.q ?? '').trim()
-  if (search.length > 200) return res.status(400).json({ error: 'A busca deve ter até 200 caracteres' })
-  try {
-    return res.json(await atlasWaitlist.list({ search, page }))
-  } catch {
-    return res.status(503).json({ error: 'Não foi possível carregar os cadastros do Atlas' })
-  }
-})
-
-app.get('/api/briefing/leads', async (req, res) => {
-  const page = Number(req.query.page ?? 1)
-  if (!Number.isSafeInteger(page) || page < 1 || (req.query.q !== undefined && typeof req.query.q !== 'string')) {
-    return res.status(400).json({ error: 'Parâmetros de busca inválidos' })
-  }
-  const search = (req.query.q ?? '').trim()
-  if (search.length > 200) return res.status(400).json({ error: 'A busca deve ter até 200 caracteres' })
-  try {
-    return res.json(await briefingLeads.list({ search, page }))
-  } catch {
-    return res.status(503).json({ error: 'Não foi possível carregar os briefings' })
-  }
-})
-
-app.get('/api/lead-assignees', async (_req, res) => {
-  try {
-    await connectToDatabase()
+app.get(
+  '/api/lead-groups',
+  route(async (req, res) => {
+    const counts = await Lead.aggregate([
+      { $match: req.leadFilter },
+      { $group: { _id: '$groupId', count: { $sum: 1 } } },
+    ])
+    res.json(
+      req.savedGroups
+        .filter((g) => req.leadFilter.groupId.$in.includes(g.groupId))
+        .map((g) => ({
+          groupId: g.groupId,
+          groupTitle: g.groupTitle,
+          count: counts.find((c) => c._id === g.groupId)?.count || 0,
+          assignees: g.assignees,
+          ...(req.isAdmin && {
+            visibility: g.visibility,
+            viewerUids: g.viewerUids,
+          }),
+        })),
+    )
+  }),
+)
+app.get(
+  '/api/leads',
+  route(async (req, res) => res.json(await Lead.find(req.leadFilter))),
+)
+app.get(
+  '/api/leads/export',
+  admin,
+  route(async (req, res) => {
+    res.setHeader(
+      'Content-Disposition',
+      'attachment; filename="codexa-leads.json"',
+    )
+    res.json(await Lead.find(req.leadFilter))
+  }),
+)
+app.get(
+  '/api/lead-assignees',
+  route(async (req, res) => {
+    const group = req.savedGroups.find(
+      (g) =>
+        g.groupId === req.query.groupId &&
+        canViewGroup(g, req.firebaseUser.localId, req.isAdmin) &&
+        !g.archivedAt,
+    )
+    if (!group) return res.json([])
     const users = await User.find({ accessStatus: 'approved' })
-    res.json(users.map((user) => ({ uid: user.firebaseUid, name: user.displayName?.trim() || user.email }))
-      .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')))
-  } catch {
-    res.status(500).json({ error: 'Não foi possível carregar os responsáveis' })
-  }
-})
-
-app.get('/api/lead-groups', async (req, res) => {
-  try {
-    await connectToDatabase()
-    const [saved, leads] = await Promise.all([req.savedGroups ?? LeadGroup.find({}), findActiveLeads(req.leadFilter)])
-    const groups = new Map(saved.filter(group => canViewGroup(group, req.firebaseUser.localId, req.isAdmin)).map((group) => [group.groupId, {
-      groupId: group.groupId, groupTitle: group.groupTitle, count: 0,
-      ...(req.isAdmin && { visibility: group.visibility ?? 'all', viewerUids: group.viewerUids ?? [] }),
-    }]))
-    for (const lead of leads) {
-      const group = groups.get(lead.groupId)
-      if (group) group.count++
-      else groups.set(lead.groupId, { groupId: lead.groupId, groupTitle: lead.groupTitle || 'Grupo', count: 1 })
-    }
-    res.json([...groups.values()].sort((a, b) => a.groupTitle.localeCompare(b.groupTitle, 'pt-BR')))
-  } catch {
-    res.status(500).json({ error: 'Não foi possível carregar as listas' })
-  }
-})
-
-app.post('/api/lead-groups', async (req, res) => {
-  const title = req.body?.groupTitle
-  if (typeof title !== 'string' || !title.trim() || title.trim().length > 120) {
-    return res.status(400).json({ error: 'Informe um nome de até 120 caracteres para a lista' })
-  }
-  try {
-    await connectToDatabase()
-    const group = await LeadGroup.create({ groupId: `group-${randomUUID()}`, groupTitle: title.trim(), visibility: 'selected', viewerUids: [req.firebaseUser.localId] })
-    res.status(201).json({ groupId: group.groupId, groupTitle: group.groupTitle, count: 0, ...(req.isAdmin && { visibility: group.visibility, viewerUids: group.viewerUids }) })
-  } catch {
-    res.status(500).json({ error: 'Não foi possível criar a lista' })
-  }
-})
-
-app.get('/api/leads', async (req, res) => {
-  try {
-    await connectToDatabase()
-    const leads = await findActiveLeads(req.leadFilter)
-    res.json(leads)
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: 'Erro ao buscar leads' })
-  }
-})
-
-app.post('/api/leads', async (req, res) => {
-  try {
-    await connectToDatabase()
-    const groupId = req.body?.groupId
-    if (typeof groupId !== 'string' || !groupId.trim()) {
-      return res.status(400).json({ error: 'Selecione um grupo para cadastrar o lead' })
-    }
-    const group = await LeadGroup.findOne({ groupId }) || await Lead.findOne({ groupId })
-    if (!group) return res.status(404).json({ error: 'Grupo não encontrado' })
-    const assignee = await resolveLeadAssignee(req.body.assigneeUid ?? null)
-    const lead = await Lead.create({ ...req.body, groupId, groupTitle: group.groupTitle, ...assignee })
-    res.status(201).json(lead)
-  } catch (err) {
-    console.error(err)
-    res.status(400).json({ error: err instanceof Error ? err.message : 'Erro ao criar lead' })
-  }
-})
-
-app.post('/api/leads/import', async (req, res) => {
-  try {
-    await connectToDatabase()
-    const payload = req.body ?? {}
-    const leads = Array.isArray(payload) ? payload : Array.isArray(payload.leads) ? payload.leads : []
-    const title = typeof payload.title === 'string' && payload.title.trim()
-      ? payload.title.trim()
-      : `Importação em ${new Date().toLocaleDateString('pt-BR')}`
-    const groupId = `group-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
-
-    await LeadGroup.create({ groupId, groupTitle: title, visibility: 'selected', viewerUids: [req.firebaseUser.localId] })
-    const result = []
-
-    for (const item of leads) {
-      if (!item || typeof item.title !== 'string' || typeof item.placeId !== 'string' || !item.title.trim() || !item.placeId.trim()) continue
-      const update = { ...item, groupId, groupTitle: title }
-      if (!item.kanbanState) delete update.kanbanState
-      const lead = await Lead.findOneAndUpdate(
-        { placeId: item.placeId },
-        { $set: update },
-        { upsert: true, returnDocument: 'after' },
+    res.json(
+      users
+        .filter(
+          (u) =>
+            canOperate(u, owner(u)) &&
+            canViewGroup(group, u.firebaseUid, owner(u)),
+        )
+        .map((u) => ({
+          uid: u.firebaseUid,
+          name: `${u.displayName || u.email} (${u.email})`,
+        })),
+    )
+  }),
+)
+app.post(
+  '/api/lead-groups',
+  admin,
+  route(async (req, res) => {
+    const title = req.body.groupTitle?.trim()
+    if (!title || title.length > 120)
+      fail(400, 'Informe um nome de até 120 caracteres.')
+    const group = await transaction(req, async (session) => {
+      const [group] = await LeadGroup.create(
+        [
+          {
+            groupId: 'group-' + randomUUID(),
+            groupTitle: title,
+            visibility: 'selected',
+            viewerUids: [],
+            assignees: [],
+          },
+        ],
+        { session },
       )
-      result.push(lead)
-    }
-
-    res.json({ imported: result.length, groupId, groupTitle: title, leads: result })
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: err instanceof Error ? err.message : 'Erro ao importar leads' })
-  }
-})
-
-app.get('/api/leads/export', async (req, res) => {
-  try {
-    await connectToDatabase()
-    const leads = await findActiveLeads(req.leadFilter)
-    const fileName = `codexa-leads-${new Date().toISOString().slice(0, 10)}.json`
-    res.setHeader('Content-Type', 'application/json')
-    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`)
-    res.json(leads)
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: 'Erro ao exportar leads' })
-  }
-})
-
-app.post('/api/leads/seed', requireAdmin, async (_req, res) => {
-  try {
-    await connectToDatabase()
-    const seedPath = path.join(process.cwd(), 'scripts', 'data', 'leads.json')
-    const seedData = JSON.parse(fs.readFileSync(seedPath, 'utf8'))
-
-    const result = []
-    const groupId = 'seed'
-    const groupTitle = 'Leads iniciais'
-    for (const item of seedData) {
-      if (!item || typeof item.title !== 'string' || typeof item.placeId !== 'string' || !item.title.trim() || !item.placeId.trim()) continue
-      const update = { ...item, groupId, groupTitle }
-      if (!item.kanbanState) delete update.kanbanState
-      const lead = await Lead.findOneAndUpdate(
-        { placeId: item.placeId },
-        { $set: update },
-        { upsert: true, returnDocument: 'after' },
+      await audit(session, req, 'create-list', group.groupId, null, { title })
+      return group
+    })
+    res.status(201).json({
+      groupId: group.groupId,
+      groupTitle: title,
+      count: 0,
+      viewerUids: [],
+      assignees: [],
+      visibility: 'selected',
+    })
+  }),
+)
+const columns = [
+  'open',
+  'em_contato',
+  'mensagem_enviada',
+  'contato',
+  'conversa',
+  'followup',
+  'proposta',
+  'negociacao',
+  'fechado',
+  'perdido',
+]
+const stateKeys = [
+  'column',
+  'nextAction',
+  'dueDate',
+  'lostReason',
+  'proposalValue',
+  'proposalReturnDate',
+  'collectedData',
+  'contactResearch',
+  'interest',
+  'budget',
+  'returnDate',
+  'order',
+]
+const cleanState = (value) => {
+  if (
+    !value ||
+    typeof value !== 'object' ||
+    Array.isArray(value) ||
+    Object.keys(value).some((k) => !stateKeys.includes(k)) ||
+    (value.column !== undefined && !columns.includes(value.column))
+  )
+    fail(400, 'Acompanhamento inválido.')
+  return Object.fromEntries(
+    Object.entries(value).map(([k, v]) => ['kanbanState.' + k, v]),
+  )
+}
+app.post(
+  '/api/leads',
+  route(async (req, res) => {
+    const result = await transaction(req, async (session) => {
+      if (!canOperate(req.crmUser, req.isAdmin))
+        fail(403, 'Seu perfil permite somente consulta.')
+      const group = req.savedGroups.find(
+        (g) =>
+          g.groupId === req.body.groupId &&
+          req.leadFilter.groupId.$in.includes(g.groupId),
       )
-      result.push(lead)
+      if (!group) fail(404, 'Lista não encontrada.')
+      const data = await cleanLead(req.body)
+      const [lead] = await Lead.create(
+        [
+          {
+            ...data,
+            groupId: group.groupId,
+            groupTitle: group.groupTitle,
+            ...(await eligibleAssignee(
+              req,
+              req.body.assigneeUid,
+              group.groupId,
+              session,
+            )),
+          },
+        ],
+        { session },
+      )
+      return lead
+    })
+    res.status(201).json(result)
+  }),
+)
+async function cleanLead(item) {
+  if (
+    !item ||
+    typeof item.title !== 'string' ||
+    !item.title.trim() ||
+    typeof item.placeId !== 'string' ||
+    !item.placeId.trim() ||
+    item.placeId.length > 500
+  )
+    fail(400, 'Nome e identificador do lead são obrigatórios.')
+  const fields = [
+    'title',
+    'subTitle',
+    'categoryName',
+    'address',
+    'neighborhood',
+    'street',
+    'city',
+    'state',
+    'postalCode',
+    'website',
+    'phone',
+    'phoneUnformatted',
+    'totalScore',
+    'reviewsCount',
+    'permanentlyClosed',
+    'temporarilyClosed',
+    'categories',
+    'placeId',
+  ]
+  const data = Object.fromEntries(
+    fields.filter((k) => item[k] !== undefined).map((k) => [k, item[k]]),
+  )
+  if (item.kanbanState) {
+    cleanState(item.kanbanState)
+    data.kanbanState = item.kanbanState
+  }
+  try {
+    await new Lead(data).validate()
+  } catch {
+    fail(400, 'Dados do lead inválidos. Confira os campos antes de importar.')
+  }
+  return data
+}
+async function importPreview(body, session) {
+  if (!Array.isArray(body.leads) || body.leads.length > 5000)
+    fail(400, 'Envie até 5.000 leads.')
+  const valid = [],
+    invalid = [],
+    seen = new Set(),
+    repeated = []
+  for (const [index, item] of body.leads.entries()) {
+    try {
+      const data = await cleanLead(item)
+      if (seen.has(data.placeId)) repeated.push(index + 1)
+      else {
+        valid.push(data)
+        seen.add(data.placeId)
+      }
+    } catch {
+      invalid.push(index + 1)
     }
-
-    res.json({ seeded: result.length })
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: err instanceof Error ? err.message : 'Erro ao popular leads' })
   }
-})
-
-app.put('/api/leads/batch', async (req, res) => {
-  try {
-    await connectToDatabase()
-    const items = Array.isArray(req.body) ? req.body : []
-    if (!items.length) return res.json({ updated: 0, leads: await findActiveLeads(req.leadFilter) })
-
-    const bulkOps = items
-      .filter((item) => item && typeof item.placeId === 'string' && item.kanbanState)
-      .map((item) => ({
-        updateOne: {
-          filter: { ...req.leadFilter, placeId: item.placeId },
-          update: { $set: { kanbanState: item.kanbanState } },
-        },
-      }))
-
-    if (!bulkOps.length) return res.status(400).json({ error: 'Nenhuma atualização válida' })
-
-    const result = await Lead.bulkWrite(bulkOps)
-    res.json({ updated: result.modifiedCount, leads: await findActiveLeads(req.leadFilter) })
-  } catch (err) {
-    console.error(err)
-    res.status(400).json({ error: err instanceof Error ? err.message : 'Erro ao atualizar leads' })
+  const existing = await Lead.find({
+    placeId: { $in: valid.map((i) => i.placeId) },
+  })
+    .select('placeId')
+    .session(session || null)
+    .lean()
+  const existingIds = new Set(existing.map((i) => i.placeId))
+  return {
+    records: valid.filter((i) => !existingIds.has(i.placeId)),
+    summary: {
+      total: body.leads.length,
+      new: valid.length - existing.length,
+      existing: existing.length,
+      invalid,
+      repeated,
+    },
   }
-})
-
-app.patch('/api/leads/:placeId/message-sent', async (req, res) => {
-  if (typeof req.body?.sent !== 'boolean') {
-    return res.status(400).json({ error: 'Informe se a mensagem foi enviada' })
-  }
-  try {
-    await connectToDatabase()
-    const lead = await Lead.findOneAndUpdate(
-      { ...req.leadFilter, placeId: req.params.placeId },
-      { $set: { messageSentOn: req.body.sent ? getMessageDay() : null } },
-      { returnDocument: 'after' },
+}
+app.post(
+  '/api/leads/import/preview',
+  admin,
+  route(async (req, res) => res.json((await importPreview(req.body)).summary)),
+)
+app.post(
+  '/api/leads/import',
+  admin,
+  route(async (req, res) => {
+    const title = req.body.title?.trim()
+    if (!title || title.length > 120 || req.body.confirmed !== true)
+      fail(400, 'Confira a prévia e confirme a importação.')
+    const result = await transaction(req, async (session) => {
+      const { records, summary } = await importPreview(req.body, session)
+      if (summary.invalid.length || summary.repeated.length)
+        fail(400, 'Corrija as linhas inválidas ou repetidas antes de importar.')
+      if (!records.length) return { imported: 0, summary }
+      const groupId = 'group-' + randomUUID()
+      await LeadGroup.create(
+        [
+          {
+            groupId,
+            groupTitle: title,
+            visibility: 'selected',
+            viewerUids: [],
+          },
+        ],
+        { session },
+      )
+      await Lead.insertMany(
+        records.map((r) => ({ ...r, groupId, groupTitle: title })),
+        { session },
+      )
+      await audit(session, req, 'import', groupId, null, summary)
+      return { imported: records.length, groupId, groupTitle: title, summary }
+    })
+    res.json(result)
+  }),
+)
+app.put(
+  '/api/leads/batch',
+  route(async (req, res) => {
+    if (
+      !Array.isArray(req.body) ||
+      req.body.length > 2000 ||
+      req.body.some(
+        (i) => !i || typeof i.placeId !== 'string' || !i.placeId.trim(),
+      ) ||
+      new Set(req.body.map((i) => i.placeId)).size !== req.body.length
     )
-    if (!lead) return res.status(404).json({ error: 'Lead não encontrado' })
-    res.json(lead)
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: 'Erro ao marcar mensagem enviada' })
-  }
-})
-
-app.patch('/api/leads/:placeId/details', async (req, res) => {
-  const input = req.body ?? {}
-  const fields = ['title', 'categoryName', 'phone', 'website', 'address', 'column', 'collectedData']
-  const columns = ['open', 'em_contato', 'mensagem_enviada', 'contato', 'conversa', 'followup', 'proposta', 'negociacao', 'fechado', 'perdido']
-  if (fields.some((key) => typeof input[key] !== 'string') || !input.title.trim() || !columns.includes(input.column)) {
-    return res.status(400).json({ error: 'Informe um nome e os dados válidos do lead' })
-  }
-  try {
-    await connectToDatabase()
-    const phone = input.phone.trim() || null
-    const website = input.website.trim()
-    const lead = await Lead.findOneAndUpdate(
-      { ...req.leadFilter, placeId: req.params.placeId },
-      { $set: {
-        ...await resolveLeadAssignee(input.assigneeUid),
-        title: input.title.trim(), categoryName: input.categoryName.trim() || null,
-        phone, phoneUnformatted: phone ? phone.replace(/\D/g, '') || phone : null,
-        website: website ? (/^https?:\/\//i.test(website) ? website : `https://${website}`) : null,
-        address: input.address.trim() || null,
-        'kanbanState.column': input.column,
-        'kanbanState.collectedData': input.collectedData.trim() || null,
-      } },
-      { returnDocument: 'after', runValidators: true },
+      fail(400, 'Lote inválido.')
+    await transaction(req, async (session) => {
+      for (const item of req.body) {
+        await editableLead(req, item.placeId, session, item.version)
+        cleanState(item.kanbanState)
+      }
+      for (const item of req.body)
+        await Lead.updateOne(
+          {
+            ...req.leadFilter,
+            placeId: item.placeId,
+            ...versionFilter(item.version),
+          },
+          { $set: cleanState(item.kanbanState), $inc: { version: 1 } },
+          { session, runValidators: true },
+        )
+    })
+    res.json({
+      updated: req.body.length,
+      leads: await Lead.find(req.leadFilter),
+    })
+  }),
+)
+app.patch(
+  '/api/leads/:placeId/message-sent',
+  route(async (req, res) => {
+    if (typeof req.body.sent !== 'boolean')
+      fail(400, 'Informe a marcação da mensagem.')
+    res.json(
+      await transaction(req, async (session) => {
+        await editableLead(req, req.params.placeId, session, req.body.version)
+        return Lead.findOneAndUpdate(
+          { placeId: req.params.placeId, ...versionFilter(req.body.version) },
+          {
+            $set: { messageSentOn: req.body.sent ? getMessageDay() : null },
+            $inc: { version: 1 },
+          },
+          { session, returnDocument: 'after' },
+        )
+      }),
     )
-    if (!lead) return res.status(404).json({ error: 'Lead não encontrado' })
-    res.json(lead)
-  } catch (error) {
-    res.status(error.statusCode || 500).json({ error: error.statusCode === 400 ? error.message : 'Não foi possível editar o lead' })
-  }
-})
-
-app.put('/api/leads/:placeId', async (req, res) => {
-  try {
-    await connectToDatabase()
-    const lead = await Lead.findOneAndUpdate(
-      { ...req.leadFilter, placeId: req.params.placeId },
-      { $set: { kanbanState: req.body.kanbanState, ...await resolveLeadAssignee(req.body.assigneeUid) } },
-      { returnDocument: 'after' },
+  }),
+)
+app.patch(
+  '/api/leads/:placeId/details',
+  route(async (req, res) => {
+    const input = req.body
+    const fields = [
+      'title',
+      'categoryName',
+      'phone',
+      'website',
+      'address',
+      'column',
+      'collectedData',
+    ]
+    if (
+      fields.some((k) => typeof input[k] !== 'string') ||
+      !input.title.trim() ||
+      !columns.includes(input.column)
     )
-    if (!lead) return res.status(404).json({ error: 'Lead não encontrado' })
-    res.json(lead)
-  } catch (err) {
-    console.error(err)
-    res.status(400).json({ error: err instanceof Error ? err.message : 'Erro ao atualizar lead' })
-  }
-})
-
+      fail(400, 'Informe os dados válidos do lead.')
+    res.json(
+      await transaction(req, async (session) => {
+        const lead = await editableLead(
+          req,
+          req.params.placeId,
+          session,
+          input.version,
+        )
+        const phone = input.phone.trim() || null,
+          website = input.website.trim()
+        return Lead.findOneAndUpdate(
+          { placeId: lead.placeId, ...versionFilter(input.version) },
+          {
+            $set: {
+              ...(await eligibleAssignee(
+                req,
+                input.assigneeUid,
+                lead.groupId,
+                session,
+              )),
+              title: input.title.trim(),
+              categoryName: input.categoryName.trim() || null,
+              phone,
+              phoneUnformatted: phone?.replace(/\D/g, '') || null,
+              website: website
+                ? /^https?:\/\//i.test(website)
+                  ? website
+                  : 'https://' + website
+                : null,
+              address: input.address.trim() || null,
+              'kanbanState.column': input.column,
+              'kanbanState.collectedData': input.collectedData.trim(),
+            },
+            $inc: { version: 1 },
+          },
+          { session, returnDocument: 'after', runValidators: true },
+        )
+      }),
+    )
+  }),
+)
+app.put(
+  '/api/leads/group/:groupId',
+  admin,
+  route(async (req, res) => {
+    const title = req.body.groupTitle?.trim()
+    if (!title || title.length > 120)
+      fail(400, 'Informe um nome de até 120 caracteres.')
+    await transaction(
+      req,
+      async (session) => {
+        const group = req.savedGroups.find(
+          (g) => g.groupId === req.params.groupId && !g.archivedAt,
+        )
+        if (!group) fail(404, 'Lista não encontrada.')
+        if (req.body.expectedTitle !== group.groupTitle)
+          fail(409, 'O nome da lista mudou. Reabra a edição para revisar.')
+        const before = group.groupTitle
+        group.groupTitle = title
+        await group.save({ session })
+        await Lead.updateMany(
+          { groupId: group.groupId },
+          { $set: { groupTitle: title }, $inc: { version: 1 } },
+          { session },
+        )
+        await audit(session, req, 'rename-list', group.groupId, before, title)
+      },
+      revision(req),
+    )
+    res.json({ updated: true })
+  }),
+)
+app.delete('/api/leads/group/:groupId', admin, (_req, res) =>
+  res.status(410).json({
+    error:
+      'Arquive a lista em Acessos do Leads. Seus registros serão preservados.',
+  }),
+)
+app.put(
+  '/api/leads/:placeId',
+  route(async (req, res) => {
+    const state = cleanState(req.body.kanbanState)
+    res.json(
+      await transaction(req, async (session) => {
+        const lead = await editableLead(
+          req,
+          req.params.placeId,
+          session,
+          req.body.version,
+        )
+        return Lead.findOneAndUpdate(
+          { placeId: lead.placeId, ...versionFilter(req.body.version) },
+          {
+            $set: {
+              ...state,
+              ...(await eligibleAssignee(
+                req,
+                req.body.assigneeUid,
+                lead.groupId,
+                session,
+              )),
+            },
+            $inc: { version: 1 },
+          },
+          { session, returnDocument: 'after', runValidators: true },
+        )
+      }),
+    )
+  }),
+)
+app.delete(
+  '/api/leads/:placeId',
+  admin,
+  route(async (req, res) => {
+    await transaction(req, async (session) => {
+      const lead = await editableLead(
+        req,
+        req.params.placeId,
+        session,
+        req.body.version,
+      )
+      await Lead.updateOne(
+        { placeId: lead.placeId, ...versionFilter(req.body.version) },
+        { $set: { archivedAt: new Date() }, $inc: { version: 1 } },
+        { session },
+      )
+      await audit(
+        session,
+        req,
+        'archive-lead',
+        lead.placeId,
+        { groupId: lead.groupId },
+        null,
+      )
+    })
+    res.status(204).end()
+  }),
+)
 app.get('/api/qna', async (_req, res) => {
   try {
     await connectToDatabase()
@@ -565,12 +924,14 @@ app.get('/api/qna', async (_req, res) => {
   }
 })
 
-app.post('/api/qna', async (req, res) => {
+app.post('/api/qna', admin, async (req, res) => {
   try {
     await connectToDatabase()
     const { question, answer, tags, isFavorite } = req.body
     if (!question || !answer) {
-      return res.status(400).json({ error: 'Pergunta e resposta são obrigatórias' })
+      return res
+        .status(400)
+        .json({ error: 'Pergunta e resposta são obrigatórias' })
     }
     const item = await QnA.create({
       question: question.trim(),
@@ -581,16 +942,20 @@ app.post('/api/qna', async (req, res) => {
     res.status(201).json(item)
   } catch (err) {
     console.error(err)
-    res.status(400).json({ error: err instanceof Error ? err.message : 'Erro ao criar pergunta' })
+    res.status(400).json({
+      error: err instanceof Error ? err.message : 'Erro ao criar pergunta',
+    })
   }
 })
 
-app.put('/api/qna/:id', async (req, res) => {
+app.put('/api/qna/:id', admin, async (req, res) => {
   try {
     await connectToDatabase()
     const { question, answer, tags, isFavorite } = req.body
     if (!question || !answer) {
-      return res.status(400).json({ error: 'Pergunta e resposta são obrigatórias' })
+      return res
+        .status(400)
+        .json({ error: 'Pergunta e resposta são obrigatórias' })
     }
     const item = await QnA.findByIdAndUpdate(
       req.params.id,
@@ -606,15 +971,18 @@ app.put('/api/qna/:id', async (req, res) => {
     res.json(item)
   } catch (err) {
     console.error(err)
-    res.status(400).json({ error: err instanceof Error ? err.message : 'Erro ao atualizar pergunta' })
+    res.status(400).json({
+      error: err instanceof Error ? err.message : 'Erro ao atualizar pergunta',
+    })
   }
 })
 
-app.patch('/api/qna/:id/favorite', async (req, res) => {
+app.patch('/api/qna/:id/favorite', admin, async (req, res) => {
   try {
     await connectToDatabase()
     const current = await QnA.findById(req.params.id)
-    if (!current) return res.status(404).json({ error: 'Pergunta não encontrada' })
+    if (!current)
+      return res.status(404).json({ error: 'Pergunta não encontrada' })
     const item = await QnA.findByIdAndUpdate(
       req.params.id,
       { isFavorite: !current.isFavorite },
@@ -623,11 +991,13 @@ app.patch('/api/qna/:id/favorite', async (req, res) => {
     res.json(item)
   } catch (err) {
     console.error(err)
-    res.status(400).json({ error: err instanceof Error ? err.message : 'Erro ao favoritar pergunta' })
+    res.status(400).json({
+      error: err instanceof Error ? err.message : 'Erro ao favoritar pergunta',
+    })
   }
 })
 
-app.delete('/api/qna/:id', async (req, res) => {
+app.delete('/api/qna/:id', admin, async (req, res) => {
   try {
     await connectToDatabase()
     const item = await QnA.findByIdAndDelete(req.params.id)
@@ -639,54 +1009,18 @@ app.delete('/api/qna/:id', async (req, res) => {
   }
 })
 
-app.put('/api/leads/group/:groupId', async (req, res) => {
-  try {
-    await connectToDatabase()
-    const { groupTitle } = req.body ?? {}
-    if (!groupTitle || typeof groupTitle !== 'string' || !groupTitle.trim()) {
-      return res.status(400).json({ error: 'Título do grupo é obrigatório' })
-    }
-    await LeadGroup.updateOne({ groupId: req.params.groupId }, { $set: { groupTitle: groupTitle.trim() } })
-    const result = await Lead.updateMany(
-      { groupId: req.params.groupId },
-      { $set: { groupTitle: groupTitle.trim() } },
-    )
-    res.json({ updated: result.modifiedCount })
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: err instanceof Error ? err.message : 'Erro ao atualizar grupo' })
-  }
+app.use((_req, res) => res.status(404).json({ error: 'Não encontrado.' }))
+app.use((error, _req, res, _next) => {
+  const status =
+    error.statusCode ||
+    (error.code === 11000 ? 409 : error.name === 'ValidationError' ? 400 : 500)
+  res.status(status).json({
+    error:
+      status === 500
+        ? 'Não foi possível concluir. Tente novamente.'
+        : error.code === 11000
+          ? 'Este registro já existe. Refaça a prévia.'
+          : error.message,
+  })
 })
-
-app.delete('/api/leads/group/:groupId', async (req, res) => {
-  try {
-    await connectToDatabase()
-    const result = await Lead.updateMany(
-      { groupId: req.params.groupId },
-      { $set: { groupId: null, groupTitle: null } },
-    )
-    await LeadGroup.deleteOne({ groupId: req.params.groupId })
-    res.json({ updated: result.modifiedCount })
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: err instanceof Error ? err.message : 'Erro ao excluir grupo' })
-  }
-})
-
-app.delete('/api/leads/:placeId', async (req, res) => {
-  try {
-    await connectToDatabase()
-    const lead = await Lead.findOneAndDelete({ ...req.leadFilter, placeId: req.params.placeId })
-    if (!lead) return res.status(404).json({ error: 'Lead não encontrado' })
-    res.status(204).end()
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: err instanceof Error ? err.message : 'Erro ao excluir lead' })
-  }
-})
-
-app.use((_req, res) => {
-  res.status(404).json({ error: 'Not found' })
-})
-
 export default app

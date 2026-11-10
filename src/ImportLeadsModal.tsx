@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { Alert, Button, Dialog, FormField, Icon, Input } from 'codexa-ui'
+import { apiFetch } from './api'
 import type { Lead } from './types'
 
 interface ImportLeadsModalProps {
@@ -9,13 +10,8 @@ interface ImportLeadsModalProps {
   onCreateEmpty: (title: string) => Promise<void>
 }
 
-function isLead(value: unknown): value is Lead {
-  if (!value || typeof value !== 'object') return false
-  const obj = value as Record<string, unknown>
-  return typeof obj.title === 'string' && typeof obj.placeId === 'string'
-}
-
 export default function ImportLeadsModal({ open, onClose, onImport, onCreateEmpty }: ImportLeadsModalProps) {
+  const [preview, setPreview] = useState<{new:number;existing:number;invalid:number[];repeated:number[]}|null>(null)
   const [title, setTitle] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -24,6 +20,7 @@ export default function ImportLeadsModal({ open, onClose, onImport, onCreateEmpt
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFile(e.target.files?.[0] ?? null)
+    setPreview(null)
     setError(null)
   }
 
@@ -44,17 +41,22 @@ export default function ImportLeadsModal({ open, onClose, onImport, onCreateEmpt
         const parsed = JSON.parse(text)
         const raw = Array.isArray(parsed) ? parsed : [parsed]
         if (!raw.length) throw new Error('O arquivo JSON está vazio.')
-        const validLeads = raw.filter(isLead)
-        if (!validLeads.length) {
-          throw new Error('Nenhum lead válido encontrado no arquivo. Verifique se cada item tem title e placeId.')
+        if (!preview) {
+          const response = await apiFetch('/api/leads/import/preview', { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ leads: raw }) })
+          const data = await response.json()
+          if (!response.ok) throw Error(data.error || 'Não foi possível conferir o arquivo.')
+          setPreview(data)
+          return
         }
+        if (preview.invalid.length || preview.repeated.length) throw Error('Corrija as linhas indicadas e selecione o arquivo novamente.')
         const finalTitle = title.trim() || `Importação em ${new Date().toLocaleDateString('pt-BR')}`
-        await onImport(finalTitle, validLeads)
+        await onImport(finalTitle, raw)
       } else {
         await onCreateEmpty(title.trim())
       }
       setTitle('')
       setFile(null)
+      setPreview(null)
       if (inputRef.current) inputRef.current.value = ''
       onClose()
     } catch (err) {
@@ -101,12 +103,14 @@ export default function ImportLeadsModal({ open, onClose, onImport, onCreateEmpt
             <Icon name="file" size={14} /> {file.name}
             <Button type="button" variant="ghost" size="small" disabled={isLoading} onClick={() => {
               setFile(null)
+      setPreview(null)
               setError(null)
               if (inputRef.current) inputRef.current.value = ''
             }}>Remover arquivo</Button>
           </p>
         )}
 
+        {preview && <Alert tone={preview.invalid.length || preview.repeated.length ? 'warning' : 'info'}>{preview.new} novos · {preview.existing} existentes serão preservados, sem mudar de lista. {preview.invalid.length > 0 && `Linhas inválidas: ${preview.invalid.join(', ')}.`} {preview.repeated.length > 0 && `Linhas repetidas: ${preview.repeated.join(', ')}.`}</Alert>}
         {error && (
           <Alert tone="danger" title="Não foi possível criar a lista">
             {error}
@@ -123,7 +127,7 @@ export default function ImportLeadsModal({ open, onClose, onImport, onCreateEmpt
             loading={isLoading}
             leadingIcon={<Icon name="plus" size={16} />}
           >
-            {file ? 'Importar e criar lista' : 'Criar lista vazia'}
+            {file ? preview ? 'Confirmar importação' : 'Conferir arquivo' : 'Criar lista vazia'}
           </Button>
         </div>
       </form>

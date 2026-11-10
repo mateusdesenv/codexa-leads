@@ -1,297 +1,672 @@
-import { useEffect, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
-import { updateProfile, type User } from 'firebase/auth'
-import { Alert, Avatar, Button, Card, ConfirmDialog, Icon, Input, Tag } from 'codexa-ui'
-
-import PermissionsDialog from './PermissionsDialog'
-import type { ScreenPermissions } from '../shared/permissions'
-
-const ADMIN_EMAIL = 'mateus.desenv@gmail.com'
-
-type UserManagementProps = {
-  user: User
-  readOnly?: boolean
-  administrator?: boolean
-}
-
-type SystemUser = {
+import { useEffect, useState } from 'react'
+import { Alert, Button, Card, Dialog, Input, ConfirmDialog } from 'codexa-ui'
+import { apiFetch } from './api'
+import { loadAccess, saveAccess } from './access-api'
+import type { SessionUser } from './session'
+export type Person = {
   uid: string
-  screenPermissions: ScreenPermissions
   email: string
   displayName: string
-  photoURL: string
-  providerId: string
-  accessStatus: 'pending' | 'approved'
-  registeredAt?: string
-  createdAt?: string
+  role: 'admin' | 'operator' | 'reader'
+  isAdmin: boolean
+  legacy: boolean
+  accessStatus: string
 }
-
-const getProviderLabel = (user: User) =>
-  user.providerData[0]?.providerId === 'google.com' ? 'Google' : 'E-mail e senha'
-
-const getSystemProviderLabel = (providerId: string) =>
-  providerId === 'google.com' ? 'Google' : 'E-mail e senha'
-
-const formatAccountDate = (value?: string) => {
-  if (!value) return '—'
-
-  const date = new Date(value)
-  return Number.isNaN(date.getTime())
-    ? '—'
-    : new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium' }).format(date)
+export type ManagedList = {
+  groupId: string
+  groupTitle: string
+  viewerUids: string[]
+  assignees: { uid: string; name: string }[]
+  archivedAt?: string | null
 }
-
-export default function UserManagement({ user, readOnly = false, administrator = false }: UserManagementProps) {
-  const [permissionsUser, setPermissionsUser] = useState<SystemUser | null>(null)
-  const [name, setName] = useState(user.displayName ?? '')
-  const [saving, setSaving] = useState(false)
-  const [feedback, setFeedback] = useState<string | null>(null)
-  const [systemUsers, setSystemUsers] = useState<SystemUser[]>([])
-  const [approving, setApproving] = useState<string | null>(null)
-  const [deletingUser, setDeletingUser] = useState<SystemUser | null>(null)
-  const [deleting, setDeleting] = useState(false)
-  const [refresh, setRefresh] = useState(0)
-  const [usersLoading, setUsersLoading] = useState(false)
-  const [usersError, setUsersError] = useState<string | null>(null)
-  const isAdmin = administrator
-  const providerLabel = getProviderLabel(user)
-
-  useEffect(() => {
-    if (!isAdmin) return
-
-    let cancelled = false
-    const loadUsers = async () => {
-      setUsersLoading(true)
-      setUsersError(null)
-      try {
-        const token = await user.getIdToken()
-        const response = await fetch('/api/users', { headers: { Authorization: `Bearer ${token}` } })
-        if (!response.ok) throw new Error('Não foi possível carregar os usuários')
-        const data: SystemUser[] = await response.json()
-        if (!cancelled) setSystemUsers(data)
-      } catch {
-        if (!cancelled) setUsersError('Não foi possível carregar os usuários do sistema.')
-      } finally {
-        if (!cancelled) setUsersLoading(false)
-      }
-    }
-
-    void loadUsers()
-    return () => { cancelled = true }
-  }, [isAdmin, user, refresh])
-
-  const approveUser = async (uid: string) => {
-    setApproving(uid)
-    setUsersError(null)
-    try {
-      const token = await user.getIdToken()
-      const response = await fetch(`/api/users/${encodeURIComponent(uid)}/approve`, {
-        method: 'PATCH', headers: { Authorization: `Bearer ${token}` },
-      })
-      if (!response.ok) throw new Error('Não foi possível liberar o acesso')
-      const updated: SystemUser = await response.json()
-      setSystemUsers((current) => current.map((entry) => entry.uid === uid ? updated : entry))
-    } catch {
-      setUsersError('Não foi possível liberar o acesso. Tente novamente.')
-    } finally { setApproving(null) }
+export type AccessSnapshot = {
+  revision: number
+  users: Person[]
+  groups: ManagedList[]
+}
+const roleName = (p: Person) =>
+  p.isAdmin ? 'Administrador' : p.role === 'operator' ? 'Operador' : 'Consulta'
+const who = (p: Person) => p.displayName || p.email
+export function AccessEditor({
+  data,
+  person,
+  list,
+  onClose,
+  onSaved,
+}: {
+  data: AccessSnapshot
+  person?: Person
+  list?: ManagedList
+  onClose: () => void
+  onSaved: (next: AccessSnapshot) => void
+}) {
+  const [profile, setProfile] = useState(
+    person?.role === 'operator' ? 'operator' : 'reader',
+  )
+  const [status, setStatus] = useState(person?.accessStatus || 'approved')
+  const [selected, setSelected] = useState(
+    person
+      ? data.groups
+          .filter((g) => !g.archivedAt && g.viewerUids.includes(person.uid))
+          .map((g) => g.groupId)
+      : list?.viewerUids || [],
+  )
+  const [responsible, setResponsible] = useState(
+    person
+      ? data.groups
+          .filter(
+            (g) =>
+              !g.archivedAt && g.assignees.some((a) => a.uid === person.uid),
+          )
+          .map((g) => g.groupId)
+      : list?.assignees.map((a) => a.uid) || [],
+  )
+  const [saving, setSaving] = useState(false),
+    [error, setError] = useState(''),
+    [dirty, setDirty] = useState(false),
+    [discard, setDiscard] = useState(false)
+  const toggle = (values: string[], id: string, checked: boolean) =>
+    checked ? [...new Set([...values, id])] : values.filter((x) => x !== id)
+  const close = () => {
+    if (saving) return
+    if (dirty) setDiscard(true)
+    else onClose()
   }
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (readOnly) return
+  const options = person
+    ? data.groups
+        .filter((g) => !g.archivedAt)
+        .map((g) => ({
+          id: g.groupId,
+          title: g.groupTitle,
+          subtitle: '',
+          eligible: profile === 'operator' && status === 'approved',
+          owner: false,
+          active: true,
+        }))
+    : data.users.map((p) => ({
+        id: p.uid,
+        title: who(p),
+        subtitle: `${p.email} · ${roleName(p)}${p.accessStatus === 'suspended' ? ' · Suspenso' : ''}`,
+        eligible:
+          p.isAdmin || (p.role === 'operator' && p.accessStatus === 'approved'),
+        owner: p.isAdmin,
+        active: p.accessStatus === 'approved',
+      }))
+  const invalid = responsible.some((id) => {
+    const p = options.find((o) => o.id === id)
+    return !p || !p.eligible || (!p.owner && !selected.includes(id))
+  })
+  const submit = async () => {
     setSaving(true)
-    setFeedback(null)
+    setError('')
     try {
-      await updateProfile(user, { displayName: name.trim() || null })
-      setFeedback('Dados atualizados com sucesso.')
-    } catch {
-      setFeedback('Não foi possível atualizar os dados. Tente novamente.')
+      const next = await saveAccess(
+        person
+          ? `/api/admin/users/${encodeURIComponent(person.uid)}/access`
+          : `/api/admin/lists/${encodeURIComponent(list!.groupId)}/access`,
+        person
+          ? {
+              revision: data.revision,
+              role: profile,
+              accessStatus: status,
+              listIds: selected,
+              responsibleListIds: responsible,
+            }
+          : {
+              revision: data.revision,
+              viewerUids: selected,
+              assigneeUids: responsible,
+            },
+      )
+      onSaved(next)
+      onClose()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Não foi possível salvar.')
     } finally {
       setSaving(false)
     }
   }
-
-  const deleteUser = async () => {
-    if (!deletingUser || deleting) return
-    setDeleting(true)
-    setUsersError(null)
-    try {
-      const token = await user.getIdToken()
-      const response = await fetch(`/api/users/${encodeURIComponent(deletingUser.uid)}`, {
-        method: 'DELETE', headers: { Authorization: `Bearer ${token}` },
-      })
-      if (!response.ok) throw new Error('Não foi possível excluir o usuário')
-      setSystemUsers((current) => current.filter((entry) => entry.uid !== deletingUser.uid))
-    } catch {
-      setUsersError('Não foi possível excluir o usuário. Tente novamente.')
-    } finally { setDeleting(false); setDeletingUser(null) }
-  }
-
   return (
-    <section className="user-management" aria-labelledby="user-management-title">
-      <div className="user-management__hero">
-        <div>
-          <span className="user-management__eyebrow">Configurações do CRM</span>
-          <h1 id="user-management-title">Acessos do Leads</h1>
-          <p>Consulte seu acesso e gerencie as permissões da equipe no CRM.</p>
-        </div>
-        <Tag tone="success">Ativo</Tag>
-      </div>
-
-      <div className="user-management__grid">
-        <Card padding="medium" className="user-management__profile">
-          <div className="user-management__profile-head">
-            <Avatar name={user.displayName ?? user.email ?? 'Usuário'} src={user.photoURL || undefined} size="large" />
-            <div>
-              <h2>{user.displayName ?? 'Usuário'}</h2>
-              <p>{user.email}</p>
+    <>
+      <Dialog
+        open
+        title={
+          person ? `Acesso de ${who(person)}` : `Equipe de ${list?.groupTitle}`
+        }
+        onClose={close}
+      >
+        <div className="access-editor">
+          <p>
+            {person
+              ? person.email
+              : 'Selecione quem acessa a lista e quem trabalha nela. O administrador sempre tem acesso.'}
+          </p>
+          {person && (
+            <div className="access-profile-fields">
+              <label>
+                Perfil
+                <select
+                  value={profile}
+                  disabled={saving}
+                  onChange={(e) => {
+                    setProfile(e.target.value)
+                    setDirty(true)
+                    if (e.target.value === 'reader') setResponsible([])
+                  }}
+                >
+                  <option value="reader">Consulta — visualizar</option>
+                  <option value="operator">
+                    Operador — trabalhar nos leads
+                  </option>
+                </select>
+              </label>
+              <label>
+                Situação
+                <select
+                  value={status}
+                  disabled={saving}
+                  onChange={(e) => {
+                    setStatus(e.target.value)
+                    setDirty(true)
+                    if (e.target.value === 'suspended') setResponsible([])
+                  }}
+                >
+                  <option value="approved">Ativo</option>
+                  <option value="suspended">Suspenso no Leads</option>
+                </select>
+              </label>
             </div>
-          </div>
-          <form className="user-management__form" onSubmit={handleSubmit}>
-            <Input disabled={readOnly} label="Nome de exibição" id="user-display-name" value={name} onChange={(event: React.ChangeEvent<HTMLInputElement>) => setName(event.target.value)} placeholder="Como seu nome deve aparecer" />
-            {feedback && <Alert tone={feedback.includes('sucesso') ? 'success' : 'danger'}>{feedback}</Alert>}
-            <Button type="submit" variant="primary" disabled={saving || readOnly}>{saving ? 'Salvando...' : 'Salvar alterações'}</Button>
-          </form>
-        </Card>
-
-        <Card padding="medium" className="user-management__access">
-          <div className="user-management__card-title">
-            <Icon name="users" size={20} />
-            <div><h2>Acesso ao CRM</h2><p>Resumo das permissões atuais.</p></div>
-          </div>
-          <dl className="user-management__details">
-            <div><dt>E-mail</dt><dd>{user.email ?? 'Não informado'}</dd></div>
-            <div><dt>Perfil</dt><dd><Tag tone={isAdmin ? 'info' : 'neutral'}>{isAdmin ? 'Administrador' : 'Usuário'}</Tag></dd></div>
-            <div><dt>Provedor</dt><dd>{providerLabel}</dd></div>
-          </dl>
-        </Card>
-      </div>
-
-      {isAdmin && (
-        <Card padding="medium" className="user-management__system-users">
-          <div className="user-management__section-head">
-            <div className="user-management__card-title">
-              <Icon name="users" size={20} />
-              <div>
-                <h2>Equipe e permissões</h2>
-                <p>Defina as permissões de cada pessoa nas telas do Leads.</p>
+          )}
+          <p className="access-editor__note">
+            {person
+              ? `${selected.length} lista(s) selecionada(s). ${responsible.length} responsabilidade(s). A entrada no aplicativo continua controlada pelo Hub.`
+              : 'Responsáveis precisam de perfil Operador ativo e de acesso à lista. Marcar responsabilidade não concede acesso automaticamente.'}
+          </p>
+          <div className="access-member-grid">
+            <div className="access-member-heading">
+              <span>{person ? 'Lista' : 'Pessoa'}</span>
+              <span>Acesso</span>
+              <span>Responsável</span>
+            </div>
+            {options.map((o) => (
+              <div key={o.id} className="access-member-row">
+                <span>
+                  <strong>{o.title}</strong>
+                  <small>{o.subtitle}</small>
+                </span>
+                <input
+                  aria-label={`Acesso: ${o.title} ${o.subtitle}`}
+                  type="checkbox"
+                  disabled={
+                    saving || o.owner || (!o.active && !selected.includes(o.id))
+                  }
+                  checked={o.owner || selected.includes(o.id)}
+                  onChange={(e) => {
+                    setSelected(toggle(selected, o.id, e.target.checked))
+                    setDirty(true)
+                    if (!e.target.checked)
+                      setResponsible((r) => r.filter((id) => id !== o.id))
+                  }}
+                />
+                <input
+                  aria-label={`Responsável: ${o.title} ${o.subtitle}`}
+                  type="checkbox"
+                  disabled={
+                    saving ||
+                    (!responsible.includes(o.id) &&
+                      (!o.eligible || (!o.owner && !selected.includes(o.id))))
+                  }
+                  checked={responsible.includes(o.id)}
+                  onChange={(e) => {
+                    setResponsible(toggle(responsible, o.id, e.target.checked))
+                    setDirty(true)
+                  }}
+                />
               </div>
-            </div>
-            <Button variant="secondary" size="small" disabled={usersLoading} onClick={() => setRefresh((value) => value + 1)}>Atualizar solicitações</Button>
-            <Tag tone="info">{usersLoading ? 'Carregando...' : `${systemUsers.length} ${systemUsers.length === 1 ? 'usuário' : 'usuários'}`}</Tag>
+            ))}
           </div>
-
-          <div className="user-management__table-wrap">
-            <table className="user-management__table">
-              <thead>
-                <tr>
-                  <th scope="col">Usuário</th>
-                  <th scope="col">Perfil</th>
-                  <th scope="col">Provedor</th>
-                  <th scope="col">Desde</th>
-                  <th scope="col">Acesso</th>
-                  <th scope="col">Ação</th>
-                </tr>
-              </thead>
-              <tbody>
-                {systemUsers.map((systemUser) => (
-                  <tr key={systemUser.uid}>
-                    <td>
-                      <div className="user-management__table-user">
-                        <Avatar name={systemUser.displayName || systemUser.email} src={systemUser.photoURL || undefined} size="small" />
-                        <span>
-                          <strong>{systemUser.displayName || 'Usuário'}</strong>
-                          <small>{systemUser.email}</small>
-                        </span>
-                      </div>
-                    </td>
-                    <td><Tag tone={systemUser.email.toLowerCase() === ADMIN_EMAIL ? 'info' : 'neutral'}>{systemUser.email.toLowerCase() === ADMIN_EMAIL ? 'Administrador' : 'Usuário'}</Tag></td>
-                    <td>{getSystemProviderLabel(systemUser.providerId)}</td>
-                    <td>{formatAccountDate(systemUser.registeredAt ?? systemUser.createdAt)}</td>
-                    <td><Tag tone={systemUser.accessStatus === 'approved' ? 'success' : 'warning'}>{systemUser.accessStatus === 'approved' ? 'Liberado' : 'Aguardando liberação'}</Tag></td>
-                    <td><UserActionsMenu user={systemUser} busy={approving !== null || deleting} onPermissions={() => setPermissionsUser(systemUser)} onApprove={() => approveUser(systemUser.uid)} onDelete={() => setDeletingUser(systemUser)} /></td>
-                  </tr>
-                ))}
-                {!usersLoading && systemUsers.length === 0 && (
-                  <tr><td className="user-management__table-empty" colSpan={6}>Nenhum usuário sincronizado ainda.</td></tr>
-                )}
-              </tbody>
-            </table>
+          {invalid && (
+            <Alert tone="warning">
+              Há responsáveis sem acesso de operação. Desmarque a
+              responsabilidade ou ajuste o perfil e a participação antes de
+              salvar.
+            </Alert>
+          )}
+          {person && status === 'suspended' && (
+            <Alert tone="warning">
+              A pessoa não poderá usar o Leads. O histórico será preservado; as
+              responsabilidades selecionadas foram removidas.
+            </Alert>
+          )}
+          {error && <Alert tone="danger">{error}</Alert>}
+          <div className="access-editor__actions">
+            <Button variant="secondary" disabled={saving} onClick={close}>
+              Cancelar
+            </Button>
+            <Button
+              disabled={invalid || !dirty}
+              loading={saving}
+              onClick={() => void submit()}
+            >
+              Salvar configuração
+            </Button>
           </div>
-          {usersError ? <Alert tone="danger">{usersError}</Alert> : <p className="user-management__table-note">Novas contas precisam de aprovação e de permissões por tela para acessar o CRM.</p>}
-        </Card>
-      )}
-      {permissionsUser && <PermissionsDialog target={permissionsUser} onClose={() => setPermissionsUser(null)} onSaved={() => setRefresh(value => value + 1)} />}
+        </div>
+      </Dialog>
       <ConfirmDialog
-        open={deletingUser !== null}
-        onClose={() => { if (!deleting) setDeletingUser(null) }}
-        onConfirm={deleteUser}
-        title="Excluir usuário"
-        description={`Excluir ${deletingUser?.email ?? 'este usuário'} do CRM? O acesso será removido. Se entrar novamente, precisará solicitar uma nova liberação.`}
-        confirmLabel={deleting ? 'Excluindo...' : 'Excluir usuário'}
+        open={discard}
+        onClose={() => setDiscard(false)}
+        onConfirm={onClose}
+        title="Descartar alterações?"
+        description="A configuração ainda não foi salva."
+        confirmLabel="Descartar"
         tone="danger"
       />
-    </section>
+    </>
   )
 }
-
-function UserActionsMenu({ user, busy, onApprove, onDelete, onPermissions }: {
-  user: SystemUser
-  busy: boolean
-  onPermissions: () => void
-  onApprove: () => void
-  onDelete: () => void
+export default function UserManagement({
+  user,
+  administrator = false,
+}: {
+  user: SessionUser
+  administrator?: boolean
+  readOnly?: boolean
 }) {
-  const [position, setPosition] = useState<{ top: number; right: number } | null>(null)
-  const trigger = useRef<HTMLSpanElement>(null)
-  const menu = useRef<HTMLDivElement>(null)
-  const owner = user.email.trim().toLowerCase() === ADMIN_EMAIL
-  const close = () => {
-    setPosition(null)
-    trigger.current?.querySelector('button')?.focus()
+  const [data, setData] = useState<AccessSnapshot | null>(null),
+    [error, setError] = useState(''),
+    [loading, setLoading] = useState(false)
+  const [tab, setTab] = useState('people'),
+    [search, setSearch] = useState(''),
+    [person, setPerson] = useState<Person | null>(null),
+    [list, setList] = useState<ManagedList | null>(null)
+  const [archive, setArchive] = useState<ManagedList | null>(null),
+    [busy, setBusy] = useState(false)
+  const [history, setHistory] = useState<
+    {
+      _id: string
+      actor: string
+      action: string
+      target: string
+      createdAt: string
+    }[]
+  >([])
+  const [recovery, setRecovery] = useState<
+      { placeId: string; title: string; version?: number }[]
+    >([]),
+    [recoveryIds, setRecoveryIds] = useState<string[]>([]),
+    [destination, setDestination] = useState(''),
+    [confirmRecovery, setConfirmRecovery] = useState(false)
+  const refresh = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      setData(await loadAccess())
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setLoading(false)
+    }
   }
-
   useEffect(() => {
-    if (!position) return
-    (menu.current?.querySelector<HTMLButtonElement>('button:not(:disabled)') ?? menu.current)?.focus()
-    const outside = (event: PointerEvent) => {
-      if (!menu.current?.contains(event.target as Node) && !trigger.current?.contains(event.target as Node)) setPosition(null)
-    }
-    const dismiss = () => setPosition(null)
-    document.addEventListener('pointerdown', outside)
-    window.addEventListener('resize', dismiss)
-    window.addEventListener('scroll', dismiss, true)
+    if (!administrator) return
+    let cancelled = false
+    void loadAccess()
+      .then((d) => {
+        if (!cancelled) setData(d)
+      })
+      .catch((e) => {
+        if (!cancelled) setError(e.message)
+      })
     return () => {
-      document.removeEventListener('pointerdown', outside)
-      window.removeEventListener('resize', dismiss)
-      window.removeEventListener('scroll', dismiss, true)
+      cancelled = true
     }
-  }, [position])
-
-  return <>
-    <span ref={trigger}>
-      <Button variant="ghost" size="small" iconOnly aria-label={`Mais ações para ${user.email}`} aria-haspopup="menu" aria-expanded={position !== null} disabled={busy}
-        leadingIcon={<Icon name="more-horizontal" size={18} />}
-        onClick={(event) => {
-          const rect = event.currentTarget.getBoundingClientRect()
-          setPosition(position ? null : { top: Math.max(8, Math.min(rect.bottom + 4, window.innerHeight - 160)), right: Math.max(8, window.innerWidth - rect.right) })
-        }} />
-    </span>
-    {position && createPortal(<div ref={menu} className="leads-table__actions-menu user-actions-menu" role="menu" tabIndex={-1} aria-label={`Ações para ${user.email}`} style={position}
-      onKeyDown={(event) => {
-        if (event.key === 'Escape') { event.preventDefault(); close() }
-        if (event.key === 'Tab') { event.preventDefault(); close() }
-        if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
-          event.preventDefault()
-          const items = Array.from(menu.current?.querySelectorAll<HTMLButtonElement>('button:not(:disabled)') ?? [])
-          const current = items.indexOf(document.activeElement as HTMLButtonElement)
-          const next = event.key === 'Home' ? 0 : event.key === 'End' ? items.length - 1 : (current + (event.key === 'ArrowUp' ? -1 : 1) + items.length) % items.length
-          items[next]?.focus()
-        }
-      }}>
-      <button type="button" role="menuitem" className="leads-table__actions-item" disabled={busy || owner} onClick={() => { close(); onPermissions() }}><Icon name="edit" size={16} />Permissões por tela</button>
-      <button type="button" role="menuitem" className="leads-table__actions-item" disabled={busy || owner || user.accessStatus === 'approved'} onClick={() => { close(); onApprove() }}><Icon name="check-circle" size={16} />Liberar acesso</button>
-      <button type="button" role="menuitem" className="leads-table__actions-item leads-table__actions-item--danger" disabled={busy || owner} onClick={() => { close(); onDelete() }}><Icon name="trash" size={16} />Excluir usuário</button>
-    </div>, document.body)}
-  </>
+  }, [administrator])
+  const changeTab = async (next: string) => {
+    setTab(next)
+    setError('')
+    try {
+      if (next === 'history') {
+        const r = await apiFetch('/api/admin/history')
+        if (!r.ok) throw Error('Não foi possível carregar o histórico.')
+        setHistory(await r.json())
+      }
+      if (next === 'recovery') {
+        const r = await apiFetch('/api/admin/recovery')
+        if (!r.ok) throw Error('Não foi possível carregar os registros.')
+        setRecovery((await r.json()).records)
+        setRecoveryIds([])
+      }
+    } catch (e) {
+      setError((e as Error).message)
+    }
+  }
+  const archiveList = async () => {
+    if (!archive || !data || busy) return
+    setBusy(true)
+    setError('')
+    try {
+      setData(
+        await saveAccess(
+          `/api/admin/lists/${encodeURIComponent(archive.groupId)}/archive`,
+          { revision: data.revision, archived: !archive.archivedAt },
+          'PATCH',
+        ),
+      )
+      setArchive(null)
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setBusy(false)
+    }
+  }
+  const recover = async () => {
+    if (!data || busy) return
+    setBusy(true)
+    setError('')
+    try {
+      await saveAccess(
+        '/api/admin/recovery',
+        {
+          revision: data.revision,
+          groupId: destination,
+          items: recovery
+            .filter((r) => recoveryIds.includes(r.placeId))
+            .map((r) => ({ placeId: r.placeId, version: r.version ?? 0 })),
+        },
+        'POST',
+      )
+      setConfirmRecovery(false)
+      await refresh()
+      await changeTab('recovery')
+    } catch (e) {
+      setError((e as Error).message)
+      setConfirmRecovery(false)
+    } finally {
+      setBusy(false)
+    }
+  }
+  const activeLists = data?.groups.filter((g) => !g.archivedAt) || []
+  const matches = (s: string) =>
+    s.toLocaleLowerCase('pt-BR').includes(search.toLocaleLowerCase('pt-BR'))
+  return (
+    <section className="user-management">
+      <Card padding="medium">
+        <h2>{administrator ? 'Acessos do Leads' : 'Meu acesso'}</h2>
+        <p>
+          {user.displayName} · {user.email}
+        </p>
+        <p>
+          Sua identidade e a entrada no aplicativo são fornecidas pelo Hub
+          Codexa.
+        </p>
+      </Card>
+      {administrator && (
+        <>
+          <div className="access-toolbar">
+            {[
+              ['people', 'Pessoas'],
+              ['lists', 'Listas'],
+              ['archived', 'Arquivadas'],
+              ['recovery', 'Recuperação'],
+              ['history', 'Histórico'],
+            ].map(([id, label]) => (
+              <Button
+                key={id}
+                variant={tab === id ? 'primary' : 'secondary'}
+                onClick={() => void changeTab(id)}
+              >
+                {label}
+              </Button>
+            ))}
+            <Button
+              variant="ghost"
+              loading={loading}
+              onClick={() => void refresh()}
+            >
+              Atualizar
+            </Button>
+          </div>
+          {error && <Alert tone="danger">{error}</Alert>}
+          {['people', 'lists', 'archived'].includes(tab) && (
+            <Input
+              label="Buscar pessoa ou lista"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          )}
+          {loading && !data && <p>Carregando acessos...</p>}
+          {data && tab === 'people' && (
+            <div className="access-directory">
+              {data.users
+                .filter((p) => matches(`${who(p)} ${p.email}`))
+                .map((p) => {
+                  const lists = p.isAdmin
+                    ? activeLists
+                    : activeLists.filter((g) => g.viewerUids.includes(p.uid))
+                  const bad = activeLists.filter(
+                    (g) =>
+                      g.assignees.some((a) => a.uid === p.uid) &&
+                      !p.isAdmin &&
+                      (!g.viewerUids.includes(p.uid) ||
+                        p.role !== 'operator' ||
+                        p.accessStatus !== 'approved'),
+                  )
+                  const state =
+                    p.accessStatus !== 'approved'
+                      ? 'Suspenso'
+                      : p.isAdmin
+                        ? 'Acesso completo'
+                        : !lists.length
+                          ? 'Sem listas'
+                          : p.role === 'operator'
+                            ? 'Pode trabalhar'
+                            : 'Somente consulta'
+                  return (
+                    <Card key={p.uid} padding="medium">
+                      <div className="access-directory-row">
+                        <div>
+                          <strong>{who(p)}</strong>
+                          <small>{p.email}</small>
+                          <p>
+                            {roleName(p)} · {state} · {lists.length} lista(s)
+                          </p>
+                          {p.legacy && (
+                            <small>
+                              Configuração anterior — revise e salve o perfil.
+                            </small>
+                          )}
+                          {bad.length > 0 && (
+                            <p className="access-warning">
+                              {bad.length} responsabilidade(s) sem acesso
+                              operacional.
+                            </p>
+                          )}
+                        </div>
+                        <Button
+                          variant="secondary"
+                          disabled={p.isAdmin}
+                          onClick={() => setPerson(p)}
+                        >
+                          {p.isAdmin
+                            ? 'Administrador protegido'
+                            : 'Gerenciar acesso'}
+                        </Button>
+                      </div>
+                    </Card>
+                  )
+                })}
+            </div>
+          )}
+          {data && ['lists', 'archived'].includes(tab) && (
+            <div className="access-directory">
+              {data.groups
+                .filter(
+                  (g) =>
+                    Boolean(g.archivedAt) === (tab === 'archived') &&
+                    matches(g.groupTitle),
+                )
+                .map((g) => (
+                  <Card key={g.groupId} padding="medium">
+                    <div className="access-directory-row">
+                      <div>
+                        <strong>{g.groupTitle}</strong>
+                        <p>
+                          {g.viewerUids.length} participante(s) além do acesso
+                          global · {g.assignees.length} responsável(is)
+                        </p>
+                      </div>
+                      <div className="access-editor__actions">
+                        {!g.archivedAt && (
+                          <Button
+                            variant="secondary"
+                            onClick={() => setList(g)}
+                          >
+                            Equipe e acesso
+                          </Button>
+                        )}
+                        <Button variant="ghost" onClick={() => setArchive(g)}>
+                          {g.archivedAt ? 'Restaurar' : 'Arquivar'}
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              {!data.groups.some(
+                (g) => Boolean(g.archivedAt) === (tab === 'archived'),
+              ) && <p>Nenhuma lista nesta seção.</p>}
+            </div>
+          )}
+          {tab === 'history' && (
+            <Card padding="medium">
+              <h3>Últimas 100 alterações administrativas</h3>
+              {history.map((h) => (
+                <p key={h._id}>
+                  <time>{new Date(h.createdAt).toLocaleString('pt-BR')}</time> ·{' '}
+                  {h.actor} ·{' '}
+                  {data?.users.find((p) => p.uid === h.target)?.email ||
+                    data?.groups.find((g) => g.groupId === h.target)
+                      ?.groupTitle ||
+                    h.target}{' '}
+                  ·{' '}
+                  {(
+                    {
+                      'user-access': 'Acesso da pessoa',
+                      'list-access': 'Equipe da lista',
+                      'archive-list': 'Lista arquivada',
+                      'restore-list': 'Lista restaurada',
+                      'recover-leads': 'Registros recuperados',
+                      import: 'Importação',
+                      'create-list': 'Lista criada',
+                      'rename-list': 'Lista renomeada',
+                      'archive-lead': 'Lead arquivado',
+                    } as Record<string, string>
+                  )[h.action] || h.action}
+                </p>
+              ))}
+              {!history.length && <p>As novas alterações aparecerão aqui.</p>}
+            </Card>
+          )}
+          {tab === 'recovery' && (
+            <Card padding="medium">
+              <h3>Registros fora da operação</h3>
+              <p>
+                Até 1.000 registros sem lista válida ou arquivados
+                individualmente. Confira antes de recuperar: os participantes da
+                lista de destino poderão acessá-los.
+              </p>
+              <label>
+                Lista de destino
+                <select
+                  value={destination}
+                  onChange={(e) => setDestination(e.target.value)}
+                >
+                  <option value="">Selecione uma lista</option>
+                  {activeLists.map((g) => (
+                    <option key={g.groupId} value={g.groupId}>
+                      {g.groupTitle}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className="access-recovery-list">
+                {recovery.map((r) => (
+                  <label key={r.placeId}>
+                    <input
+                      type="checkbox"
+                      checked={recoveryIds.includes(r.placeId)}
+                      onChange={(e) =>
+                        setRecoveryIds((ids) =>
+                          e.target.checked
+                            ? [...ids, r.placeId]
+                            : ids.filter((id) => id !== r.placeId),
+                        )
+                      }
+                    />
+                    {r.title}
+                  </label>
+                ))}
+              </div>
+              <Button
+                disabled={!destination || !recoveryIds.length}
+                onClick={() => setConfirmRecovery(true)}
+              >
+                Recuperar {recoveryIds.length} selecionado(s)
+              </Button>
+            </Card>
+          )}
+          {data && person && (
+            <AccessEditor
+              key={person.uid}
+              data={data}
+              person={person}
+              onClose={() => setPerson(null)}
+              onSaved={setData}
+            />
+          )}
+          {data && list && (
+            <AccessEditor
+              key={list.groupId}
+              data={data}
+              list={list}
+              onClose={() => setList(null)}
+              onSaved={setData}
+            />
+          )}
+          <ConfirmDialog
+            open={!!archive}
+            onClose={() => {
+              if (!busy) setArchive(null)
+            }}
+            onConfirm={() => void archiveList()}
+            title={archive?.archivedAt ? 'Restaurar lista?' : 'Arquivar lista?'}
+            description={
+              archive?.archivedAt
+                ? 'A lista voltará à operação com as permissões que já possuía.'
+                : 'A lista sairá da operação. Leads, vínculos e histórico serão preservados.'
+            }
+            confirmLabel={
+              busy
+                ? 'Salvando...'
+                : archive?.archivedAt
+                  ? 'Restaurar'
+                  : 'Arquivar'
+            }
+            tone="primary"
+          />
+          <ConfirmDialog
+            open={confirmRecovery}
+            onClose={() => {
+              if (!busy) setConfirmRecovery(false)
+            }}
+            onConfirm={() => void recover()}
+            title="Recuperar registros?"
+            description={`${recoveryIds.length} registro(s) ficarão disponíveis aos participantes da lista de destino.`}
+            confirmLabel={busy ? 'Recuperando...' : 'Recuperar'}
+            tone="primary"
+          />
+        </>
+      )}
+    </section>
+  )
 }
