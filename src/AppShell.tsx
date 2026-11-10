@@ -5,20 +5,14 @@ import type { ThemePreference } from './useTheme'
 import './AppShell.css'
 
 const navigation = [
-  { label: 'Workspace', items: [
-    { view: 'dashboard', label: 'Dashboard', icon: 'home' },
+  { label: 'Comercial', items: [
+    { view: 'dashboard', label: 'Início', icon: 'home' },
+    { view: 'table', label: 'Listas', icon: 'users' },
     { view: 'kanban', label: 'Kanban', icon: 'sort' },
-    { view: 'table', label: 'Leads', icon: 'users' },
-    { view: 'packages', label: 'Pacotes', icon: 'file' },
-    { view: 'portfolio', label: 'Portfólio', icon: 'file' },
-    { view: 'users', label: 'Usuários', icon: 'user' },
-    { view: 'help', label: 'Help', icon: 'help' },
   ] },
-  { label: 'Atlas', items: [
-    { view: 'atlas-early-access', label: 'Acesso antecipado', icon: 'users' },
-  ] },
-  { label: 'Briefing', items: [
-    { view: 'briefing-leads', label: 'Leads', icon: 'file' },
+  { label: 'Configurações e ajuda', items: [
+    { view: 'users', label: 'Acessos do Leads', icon: 'user' },
+    { view: 'help', label: 'Ajuda', icon: 'help' },
   ] },
 ] as const satisfies readonly { label: string; items: readonly { view: string; label: string; icon: IconName }[] }[]
 

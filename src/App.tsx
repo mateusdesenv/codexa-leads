@@ -24,8 +24,6 @@ import { auth } from './firebase'
 import AccessGate from './AccessGate'
 import Help from './Help'
 import Dashboard from './Dashboard'
-import AtlasEarlyAccess from './AtlasEarlyAccess'
-import BriefingLeads from './BriefingLeads'
 import LeadAssigneeSelect from './LeadAssigneeSelect'
 import AddLeadModal, { type NewLeadInput } from './AddLeadModal'
 import ImportLeadsModal from './ImportLeadsModal'
@@ -33,11 +31,9 @@ import LeadClientInfo from './LeadClientInfo'
 import { ContactResearchFields } from './ContactResearchFields'
 import LeadGroupsTable, { type LeadGroup } from './LeadGroupsTable'
 import LeadsTable from './LeadsTable'
-import Packages from './Packages'
-import Portfolio from './Portfolio'
 import UserManagement from './UserManagement'
 import ListAccessDialog from './ListAccessDialog'
-import { SCREENS, type AccessProfile } from '../shared/permissions'
+import { CRM_SCREENS, type AccessProfile } from '../shared/permissions'
 import {
   Alert,
   Badge,
@@ -976,7 +972,7 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
   const [selectedLead, setSelectedLead] = useState<LeadWithMeta | null>(null)
   const [activeDrag, setActiveDrag] = useState<LeadWithMeta | null>(null)
   const [requestedView, setView] = useState<AppView>('dashboard')
-  const allowedViews = SCREENS.filter(screen => access.screenPermissions[screen.id].read).map(screen => screen.id)
+  const allowedViews = CRM_SCREENS.filter(screen => access.screenPermissions[screen.id].read).map(screen => screen.id)
   const currentView = allowedViews.includes(requestedView) ? requestedView : (allowedViews[0] ?? 'dashboard')
   const canRead = access.screenPermissions[currentView].read
   const canWrite = access.screenPermissions[currentView].write
@@ -1773,14 +1769,6 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
                 onCreateEmpty={handleCreateGroup}
               />
             </>
-          ) : currentView === 'briefing-leads' ? (
-            <BriefingLeads />
-          ) : currentView === 'atlas-early-access' ? (
-            <AtlasEarlyAccess />
-          ) : currentView === 'packages' ? (
-            <Packages />
-          ) : currentView === 'portfolio' ? (
-            <Portfolio />
           ) : currentView === 'users' ? (
             <UserManagement user={user} readOnly={!canWrite} administrator={access.isAdmin} />
           ) : (

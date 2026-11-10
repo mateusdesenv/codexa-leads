@@ -131,9 +131,9 @@ export default function UserManagement({ user, readOnly = false, administrator =
     <section className="user-management" aria-labelledby="user-management-title">
       <div className="user-management__hero">
         <div>
-          <span className="user-management__eyebrow">Conta e acesso</span>
-          <h1 id="user-management-title">Gerenciamento de usuário</h1>
-          <p>Atualize seus dados de perfil e consulte as permissões da sua conta.</p>
+          <span className="user-management__eyebrow">Configurações do CRM</span>
+          <h1 id="user-management-title">Acessos do Leads</h1>
+          <p>Consulte seu acesso e gerencie as permissões da equipe no CRM.</p>
         </div>
         <Tag tone="success">Ativo</Tag>
       </div>
@@ -173,8 +173,8 @@ export default function UserManagement({ user, readOnly = false, administrator =
             <div className="user-management__card-title">
               <Icon name="users" size={20} />
               <div>
-                <h2>Usuários do sistema</h2>
-                <p>Defina as permissões por tela e libere o acesso de cada usuário.</p>
+                <h2>Equipe e permissões</h2>
+                <p>Defina as permissões de cada pessoa nas telas do Leads.</p>
               </div>
             </div>
             <Button variant="secondary" size="small" disabled={usersLoading} onClick={() => setRefresh((value) => value + 1)}>Atualizar solicitações</Button>

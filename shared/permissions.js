@@ -10,6 +10,15 @@ export const SCREENS = [
   { id: 'briefing-leads', label: 'Briefing — Leads' },
 ]
 
+// Keep legacy permission keys readable while offering only the current CRM screens.
+export const CRM_SCREENS = [
+  { id: 'dashboard', label: 'Início' },
+  { id: 'table', label: 'Listas' },
+  { id: 'kanban', label: 'Kanban' },
+  { id: 'users', label: 'Acessos do Leads' },
+  { id: 'help', label: 'Ajuda' },
+]
+
 export function resolvePermissions(user, administrator = false) {
   // Existing approved accounts retain their access until explicitly configured.
   const legacy = user?.screenPermissions == null && user?.accessStatus === 'approved'

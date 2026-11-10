@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Alert, Button, Dialog } from 'codexa-ui'
-import { SCREENS, type ScreenPermissions } from '../shared/permissions'
+import { CRM_SCREENS, type ScreenPermissions } from '../shared/permissions'
 import { apiFetch } from './api'
 
 export default function PermissionsDialog({ target, onClose, onSaved }: {
@@ -29,7 +29,7 @@ export default function PermissionsDialog({ target, onClose, onSaved }: {
       <p>Leitura permite visualizar a tela. Escrita permite alterar seus dados e exige leitura.</p>
       <div className="access-editor__table-wrap"><table className="access-editor__table">
         <thead><tr><th scope="col">Tela</th><th scope="col">Leitura</th><th scope="col">Escrita</th></tr></thead>
-        <tbody>{SCREENS.map(({ id, label }) => <tr key={id}>
+        <tbody>{CRM_SCREENS.map(({ id, label }) => <tr key={id}>
           <th scope="row">{label}</th>
           <td><input type="checkbox" aria-label={`Leitura: ${label}`} checked={permissions[id].read} disabled={saving}
             onChange={event => setPermissions(current => ({ ...current, [id]: { read: event.target.checked, write: event.target.checked && current[id].write } }))} /></td>
@@ -37,7 +37,7 @@ export default function PermissionsDialog({ target, onClose, onSaved }: {
             onChange={event => setPermissions(current => ({ ...current, [id]: { ...current[id], write: event.target.checked } }))} /></td>
         </tr>)}</tbody>
       </table></div>
-      <p className="access-editor__note">Nas telas de consulta, escrita não adiciona ações. Em Usuários, ela permite editar o próprio perfil. Somente o administrador gerencia contas, permissões e acesso às listas.</p>
+      <p className="access-editor__note">Somente o administrador gerencia contas, permissões e acesso às listas. A edição de perfil depende do provedor de acesso da conta.</p>
       {error && <Alert tone="danger">{error}</Alert>}
       <div className="access-editor__actions"><Button variant="secondary" disabled={saving} onClick={onClose}>Cancelar</Button><Button loading={saving} onClick={save}>Salvar permissões</Button></div>
     </div>
