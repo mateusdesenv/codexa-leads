@@ -29,6 +29,7 @@ import AddLeadModal, { type NewLeadInput } from './AddLeadModal'
 import ImportLeadsModal from './ImportLeadsModal'
 import LeadClientInfo from './LeadClientInfo'
 import { ContactResearchFields } from './ContactResearchFields'
+import FirstOutreachFields from './FirstOutreachFields'
 import LeadGroupsTable, { type LeadGroup } from './LeadGroupsTable'
 import LeadsTable from './LeadsTable'
 import UserManagement from './UserManagement'
@@ -66,6 +67,7 @@ import { useTheme, type ThemePreference } from './useTheme'
 
 const COLUMNS: { id: ColumnId; label: string; emoji: string; color: string; icon: IconName }[] = [
   { id: 'open', label: 'Novos', emoji: '🟢', color: '#25BF44', icon: 'check-circle' },
+  { id: 'triado', label: 'Triados', emoji: '📋', color: '#0D9488', icon: 'filter' },
   { id: 'em_contato', label: 'Tentativa de ligação', emoji: '📞', color: '#3B82F6', icon: 'send' },
   { id: 'mensagem_enviada', label: 'Mensagem enviada', emoji: '✉️', color: '#6366F1', icon: 'message' },
   { id: 'contato', label: 'Contato feito', emoji: '✅', color: '#2DD4A0', icon: 'check' },
@@ -89,6 +91,7 @@ const KANBAN_SORT_OPTIONS: { value: KanbanSort; label: string }[] = [
 
 const DEFAULT_KANBAN_SORT: Record<ColumnId, KanbanSort> = {
   open: 'score-desc',
+  triado: 'manual',
   em_contato: 'manual',
   mensagem_enviada: 'manual',
   contato: 'manual',
@@ -165,6 +168,15 @@ const updateLeadsBatch = async (leads: { placeId: string; kanbanState: KanbanSta
   if (!res.ok) throw new Error((await res.json()).error || 'Erro ao atualizar leads')
   const payload = await res.json()
   return payload.leads
+}
+
+function getNextColumnOrder(leads: Lead[], groupId: Lead['groupId'], column: ColumnId): number {
+  const lastOrder = leads.reduce((max, lead) => (
+    lead.groupId === groupId && lead.kanbanState?.column === column
+      ? Math.max(max, lead.kanbanState.order ?? -1)
+      : max
+  ), -1)
+  return lastOrder + 1
 }
 
 function getHost(website: string): string | null {
@@ -757,16 +769,19 @@ function LeadModal({
 }) {
   const [assigneeUid, setAssigneeUid] = useState(lead.assigneeUid ?? '')
   const [state, setState] = useState<KanbanState>({ ...lead.kanbanState })
-  const [saving, setSaving] = useState(false)
+  const [saving, setSaving] = useState<'save' | 'triage' | null>(null)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [discard, setDiscard] = useState(false)
   const dirty = assigneeUid !== (lead.assigneeUid??'') || JSON.stringify(state) !== JSON.stringify(lead.kanbanState)
   const close = () => { if(saving)return; if(dirty&&!readOnly)setDiscard(true);else onClose() }
 
-  const [activeTab, setActiveTab] = useState('dados')
+  const [activeTab, setActiveTab] = useState(lead.kanbanState.column === 'triado' ? 'abordagem' : 'dados')
+  const showTriageActions = activeTab === 'abordagem' && lead.kanbanState.column === 'open' && state.column === 'open'
+  const stage = COLUMNS.find((column) => column.id === state.column)
 
   const tabItems: TabItem[] = [
     { id: 'dados', label: 'Dados' },
+    { id: 'abordagem', label: 'Primeira abordagem' },
     { id: 'cliente', label: 'Informações do cliente' },
   ]
 
@@ -784,18 +799,18 @@ function LeadModal({
     }
   }, [])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const save = async (markTriaged = false) => {
     if (saving || readOnly) return
-    setSaving(true)
+    setSaving(markTriaged ? 'triage' : 'save')
     setSaveError(null)
     try {
-      await onSave(lead.placeId, state, assigneeUid === (lead.assigneeUid ?? '') ? undefined : assigneeUid || null, lead.version ?? 0)
+      const nextState: KanbanState = markTriaged ? { ...state, column: 'triado' } : state
+      await onSave(lead.placeId, nextState, assigneeUid === (lead.assigneeUid ?? '') ? undefined : assigneeUid || null, lead.version ?? 0)
       onClose()
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : 'Erro ao salvar lead')
     } finally {
-      setSaving(false)
+      setSaving(null)
     }
   }
 
@@ -820,19 +835,34 @@ function LeadModal({
             {lead.categoryName}
           </Tag>
         )}
+        {activeTab === 'abordagem' && stage && <Tag tone="neutral">{stage.label}</Tag>}
       </div>
 
-      <form className="modal__form" onSubmit={handleSubmit}>
-        <LeadAssigneeSelect groupId={lead.groupId} value={assigneeUid} currentName={lead.assigneeName} onChange={setAssigneeUid} disabled={saving || readOnly} />
+      <form className="modal__form" onSubmit={(event) => {
+        event.preventDefault()
+        void save()
+      }}>
+        <LeadAssigneeSelect groupId={lead.groupId} value={assigneeUid} currentName={lead.assigneeName} onChange={setAssigneeUid} disabled={Boolean(saving) || readOnly} />
         <Tabs
           items={tabItems}
           value={activeTab}
           onChange={setActiveTab}
         />
 
-        <fieldset className="permission-fields" disabled={readOnly}>
+        {activeTab === 'abordagem' && (
+          <FirstOutreachFields
+            lead={lead}
+            research={state.contactResearch}
+            value={state.firstOutreach ?? {}}
+            onChange={(firstOutreach) => setState((current) => ({ ...current, firstOutreach }))}
+            onViewClient={() => setActiveTab('cliente')}
+            readOnly={Boolean(saving) || readOnly}
+          />
+        )}
+
+        {activeTab !== 'abordagem' && <fieldset className="permission-fields" disabled={Boolean(saving) || readOnly}>
         {activeTab === 'cliente' && (
-          <div className="modal__column">
+          <div className="modal__column" id="cliente-panel" role="tabpanel" aria-label="Informações do cliente">
             <h3 className="modal__column-title">Informações do cliente</h3>
 
             <div className="lead-information">
@@ -846,7 +876,7 @@ function LeadModal({
         )}
 
         {activeTab === 'dados' && (
-          <div className="modal__column modal__column--dados">
+          <div className="modal__column modal__column--dados" id="dados-panel" role="tabpanel" aria-label="Dados">
             <h3 className="modal__column-title">Dados coletados</h3>
 
             <Select
@@ -949,15 +979,30 @@ function LeadModal({
           </div>
         )}
 
-        </fieldset>
+        </fieldset>}
         {saveError && <Alert tone="danger" title="Não foi possível salvar">{saveError}</Alert>}
         <div className="modal__actions">
-          <Button type="button" variant="secondary" onClick={close} disabled={saving}>
-            Cancelar
-          </Button>
-          <Button type="submit" variant="primary" loading={saving} disabled={readOnly}>
-            Salvar
-          </Button>
+          {showTriageActions && !readOnly ? (
+            <>
+              <Button type="submit" variant="secondary" loading={saving === 'save'} disabled={Boolean(saving)}>
+                Salvar rascunho
+              </Button>
+              <Button type="button" variant="primary" onClick={() => void save(true)} loading={saving === 'triage'} disabled={Boolean(saving)}>
+                Marcar como triado
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button type="button" variant="secondary" onClick={close} disabled={Boolean(saving)}>
+                {readOnly ? 'Fechar' : 'Cancelar'}
+              </Button>
+              {!readOnly && (
+                <Button type="submit" variant="primary" loading={saving === 'save'} disabled={Boolean(saving)}>
+                  Salvar
+                </Button>
+              )}
+            </>
+          )}
         </div>
       </form>
 
@@ -1245,11 +1290,10 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
     const columnIndex = COLUMNS.findIndex((column) => column.id === (currentLead.kanbanState?.column ?? 'open'))
     const nextColumn = COLUMNS[columnIndex + 1]
     if (columnIndex < 0 || !nextColumn) return
-    const destinationLeads = baseLeads.filter((item) => item.groupId === currentLead.groupId && item.kanbanState?.column === nextColumn.id)
     const state: KanbanState = {
       ...currentLead.kanbanState,
       column: nextColumn.id,
-      order: Math.max(-1, ...destinationLeads.map((item) => item.kanbanState?.order ?? -1)) + 1,
+      order: getNextColumnOrder(baseLeads, currentLead.groupId, nextColumn.id),
     }
     try {
       const savedLead = await updateLeadState(lead.placeId, state, undefined, currentLead.version ?? 0)
@@ -1262,7 +1306,11 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
   }
 
   const handleSaveLead = async (placeId: string, state: KanbanState, assigneeUid?: string | null, version = 0) => {
-    const savedLead = await updateLeadState(placeId, state, assigneeUid, version)
+    const currentLead = baseLeads.find((lead) => lead.placeId === placeId)
+    const nextState = state.column === 'triado' && currentLead?.kanbanState?.column !== 'triado'
+      ? { ...state, order: getNextColumnOrder(baseLeads, currentLead?.groupId, 'triado') }
+      : state
+    const savedLead = await updateLeadState(placeId, nextState, assigneeUid, version)
     setBaseLeads((prev) =>
       prev.map((l) => (l.placeId === placeId ? savedLead : l)),
     )

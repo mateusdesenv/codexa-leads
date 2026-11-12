@@ -31,6 +31,7 @@ export interface Lead {
 
 export type ColumnId =
   | 'open'
+  | 'triado'
   | 'em_contato'
   | 'mensagem_enviada'
   | 'contato'
@@ -43,6 +44,13 @@ export type ColumnId =
 
 export type Temperature = 'quente' | 'medio' | 'frio'
 
+export interface FirstOutreach {
+  opportunity?: string
+  offer?: string
+  channel?: 'whatsapp' | 'phone' | ''
+  message?: string
+}
+
 export interface KanbanState {
   column: ColumnId
   nextAction?: string
@@ -52,6 +60,7 @@ export interface KanbanState {
   proposalReturnDate?: string
   collectedData?: string
   contactResearch?: ContactResearch
+  firstOutreach?: FirstOutreach
   interest?: 'alto' | 'medio' | 'baixo' | ''
   budget?: string
   returnDate?: string

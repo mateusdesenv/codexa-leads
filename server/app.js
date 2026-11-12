@@ -511,6 +511,7 @@ app.post(
 )
 const columns = [
   'open',
+  'triado',
   'em_contato',
   'mensagem_enviada',
   'contato',
@@ -530,6 +531,7 @@ const stateKeys = [
   'proposalReturnDate',
   'collectedData',
   'contactResearch',
+  'firstOutreach',
   'interest',
   'budget',
   'returnDate',
@@ -544,6 +546,18 @@ const cleanState = (value) => {
     (value.column !== undefined && !columns.includes(value.column))
   )
     fail(400, 'Acompanhamento inválido.')
+  const outreach = value.firstOutreach
+  if (
+    outreach !== undefined &&
+    (!outreach ||
+      typeof outreach !== 'object' ||
+      Array.isArray(outreach) ||
+      Object.entries(outreach).some(([key, field]) =>
+        !['opportunity', 'offer', 'channel', 'message'].includes(key) ||
+        typeof field !== 'string',
+      ))
+  )
+    fail(400, 'Dados da primeira abordagem inválidos.')
   return Object.fromEntries(
     Object.entries(value).map(([k, v]) => ['kanbanState.' + k, v]),
   )
