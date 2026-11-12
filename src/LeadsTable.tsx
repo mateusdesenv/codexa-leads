@@ -12,6 +12,7 @@ type TableLead = LeadWithMeta
 
 const COLUMN_ORDER: ColumnId[] = [
   'open',
+  'triado',
   'em_contato',
   'mensagem_enviada',
   'contato',
@@ -25,6 +26,7 @@ const COLUMN_ORDER: ColumnId[] = [
 
 const COLUMN_LABELS: Record<ColumnId, string> = {
   open: 'Novos',
+  triado: 'Triados',
   em_contato: 'Tentativa de ligação',
   mensagem_enviada: 'Mensagem enviada',
   contato: 'Contato feito',

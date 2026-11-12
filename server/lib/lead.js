@@ -6,6 +6,16 @@ const contactResearchSchema = new mongoose.Schema(
   { _id: false, minimize: false },
 )
 
+const firstOutreachSchema = new mongoose.Schema(
+  {
+    opportunity: String,
+    offer: String,
+    channel: { type: String, enum: ['', 'whatsapp', 'phone'] },
+    message: String,
+  },
+  { _id: false },
+)
+
 const leadSchema = new mongoose.Schema(
   {
     version: { type: Number, default: 0 },
@@ -42,6 +52,7 @@ const leadSchema = new mongoose.Schema(
       proposalReturnDate: { type: String, default: null },
       collectedData: { type: String, default: null },
       contactResearch: { type: contactResearchSchema, default: undefined },
+      firstOutreach: { type: firstOutreachSchema, default: undefined },
       interest: { type: String, default: null },
       budget: { type: String, default: null },
       returnDate: { type: String, default: null },

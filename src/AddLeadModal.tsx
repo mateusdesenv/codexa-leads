@@ -24,6 +24,7 @@ interface AddLeadModalProps {
 
 const STAGE_OPTIONS: { value: ColumnId; label: string }[] = [
   { value: 'open', label: 'Novos' },
+  { value: 'triado', label: 'Triados' },
   { value: 'em_contato', label: 'Tentativa de ligação' },
   { value: 'mensagem_enviada', label: 'Mensagem enviada' },
   { value: 'contato', label: 'Contato feito' },

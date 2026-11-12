@@ -660,6 +660,48 @@ test(
           )
         },
       )
+      await t.test('first outreach draft persists through triage and stage changes', async () => {
+        const leadPath = '/api/leads/manual-check'
+        const firstOutreach = {
+          opportunity: 'Active property listings on Instagram',
+          offer: 'Property page with a WhatsApp button',
+          channel: 'whatsapp',
+          message: 'Hello!\nCan I show you an example?',
+        }
+        const original = (await json('/api/leads', 'operator')).find(
+          (lead) => lead.placeId === 'manual-check',
+        )
+        assert.equal(original.kanbanState.firstOutreach, undefined)
+        const draft = await json(leadPath, 'operator', 'PUT', {
+          version: original.version,
+          kanbanState: { firstOutreach },
+        })
+        assert.equal(draft.kanbanState.column, 'open')
+        assert.deepEqual(draft.kanbanState.firstOutreach, firstOutreach)
+
+        const badDraft = await request(leadPath, 'operator', 'PUT', {
+          version: draft.version,
+          kanbanState: { column: 'triado', firstOutreach: { channel: 'unknown' } },
+        })
+        assert.equal(badDraft.status, 400)
+
+        const triaged = await json(leadPath, 'operator', 'PUT', {
+          version: draft.version,
+          kanbanState: { column: 'triado', order: 0, firstOutreach },
+        })
+        assert.equal(triaged.kanbanState.column, 'triado')
+        assert.deepEqual(triaged.kanbanState.firstOutreach, firstOutreach)
+        assert.equal(triaged.messageSentOn, null)
+
+        const result = await json('/api/leads/batch', 'operator', 'PUT', [{
+          placeId: triaged.placeId,
+          version: triaged.version,
+          kanbanState: { column: 'mensagem_enviada', order: 0 },
+        }])
+        const moved = result.leads.find((lead) => lead.placeId === triaged.placeId)
+        assert.equal(moved.kanbanState.column, 'mensagem_enviada')
+        assert.deepEqual(moved.kanbanState.firstOutreach, firstOutreach)
+      })
       await t.test(
         'malformed or duplicate identity cannot obtain owner privileges',
         async () => {
