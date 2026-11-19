@@ -299,20 +299,23 @@ function isValidUrl(url: string): boolean {
   }
 }
 
-function getWhatsAppUrl(phone: string | null | undefined): string | null {
+function getWhatsAppUrl(phone: string | null | undefined, message?: string): string | null {
   if (!phone) return null
   let digits = phone.replace(/\D/g, '')
   if (!digits) return null
   if (digits.length === 11 && !digits.startsWith('55')) {
     digits = `55${digits}`
   }
-  return `https://wa.me/${digits}`
+  const url = new URL(`https://wa.me/${digits}`)
+  if (message?.trim()) url.searchParams.set('text', message)
+  return url.href
 }
 
 function Actions({ lead }: { lead: Lead }) {
   const phoneForUrl = lead.phoneUnformatted ?? lead.phone
   const phoneHref = phoneForUrl ? `tel:${phoneForUrl}` : null
-  const waUrl = phoneForUrl ? getWhatsAppUrl(phoneForUrl) : null
+  const outreach = lead.kanbanState?.firstOutreach
+  const waUrl = getWhatsAppUrl(phoneForUrl, outreach?.channel === 'phone' ? undefined : outreach?.message)
   const hasWebsite = !!lead.website && isValidUrl(lead.website)
 
   return (
