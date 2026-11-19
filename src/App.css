@@ -5250,3 +5250,8 @@ html[data-theme="dark"] .kanban-card--model-two .ds-button.kanban-card__details 
 }
 .drop-before::before { top: -6px; }
 .drop-after::after { bottom: -6px; }
+.kanban-card__drag-hint {
+  color: var(--ds-charcoal);
+  font-size: .75rem;
+  text-align: center;
+}

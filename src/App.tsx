@@ -14,6 +14,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core'
+import { startBoardScroll, columnAutoScroll } from './kanban-edge-scroll'
 import { locateDrop, type DropSlot } from './kanban-drop'
 import { planMove, previewMove, mergeFetchedLeads, type CardMove } from './kanban-move'
 import { logoutSession, type SessionUser as User } from './session'
@@ -1232,7 +1233,13 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
     }),
   )
 
+  const boardRef = useRef<HTMLDivElement>(null)
+  const stopBoardScroll = useRef<(() => void) | null>(null)
+  useEffect(() => () => stopBoardScroll.current?.(), [currentView])
+
   const handleDragStart = (event: DragStartEvent) => {
+    stopBoardScroll.current?.()
+    if (boardRef.current) stopBoardScroll.current = startBoardScroll(boardRef.current, event.activatorEvent)
     didDrag.current = true
     const placeId = event.active.id as string
     const lead = leadsWithMeta.find((l) => l.placeId === placeId)
@@ -1240,6 +1247,8 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
   }
 
   const finishDrag = () => {
+    stopBoardScroll.current?.()
+    stopBoardScroll.current = null
     setActiveDrag(null)
     setTimeout(() => { didDrag.current = false }, 100)
   }
@@ -1626,13 +1635,14 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
                 </div>
               ) : (
                 <DndContext
+                  autoScroll={columnAutoScroll}
                   sensors={sensors}
                   collisionDetection={locateDrop}
                   onDragCancel={finishDrag}
                   onDragStart={handleDragStart}
                   onDragEnd={handleDragEnd}
                 >
-                  <div className={`kanban-board${activeDrag ? ' kanban-board--dragging' : ''}`}>
+                  <div ref={boardRef} className={`kanban-board${activeDrag ? ' kanban-board--dragging' : ''}`}>
                     {COLUMNS.map((column) => (
                       <KanbanColumn
                         readOnly={!canWrite}
@@ -1651,6 +1661,7 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
                   <DragOverlay dropAnimation={null} style={{ pointerEvents: 'none' }}>
                     {activeDrag ? (
                       <div className={`kanban-card kanban-card--dragging${activeDrag.messageSentOn === messageDay ? ' kanban-card--message-sent' : ''}`}>
+                        <small className="kanban-card__drag-hint">Segure perto da borda para rolar o quadro</small>
                         <div className="kanban-card__header">
                           <div className="kanban-card__title-wrap">
                             <h3 className="kanban-card__title">{activeDrag.title}</h3>
