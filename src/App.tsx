@@ -6,19 +6,17 @@ import {
   DragOverlay,
   PointerSensor,
   TouchSensor,
+  useDraggable,
   useDroppable,
+  useDndContext,
   useSensor,
   useSensors,
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core'
-import { CSS } from '@dnd-kit/utilities'
-import {
-  SortableContext,
-  arrayMove,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable'
+import { startBoardScroll, columnAutoScroll } from './kanban-edge-scroll'
+import { locateDrop, type DropSlot } from './kanban-drop'
+import { planMove, previewMove, mergeFetchedLeads, type CardMove } from './kanban-move'
 import { logoutSession, type SessionUser as User } from './session'
 
 import AccessGate from './AccessGate'
@@ -52,6 +50,8 @@ import {
   Tag,
   Textarea,
   Tooltip,
+  ToastProvider,
+  useToast,
 } from 'codexa-ui'
 import type { IconName, TabItem } from 'codexa-ui'
 
@@ -162,7 +162,7 @@ const updateLeadState = async (placeId: string, kanbanState: KanbanState, assign
 const updateLeadsBatch = async (leads: { placeId: string; kanbanState: KanbanState; version?: number }[]): Promise<Lead[]> => {
   const res = await apiFetch('/api/leads/batch', {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'X-CRM-Screen': 'kanban' },
     body: JSON.stringify(leads),
   })
   if (!res.ok) throw new Error((await res.json()).error || 'Erro ao atualizar leads')
@@ -430,6 +430,7 @@ function ReturnDateHighlight({ value, label }: { value: string; label: string })
 }
 
 function LeadCard({
+  marker,
   lead,
   index,
   onClick,
@@ -438,15 +439,15 @@ function LeadCard({
   onToggleMessage,
   readOnly = false,
 }: {
+  marker?: 'drop-before' | 'drop-after'
   readOnly?: boolean
   lead: LeadWithMeta
   index: number
   onClick: (lead: LeadWithMeta) => void
-  onAdvance: (lead: LeadWithMeta) => Promise<void>
+  onAdvance: (lead: LeadWithMeta) => void
   messageDay: string
   onToggleMessage: (lead: LeadWithMeta, sent: boolean) => Promise<void>
 }) {
-  const [isAdvancing, setIsAdvancing] = useState(false)
   const [isMarkingMessage, setIsMarkingMessage] = useState(false)
   const [messageError, setMessageError] = useState<string | null>(null)
   const messageSentToday = lead.messageSentOn === messageDay
@@ -455,23 +456,20 @@ function LeadCard({
     attributes,
     listeners,
     setNodeRef,
-    transform,
-    transition,
     isDragging,
-  } = useSortable({ disabled: readOnly, id: lead.placeId, data: { lead } })
+  } = useDraggable({ disabled: readOnly, id: lead.placeId, data: { lead } })
 
   const style = {
-    transform: CSS.Translate.toString(transform),
-    transition,
     opacity: isDragging ? 0.4 : 1,
   }
 
   return (
     <article
+      data-place-id={lead.placeId}
       ref={setNodeRef}
       {...listeners}
       {...(readOnly ? {} : attributes)}
-      className={`kanban-card kanban-card--model-two kanban-card--${lead.temperature}${messageSentToday ? ' kanban-card--message-sent' : ''}`}
+      className={`kanban-card ${marker ?? ''} kanban-card--model-two kanban-card--${lead.temperature}${messageSentToday ? ' kanban-card--message-sent' : ''}`}
       style={style}
       onClick={() => !isDragging && onClick(lead)}
     >
@@ -629,23 +627,17 @@ function LeadCard({
             fullWidth
             className="kanban-card__advance"
             variant="primary"
-            disabled={readOnly || isAdvancing}
+            disabled={readOnly}
             aria-label={`Mover para ${nextColumn.label}`}
             title={`Mover para ${nextColumn.label}`}
             onPointerDown={(event: React.PointerEvent) => event.stopPropagation()}
             onTouchStart={(event: React.TouchEvent) => event.stopPropagation()}
-            onClick={async (event: React.MouseEvent) => {
+            onClick={(event: React.MouseEvent) => {
               event.stopPropagation()
-              if (isAdvancing) return
-              setIsAdvancing(true)
-              try {
-                await onAdvance(lead)
-              } finally {
-                setIsAdvancing(false)
-              }
+              onAdvance(lead)
             }}
           >
-            {isAdvancing ? 'Movendo…' : 'Próxima coluna →'}
+            Próxima coluna →
           </Button>
         )}
       </div>
@@ -668,13 +660,16 @@ function KanbanColumn({
   column: (typeof COLUMNS)[number]
   leads: LeadWithMeta[]
   onCardClick: (lead: LeadWithMeta) => void
-  onAdvance: (lead: LeadWithMeta) => Promise<void>
+  onAdvance: (lead: LeadWithMeta) => void
   messageDay: string
   onToggleMessage: (lead: LeadWithMeta, sent: boolean) => Promise<void>
   sort: KanbanSort
   onSortChange: (sort: KanbanSort) => void
 }) {
-  const { setNodeRef, isOver } = useDroppable({ id: column.id, data: { column } })
+  const { setNodeRef } = useDroppable({ id: column.id, disabled: readOnly })
+  const { collisions } = useDndContext()
+  const slot = collisions?.[0]?.data?.slot as DropSlot | undefined
+  const isOver = slot?.column === column.id
   const [isSortMenuOpen, setIsSortMenuOpen] = useState(false)
   const sortMenuRef = useRef<HTMLDivElement>(null)
 
@@ -696,7 +691,7 @@ function KanbanColumn({
 
   return (
     <div
-      ref={setNodeRef}
+      data-kanban-column={column.id}
       className={`kanban-column ${isOver ? 'kanban-column--over' : ''}`}
     >
       <header className="kanban-column__header" style={{ borderColor: column.color }}>
@@ -742,16 +737,24 @@ function KanbanColumn({
           )}
         </div>
       </header>
-      <SortableContext
-        items={leads.map((lead) => lead.placeId)}
-        strategy={verticalListSortingStrategy}
-      >
-        <div className="kanban-column__cards">
+      <div className="kanban-column__cards">
+        <div className="kanban-column__list" ref={setNodeRef}>
           {leads.map((lead, index) => (
-            <LeadCard readOnly={readOnly} key={lead.placeId} lead={lead} index={index} onClick={onCardClick} onAdvance={onAdvance} messageDay={messageDay} onToggleMessage={onToggleMessage} />
+            <LeadCard
+              key={lead.placeId}
+              marker={isOver && slot.before === lead.placeId ? 'drop-before' :
+                isOver && !slot.before && index === leads.length - 1 ? 'drop-after' : undefined}
+              readOnly={readOnly}
+              lead={lead}
+              index={index}
+              onClick={onCardClick}
+              onAdvance={onAdvance}
+              messageDay={messageDay}
+              onToggleMessage={onToggleMessage}
+            />
           ))}
         </div>
-      </SortableContext>
+      </div>
     </div>
   )
 }
@@ -1018,7 +1021,53 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('')
   const [kanbanGroupFilter, setKanbanGroupFilter] = useState(() => { try { return localStorage.getItem('leads-last-list-' + access.uid) || '' } catch { return '' } })
-  const [kanbanSorts, setKanbanSorts] = useState<Record<ColumnId, KanbanSort>>(DEFAULT_KANBAN_SORT)
+  const [savedSorts, setKanbanSorts] = useState(() => {
+    const sorts = { ...DEFAULT_KANBAN_SORT }
+    try {
+      const stored = JSON.parse(localStorage.getItem('kanban-sorts-' + access.uid) || '{}')
+      for (const { id } of COLUMNS) {
+        if (KANBAN_SORT_OPTIONS.some(option => option.value === stored?.[id])) sorts[id] = stored[id]
+      }
+    } catch { /* Storage unavailable. */ }
+    return sorts
+  })
+  useEffect(() => {
+    try { localStorage.setItem('kanban-sorts-' + access.uid, JSON.stringify(savedSorts)) } catch { /* Storage unavailable. */ }
+  }, [access.uid, savedSorts])
+  const [moves, setMoves] = useState<CardMove[]>([])
+  const savingMove = useRef<CardMove | null>(null)
+  const toast = useToast()
+  const head = moves[0]
+  useEffect(() => {
+    if (!head || savingMove.current === head) return
+    savingMove.current = head
+    const persist = async () => {
+      try {
+        if (!baseLeads.some(lead => lead.placeId === head.placeId)) throw new Error('Lead indisponível')
+        const changes = planMove(baseLeads, head)
+        if (changes.length) {
+          const saved = await updateLeadsBatch(changes)
+          const changed = new Set(changes.map(item => item.placeId))
+          const byId = new Map(saved.filter(item => changed.has(item.placeId)).map(item => [item.placeId, item]))
+          setBaseLeads(current => current.map(item => {
+            const updated = byId.get(item.placeId)
+            return updated && (updated.version ?? 0) >= (item.version ?? 0) ? updated : item
+          }))
+          if (head.displayedOrder) setKanbanSorts(current => ({ ...current, [head.column]: 'manual' }))
+        }
+      } catch {
+        toast.add('Não foi possível mover o card. Ele voltou à posição anterior.', 'danger', 6000)
+      } finally {
+        setMoves(current => current.filter(move => move !== head))
+      }
+    }
+    void persist()
+  }, [head, baseLeads, toast])
+  const kanbanSorts = useMemo(() => {
+    const sorts = { ...savedSorts }
+    for (const move of moves) if (move.displayedOrder) sorts[move.column] = 'manual'
+    return sorts
+  }, [moves, savedSorts])
   const [selectedLead, setSelectedLead] = useState<LeadWithMeta | null>(null)
   const [activeDrag, setActiveDrag] = useState<LeadWithMeta | null>(null)
   const [requestedView, setView] = useState<AppView>('dashboard')
@@ -1068,7 +1117,7 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
       try {
         const [data, lists] = await Promise.all([fetchLeads(controller.signal), fetchGroups(controller.signal)])
         if (controller.signal.aborted) return
-        setSavedGroups(lists); setBaseLeads(data); setError(null); setLoading(false)
+        setSavedGroups(lists); setBaseLeads(current => mergeFetchedLeads(current, data)); setError(null); setLoading(false)
         setSelectedLead(current => current && data.some(lead => lead.placeId === current.placeId) ? current : null)
         setEditingLead(current => current && data.some(lead => lead.placeId === current.placeId) ? current : null)
         setSelectedGroup(current => current && lists.some(group => group.groupId === current) ? current : null)
@@ -1083,7 +1132,7 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
     return () => { controller.abort(); window.clearInterval(timer) }
   }, [currentView, canRead, permissionsKey])
 
-  const allLeads = baseLeads
+  const allLeads = useMemo(() => moves.reduce(previewMove, baseLeads), [baseLeads, moves])
 
   const categories = useMemo(
     () =>
@@ -1142,12 +1191,12 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
     return filteredLeads.filter((lead) => lead.groupId === activeKanbanGroup)
   }, [filteredLeads, activeKanbanGroup])
 
-  const leadsByColumn = useMemo(() => {
+  const groupColumns = useMemo(() => {
     const map: Record<ColumnId, LeadWithMeta[]> = COLUMNS.reduce(
       (acc, c) => ({ ...acc, [c.id]: [] }),
       {} as Record<ColumnId, LeadWithMeta[]>,
     )
-    kanbanFilteredLeads.forEach((lead) => {
+    leadsWithMeta.filter(lead => lead.groupId === activeKanbanGroup).forEach((lead) => {
       map[lead.kanbanState.column] = map[lead.kanbanState.column] ?? []
       map[lead.kanbanState.column].push(lead)
     })
@@ -1163,7 +1212,9 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
       })
     })
     return map
-  }, [kanbanFilteredLeads, kanbanSorts])
+  }, [leadsWithMeta, activeKanbanGroup, kanbanSorts])
+
+  const visibleIds = useMemo(() => new Set(kanbanFilteredLeads.map(lead => lead.placeId)), [kanbanFilteredLeads])
 
   const selectedGroupLeads = useMemo(() => {
     if (!selectedGroup) return []
@@ -1182,127 +1233,45 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
     }),
   )
 
+  const boardRef = useRef<HTMLDivElement>(null)
+  const stopBoardScroll = useRef<(() => void) | null>(null)
+  useEffect(() => () => stopBoardScroll.current?.(), [currentView])
+
   const handleDragStart = (event: DragStartEvent) => {
+    stopBoardScroll.current?.()
+    if (boardRef.current) stopBoardScroll.current = startBoardScroll(boardRef.current, event.activatorEvent)
     didDrag.current = true
     const placeId = event.active.id as string
     const lead = leadsWithMeta.find((l) => l.placeId === placeId)
     if (lead) setActiveDrag(lead)
   }
 
-  const handleDragEnd = async (event: DragEndEvent) => {
+  const finishDrag = () => {
+    stopBoardScroll.current?.()
+    stopBoardScroll.current = null
     setActiveDrag(null)
-    setTimeout(() => {
-      didDrag.current = false
-    }, 100)
-
-    const { active, over } = event
-    if (!over) return
-
-    const activeId = active.id as string
-    const overId = over.id as string
-    const activeIndex = baseLeads.findIndex((l) => l.placeId === activeId)
-    if (activeIndex === -1) return
-
-    const activeLead = baseLeads[activeIndex]
-    const activeColumn = activeLead.kanbanState?.column ?? 'open'
-
-    // Build current column map respecting the same ordering used in leadsByColumn
-    const byColumn = COLUMNS.reduce(
-      (acc, c) => ({ ...acc, [c.id]: [] as Lead[] }),
-      {} as Record<ColumnId, Lead[]>,
-    )
-    baseLeads.forEach((lead) => {
-      if (lead.groupId !== activeLead.groupId) return
-      byColumn[lead.kanbanState?.column ?? 'open'].push(lead)
-    })
-    COLUMNS.forEach((c) => {
-      if (c.id === 'open') {
-        byColumn[c.id].sort((a, b) => scoreLead(b) - scoreLead(a))
-      } else {
-        byColumn[c.id].sort(
-          (a, b) => (a.kanbanState?.order ?? Infinity) - (b.kanbanState?.order ?? Infinity),
-        )
-      }
-    })
-
-    const overIsColumn = COLUMNS.some((c) => c.id === overId)
-    let targetColumn: ColumnId
-    let targetIndex: number
-
-    if (overIsColumn) {
-      targetColumn = overId as ColumnId
-      targetIndex = byColumn[targetColumn].length
-    } else {
-      const overLead = baseLeads.find((l) => l.placeId === overId)
-      if (!overLead || overLead.groupId !== activeLead.groupId) return
-      targetColumn = overLead.kanbanState?.column ?? 'open'
-      targetIndex = byColumn[targetColumn].findIndex((l) => l.placeId === overId)
-      if (targetIndex === -1) return
-    }
-
-    const activeInColumnIndex = byColumn[activeColumn].findIndex((l) => l.placeId === activeId)
-    if (activeInColumnIndex === -1) return
-
-    if (activeColumn === targetColumn) {
-      byColumn[targetColumn] = arrayMove(
-        byColumn[targetColumn],
-        activeInColumnIndex,
-        targetIndex,
-      )
-    } else {
-      const [moved] = byColumn[activeColumn].splice(activeInColumnIndex, 1)
-      byColumn[targetColumn].splice(targetIndex, 0, moved)
-    }
-
-    // Rebuild leads with updated column and order, persisting order only for non-open columns
-    const leadsToUpdate: { placeId: string; kanbanState: KanbanState; version?: number }[] = []
-
-    COLUMNS.forEach((c) => {
-      byColumn[c.id].forEach((lead, index) => {
-        const nextKanbanState: KanbanState = {
-          ...(lead.kanbanState ?? {}),
-          column: c.id,
-          order: c.id === 'open' ? undefined : index,
-        }
-        if (
-          lead.kanbanState?.column !== c.id ||
-          lead.kanbanState?.order !== nextKanbanState.order
-        ) {
-          leadsToUpdate.push({ placeId: lead.placeId, kanbanState: nextKanbanState, version: lead.version ?? 0 })
-        }
-      })
-    })
-
-    if (leadsToUpdate.length) {
-      try {
-        setBaseLeads(await updateLeadsBatch(leadsToUpdate))
-        setError(null)
-      } catch (err) {
-        console.error(err)
-        setError('Erro ao salvar ordem dos leads')
-      }
-    }
+    setTimeout(() => { didDrag.current = false }, 100)
   }
 
-  const handleAdvanceLead = async (lead: LeadWithMeta) => {
-    const currentLead = baseLeads.find((item) => item.placeId === lead.placeId)
-    if (!currentLead) return
-    const columnIndex = COLUMNS.findIndex((column) => column.id === (currentLead.kanbanState?.column ?? 'open'))
-    const nextColumn = COLUMNS[columnIndex + 1]
-    if (columnIndex < 0 || !nextColumn) return
-    const state: KanbanState = {
-      ...currentLead.kanbanState,
-      column: nextColumn.id,
-      order: getNextColumnOrder(baseLeads, currentLead.groupId, nextColumn.id),
-    }
-    try {
-      const savedLead = await updateLeadState(lead.placeId, state, undefined, currentLead.version ?? 0)
-      setBaseLeads((current) => current.map((item) => item.placeId === savedLead.placeId ? savedLead : item))
-      setError(null)
-    } catch (err) {
-      console.error(err)
-      setError('Erro ao mover lead para a próxima coluna. Tente novamente.')
-    }
+  const handleDragEnd = (event: DragEndEvent) => {
+    finishDrag()
+    const slot = event.collisions?.[0]?.data?.slot as DropSlot | undefined
+    if (!slot || !canWrite) return
+    const placeId = String(event.active.id)
+    const ordered = groupColumns[slot.column]
+    const visible = ordered.filter(lead => visibleIds.has(lead.placeId))
+    const oldIndex = visible.findIndex(lead => lead.placeId === placeId)
+    const nextVisible = visible[oldIndex + 1]?.placeId ?? null
+    if (oldIndex >= 0 && (slot.before === placeId || slot.before === nextVisible)) return
+    const move: CardMove = { placeId, ...slot }
+    if (kanbanSorts[slot.column] !== 'manual') move.displayedOrder = ordered.map(lead => lead.placeId)
+    setMoves(current => [...current, move])
+  }
+
+  const handleAdvanceLead = (lead: LeadWithMeta) => {
+    const index = COLUMNS.findIndex(column => column.id === lead.kanbanState.column)
+    const next = COLUMNS[index + 1]
+    if (canWrite && next) setMoves(current => [...current, { placeId: lead.placeId, column: next.id, before: null }])
   }
 
   const handleSaveLead = async (placeId: string, state: KanbanState, assigneeUid?: string | null, version = 0) => {
@@ -1339,7 +1308,7 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
       setLoading(true)
       setError(null)
       const [fresh, lists] = await Promise.all([fetchLeads(), fetchGroups()])
-      setBaseLeads(fresh)
+      setBaseLeads(current => mergeFetchedLeads(current, fresh))
       setSavedGroups(lists)
     } catch (err) {
       console.error(err)
@@ -1358,7 +1327,7 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
       })
       if (!res.ok) throw new Error((await res.json()).error || 'Erro ao importar leads')
       const [fresh, lists] = await Promise.all([fetchLeads(), fetchGroups()])
-      setBaseLeads(fresh)
+      setBaseLeads(current => mergeFetchedLeads(current, fresh))
       setSavedGroups(lists)
     } catch (err) {
       console.error(err)
@@ -1666,17 +1635,20 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
                 </div>
               ) : (
                 <DndContext
+                  autoScroll={columnAutoScroll}
                   sensors={sensors}
+                  collisionDetection={locateDrop}
+                  onDragCancel={finishDrag}
                   onDragStart={handleDragStart}
                   onDragEnd={handleDragEnd}
                 >
-                  <div className="kanban-board">
+                  <div ref={boardRef} className={`kanban-board${activeDrag ? ' kanban-board--dragging' : ''}`}>
                     {COLUMNS.map((column) => (
                       <KanbanColumn
                         readOnly={!canWrite}
                         key={column.id}
                         column={column}
-                        leads={leadsByColumn[column.id]}
+                        leads={groupColumns[column.id].filter(lead => visibleIds.has(lead.placeId))}
                         onCardClick={handleCardClick}
                         onAdvance={handleAdvanceLead}
                         messageDay={messageDay}
@@ -1686,9 +1658,10 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
                       />
                     ))}
                   </div>
-                  <DragOverlay dropAnimation={null}>
+                  <DragOverlay dropAnimation={null} style={{ pointerEvents: 'none' }}>
                     {activeDrag ? (
                       <div className={`kanban-card kanban-card--dragging${activeDrag.messageSentOn === messageDay ? ' kanban-card--message-sent' : ''}`}>
+                        <small className="kanban-card__drag-hint">Segure perto da borda para rolar o quadro</small>
                         <div className="kanban-card__header">
                           <div className="kanban-card__title-wrap">
                             <h3 className="kanban-card__title">{activeDrag.title}</h3>
@@ -1821,5 +1794,5 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
 
 export default function ProtectedApp() {
   const [theme, selectTheme] = useTheme()
-  return <AccessGate>{(user, access) => <App key={user.uid + JSON.stringify(access.screenPermissions)} user={user} access={access} theme={theme} onThemeChange={selectTheme} />}</AccessGate>
+  return <ToastProvider><AccessGate>{(user, access) => <App key={user.uid + JSON.stringify(access.screenPermissions)} user={user} access={access} theme={theme} onThemeChange={selectTheme} />}</AccessGate></ToastProvider>
 }
