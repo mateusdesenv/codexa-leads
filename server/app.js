@@ -732,6 +732,9 @@ app.put(
       for (const item of req.body) {
         await editableLead(req, item.placeId, session, item.version)
         cleanState(item.kanbanState)
+        if (item.markMessageSent !== undefined &&
+            (item.markMessageSent !== true || item.kanbanState.column !== 'mensagem_enviada'))
+          fail(400, 'Marcação de mensagem inválida.')
       }
       for (const item of req.body)
         await Lead.updateOne(
@@ -740,7 +743,13 @@ app.put(
             placeId: item.placeId,
             ...versionFilter(item.version),
           },
-          { $set: cleanState(item.kanbanState), $inc: { version: 1 } },
+          {
+            $set: {
+              ...cleanState(item.kanbanState),
+              ...(item.markMessageSent && { messageSentOn: getMessageDay() }),
+            },
+            $inc: { version: 1 },
+          },
           { session, runValidators: true },
         )
     })

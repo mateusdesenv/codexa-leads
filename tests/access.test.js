@@ -696,10 +696,12 @@ test(
         const result = await json('/api/leads/batch', 'operator', 'PUT', [{
           placeId: triaged.placeId,
           version: triaged.version,
+          markMessageSent: true,
           kanbanState: { column: 'mensagem_enviada', order: 0 },
         }])
         const moved = result.leads.find((lead) => lead.placeId === triaged.placeId)
         assert.equal(moved.kanbanState.column, 'mensagem_enviada')
+        assert.ok(moved.messageSentOn)
         assert.deepEqual(moved.kanbanState.firstOutreach, firstOutreach)
       })
       await t.test(
