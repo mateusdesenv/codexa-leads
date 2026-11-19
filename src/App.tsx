@@ -16,7 +16,7 @@ import {
 } from '@dnd-kit/core'
 import { startBoardScroll, columnAutoScroll } from './kanban-edge-scroll'
 import { locateDrop, type DropSlot } from './kanban-drop'
-import { planMove, previewMove, mergeFetchedLeads, type CardMove } from './kanban-move'
+import { getNextColumnOrder, planMove, previewMove, mergeFetchedLeads, type CardMove, type ContactOutcome, type KanbanChange } from './kanban-move'
 import { logoutSession, type SessionUser as User } from './session'
 
 import AccessGate from './AccessGate'
@@ -159,7 +159,7 @@ const updateLeadState = async (placeId: string, kanbanState: KanbanState, assign
   return res.json()
 }
 
-const updateLeadsBatch = async (leads: { placeId: string; kanbanState: KanbanState; version?: number }[]): Promise<Lead[]> => {
+const updateLeadsBatch = async (leads: KanbanChange[]): Promise<Lead[]> => {
   const res = await apiFetch('/api/leads/batch', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', 'X-CRM-Screen': 'kanban' },
@@ -168,15 +168,6 @@ const updateLeadsBatch = async (leads: { placeId: string; kanbanState: KanbanSta
   if (!res.ok) throw new Error((await res.json()).error || 'Erro ao atualizar leads')
   const payload = await res.json()
   return payload.leads
-}
-
-function getNextColumnOrder(leads: Lead[], groupId: Lead['groupId'], column: ColumnId): number {
-  const lastOrder = leads.reduce((max, lead) => (
-    lead.groupId === groupId && lead.kanbanState?.column === column
-      ? Math.max(max, lead.kanbanState.order ?? -1)
-      : max
-  ), -1)
-  return lastOrder + 1
 }
 
 function getHost(website: string): string | null {
@@ -311,7 +302,9 @@ function getWhatsAppUrl(phone: string | null | undefined, message?: string): str
   return url.href
 }
 
-function Actions({ lead }: { lead: Lead }) {
+type WhatsAppClick = (placeId: string) => void
+
+function Actions({ lead, onWhatsApp }: { lead: Lead; onWhatsApp?: WhatsAppClick }) {
   const phoneForUrl = lead.phoneUnformatted ?? lead.phone
   const phoneHref = phoneForUrl ? `tel:${phoneForUrl}` : null
   const outreach = lead.kanbanState?.firstOutreach
@@ -319,7 +312,8 @@ function Actions({ lead }: { lead: Lead }) {
   const hasWebsite = !!lead.website && isValidUrl(lead.website)
 
   return (
-    <div className="lead-actions" onClick={(e) => e.stopPropagation()}>
+    <div className="lead-actions" onClick={(e) => e.stopPropagation()}
+      onPointerDown={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()}>
       <Tooltip label="Ligar">
         {phoneHref ? (
           <AnchorButton
@@ -354,6 +348,7 @@ function Actions({ lead }: { lead: Lead }) {
             variant="primary"
             size="small"
             iconOnly
+            onClick={() => onWhatsApp?.(lead.placeId)}
             aria-label="WhatsApp"
             leadingIcon={<LeadActionIcon action="whatsapp" />}
           />
@@ -362,8 +357,9 @@ function Actions({ lead }: { lead: Lead }) {
             type="button"
             variant="primary"
             size="small"
-            disabled
+            disabled={!onWhatsApp}
             iconOnly
+            onClick={() => onWhatsApp?.(lead.placeId)}
             aria-label="WhatsApp"
             leadingIcon={<LeadActionIcon action="whatsapp" />}
           />
@@ -438,6 +434,7 @@ function LeadCard({
   index,
   onClick,
   onAdvance,
+  onWhatsApp,
   messageDay,
   onToggleMessage,
   readOnly = false,
@@ -448,6 +445,7 @@ function LeadCard({
   index: number
   onClick: (lead: LeadWithMeta) => void
   onAdvance: (lead: LeadWithMeta) => void
+  onWhatsApp?: WhatsAppClick
   messageDay: string
   onToggleMessage: (lead: LeadWithMeta, sent: boolean) => Promise<void>
 }) {
@@ -591,7 +589,7 @@ function LeadCard({
           Ver detalhes <span aria-hidden="true">→</span>
         </Button>
         </div>
-        <Actions lead={lead} />
+        <Actions lead={lead} onWhatsApp={onWhatsApp} />
         <Button
           type="button"
           variant="secondary"
@@ -653,6 +651,7 @@ function KanbanColumn({
   leads,
   onCardClick,
   onAdvance,
+  onWhatsApp,
   messageDay,
   onToggleMessage,
   sort,
@@ -664,6 +663,7 @@ function KanbanColumn({
   leads: LeadWithMeta[]
   onCardClick: (lead: LeadWithMeta) => void
   onAdvance: (lead: LeadWithMeta) => void
+  onWhatsApp?: WhatsAppClick
   messageDay: string
   onToggleMessage: (lead: LeadWithMeta, sent: boolean) => Promise<void>
   sort: KanbanSort
@@ -752,6 +752,7 @@ function KanbanColumn({
               index={index}
               onClick={onCardClick}
               onAdvance={onAdvance}
+              onWhatsApp={onWhatsApp}
               messageDay={messageDay}
               onToggleMessage={onToggleMessage}
             />
@@ -1037,8 +1038,8 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
   useEffect(() => {
     try { localStorage.setItem('kanban-sorts-' + access.uid, JSON.stringify(savedSorts)) } catch { /* Storage unavailable. */ }
   }, [access.uid, savedSorts])
-  const [moves, setMoves] = useState<CardMove[]>([])
-  const savingMove = useRef<CardMove | null>(null)
+  const [moves, setMoves] = useState<(CardMove | ContactOutcome)[]>([])
+  const savingMove = useRef<CardMove | ContactOutcome | null>(null)
   const toast = useToast()
   const head = moves[0]
   useEffect(() => {
@@ -1056,10 +1057,10 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
             const updated = byId.get(item.placeId)
             return updated && (updated.version ?? 0) >= (item.version ?? 0) ? updated : item
           }))
-          if (head.displayedOrder) setKanbanSorts(current => ({ ...current, [head.column]: 'manual' }))
+          if ('displayedOrder' in head && head.displayedOrder) setKanbanSorts(current => ({ ...current, [head.column]: 'manual' }))
         }
       } catch {
-        toast.add('Não foi possível mover o card. Ele voltou à posição anterior.', 'danger', 6000)
+        toast.add('contactDay' in head ? 'Não foi possível registrar o resultado do contato.' : 'Não foi possível mover o card. Ele voltou à posição anterior.', 'danger', 6000)
       } finally {
         setMoves(current => current.filter(move => move !== head))
       }
@@ -1068,9 +1069,10 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
   }, [head, baseLeads, toast])
   const kanbanSorts = useMemo(() => {
     const sorts = { ...savedSorts }
-    for (const move of moves) if (move.displayedOrder) sorts[move.column] = 'manual'
+    for (const move of moves) if ('displayedOrder' in move && move.displayedOrder) sorts[move.column] = 'manual'
     return sorts
   }, [moves, savedSorts])
+  const [contactId, setContactId] = useState<string | null>(null)
   const [selectedLead, setSelectedLead] = useState<LeadWithMeta | null>(null)
   const [activeDrag, setActiveDrag] = useState<LeadWithMeta | null>(null)
   const [requestedView, setView] = useState<AppView>('dashboard')
@@ -1107,6 +1109,7 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
     setLoading(true)
     setError(null)
     setSelectedLead(null); setEditingLead(null); setAddLeadOpen(false); setImportOpen(false)
+    setContactId(null)
     setBaseLeads([]); setSavedGroups([])
     setView(view)
   }
@@ -1269,6 +1272,14 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
     const move: CardMove = { placeId, ...slot }
     if (kanbanSorts[slot.column] !== 'manual') move.displayedOrder = ordered.map(lead => lead.placeId)
     setMoves(current => [...current, move])
+  }
+
+  const contactLead = contactId ? leadsWithMeta.find(lead => lead.placeId === contactId) : undefined
+  const confirmContact = (column: ContactOutcome['column']) => {
+    if (!contactLead || !canWrite) return
+    const outcome = { placeId: contactLead.placeId, column, contactDay: getMessageDay() }
+    setContactId(null)
+    setMoves(current => [...current, outcome])
   }
 
   const handleAdvanceLead = (lead: LeadWithMeta) => {
@@ -1654,6 +1665,7 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
                         leads={groupColumns[column.id].filter(lead => visibleIds.has(lead.placeId))}
                         onCardClick={handleCardClick}
                         onAdvance={handleAdvanceLead}
+                        onWhatsApp={canWrite ? setContactId : undefined}
                         messageDay={messageDay}
                         onToggleMessage={handleToggleMessage}
                         sort={kanbanSorts[column.id]}
@@ -1690,6 +1702,19 @@ function App({ user, access, theme, onThemeChange }: { user: User; access: Acces
                     ) : null}
                   </DragOverlay>
                 </DndContext>
+              )}
+
+              {contactLead && canWrite && (
+                <Dialog open title="Conseguiu enviar a mensagem?" onClose={() => setContactId(null)}>
+                  <p>{getWhatsAppUrl(contactLead.phoneUnformatted ?? contactLead.phone)
+                    ? <>Se o número de <strong>{contactLead.title}</strong> estiver sem WhatsApp, tu pode mover o lead para Perdido.</>
+                    : <><strong>{contactLead.title}</strong> está sem número para abrir no WhatsApp.</>}</p>
+                  <div className="modal__actions whatsapp-outcome__actions">
+                    <Button variant="ghost" onClick={() => setContactId(null)}>Cancelar</Button>
+                    <Button variant="secondary" onClick={() => confirmContact('perdido')}>Mover para Perdido</Button>
+                    <Button variant="primary" onClick={() => confirmContact('mensagem_enviada')}>Mensagem enviada</Button>
+                  </div>
+                </Dialog>
               )}
 
               {selectedLead && (

@@ -1,4 +1,4 @@
-import type { ColumnId, Lead } from './types'
+import type { ColumnId, KanbanState, Lead } from './types'
 
 export interface CardMove {
   placeId: string
@@ -8,9 +8,41 @@ export interface CardMove {
   displayedOrder?: string[]
 }
 
-export function planMove(leads: Lead[], move: CardMove) {
+export interface ContactOutcome {
+  placeId: string
+  column: 'mensagem_enviada' | 'perdido'
+  contactDay: string
+}
+
+export interface KanbanChange {
+  placeId: string
+  version: number
+  kanbanState: KanbanState
+  markMessageSent?: true
+}
+
+export function getNextColumnOrder(leads: Lead[], groupId: Lead['groupId'], column: ColumnId): number {
+  const lastOrder = leads.reduce((max, lead) => (
+    lead.groupId === groupId && lead.kanbanState?.column === column
+      ? Math.max(max, lead.kanbanState.order ?? -1)
+      : max
+  ), -1)
+  return lastOrder + 1
+}
+
+export function planMove(leads: Lead[], move: CardMove | ContactOutcome): KanbanChange[] {
   const moving = leads.find(lead => lead.placeId === move.placeId)
-  if (!moving || move.before === move.placeId) return []
+  if (!moving) return []
+  if ('contactDay' in move) {
+    const sameColumn = moving.kanbanState?.column === move.column
+    const markSent = move.column === 'mensagem_enviada' && moving.messageSentOn !== move.contactDay
+    if (sameColumn && !markSent) return []
+    const kanbanState: KanbanState = { column: move.column }
+    if (!sameColumn) kanbanState.order = getNextColumnOrder(leads, moving.groupId, move.column)
+    return [{ placeId: moving.placeId, version: moving.version ?? 0, kanbanState,
+      ...(markSent && { markMessageSent: true }) }]
+  }
+  if (move.before === move.placeId) return []
   const rank = new Map(move.displayedOrder?.map((id, i) => [id, i]))
   const ordered = leads.filter(lead =>
     lead.groupId === moving.groupId && (lead.kanbanState?.column ?? 'open') === move.column,
@@ -29,11 +61,17 @@ export function planMove(leads: Lead[], move: CardMove) {
       [{ placeId: lead.placeId, version: lead.version ?? 0, kanbanState: { column: move.column, order } }])
 }
 
-export function previewMove(leads: Lead[], move: CardMove): Lead[] {
-  const changes = new Map(planMove(leads, move).map(change => [change.placeId, change.kanbanState]))
-  return leads.map(lead => changes.has(lead.placeId)
-    ? { ...lead, kanbanState: { ...lead.kanbanState, ...changes.get(lead.placeId)! } }
-    : lead)
+export function previewMove(leads: Lead[], move: CardMove | ContactOutcome): Lead[] {
+  const changes = new Map(planMove(leads, move).map(change => [change.placeId, change]))
+  return leads.map(lead => {
+    const change = changes.get(lead.placeId)
+    if (!change) return lead
+    return {
+      ...lead,
+      kanbanState: { ...lead.kanbanState, ...change.kanbanState },
+      ...(change.markMessageSent && 'contactDay' in move && { messageSentOn: move.contactDay }),
+    }
+  })
 }
 
 // A poll started before a move can arrive after its acknowledgement.

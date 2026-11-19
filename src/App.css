@@ -5255,3 +5255,4 @@ html[data-theme="dark"] .kanban-card--model-two .ds-button.kanban-card__details 
   font-size: .75rem;
   text-align: center;
 }
+.whatsapp-outcome__actions { flex-wrap: wrap; }

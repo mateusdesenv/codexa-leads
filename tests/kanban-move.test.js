@@ -43,3 +43,26 @@ test('a stale refresh cannot undo an acknowledged move or reintroduce inaccessib
   assert.deepEqual(result, [saved])
   assert.equal(planMove(result, { placeId: 'a', column: 'contato', before: null })[0].version, 3)
 })
+
+test('confirming WhatsApp contact moves only the selected lead and marks its message today', () => {
+  const outcome = { placeId: 'a', column: 'mensagem_enviada', contactDay: '2026-11-19' }
+  const board = [...base, lead('previous', outcome.column, 4)]
+  const changes = planMove(board, outcome)
+  assert.deepEqual(changes, [{ placeId: 'a', version: 2, kanbanState: { column: outcome.column, order: 5 }, markMessageSent: true }])
+  const preview = previewMove(board, outcome)
+  assert.equal(preview[0].messageSentOn, outcome.contactDay)
+  assert.deepEqual(planMove(preview, outcome), [])
+  assert.equal(preview[0].kanbanState.nextAction, 'Ligar')
+  const earlier = { ...preview[0], messageSentOn: '2026-11-18' }
+  assert.equal(previewMove([earlier], outcome)[0].kanbanState.order, 5)
+  assert.equal(board[0].messageSentOn, undefined)
+})
+
+test('marking a lead lost preserves its message history and its rank if already lost', () => {
+  const item = { ...base[0], messageSentOn: '2026-11-18' }
+  const outcome = { placeId: item.placeId, column: 'perdido', contactDay: '2026-11-19' }
+  const [lost] = previewMove([item], outcome)
+  assert.equal(lost.kanbanState.column, 'perdido')
+  assert.equal(lost.messageSentOn, item.messageSentOn)
+  assert.deepEqual(planMove([lost], outcome), [])
+})
